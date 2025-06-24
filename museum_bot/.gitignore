@@ -75,10 +75,6 @@ coverage.xml
 .pytest_cache/
 cover/
 
-# Docker
-Dockerfile
-.dockerignore
-
 # Local configuration
 config.local.py
 settings.local.py

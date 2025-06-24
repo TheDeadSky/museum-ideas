@@ -61,9 +61,6 @@ desktop.ini
 logs/
 log/
 
-# Docker
-.dockerignore
-
 # Database
 *.db
 *.sqlite
