@@ -1,0 +1,14 @@
+[
+    {
+        "content": "Текст истории 1\\.",
+        "type": "text"
+    },
+    {
+        "content": "https://www\\.youtube\\.com/watch?v\\=2PYv0ugIrbY",
+        "type": "video"
+    },
+    {
+        "content": "Текст истории 3\\.",
+        "type": "text"
+    }
+]
