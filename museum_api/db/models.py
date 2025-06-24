@@ -25,14 +25,14 @@ class User(Base):
     __tablename__ = "user"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    telegram_id: Mapped[Optional[str]]
-    vk_id: Mapped[Optional[str]]
-    tg_username: Mapped[Optional[str]]
-    firstname: Mapped[Optional[str]]
-    lastname: Mapped[Optional[str]]
+    telegram_id: Mapped[Optional[str]] = mapped_column(String(255))
+    vk_id: Mapped[Optional[str]] = mapped_column(String(255))
+    tg_username: Mapped[Optional[str]] = mapped_column(String(255))
+    firstname: Mapped[Optional[str]] = mapped_column(String(255))
+    lastname: Mapped[Optional[str]] = mapped_column(String(255))
     is_museum_worker: Mapped[Optional[bool]] = mapped_column(Boolean, default=False)
-    museum: Mapped[Optional[str]]
-    occupation: Mapped[Optional[str]]
+    museum: Mapped[Optional[str]] = mapped_column(String(255))
+    occupation: Mapped[Optional[str]] = mapped_column(String(255))
     registration_date: Mapped[Optional[DateTime]] = mapped_column(
         DateTime,
         default=datetime.now()
@@ -67,7 +67,7 @@ class Story(Base):
         ForeignKey("user.id"),
         nullable=True
     )
-    user_name: Mapped[Optional[str]]
+    user_name: Mapped[Optional[str]] = mapped_column(String(255))
     updated: Mapped[Optional[DateTime]] = mapped_column(
         DateTime,
         default=datetime.now(),
@@ -78,13 +78,13 @@ class Story(Base):
         default=datetime.now(),
         onupdate=datetime.now()
     )
-    status: Mapped[Optional[str]]
-    content_type: Mapped[Optional[str]]
-    title: Mapped[Optional[str]]
-    text: Mapped[Optional[str]]
+    status: Mapped[Optional[str]] = mapped_column(String(50))
+    content_type: Mapped[Optional[str]] = mapped_column(String(50))
+    title: Mapped[Optional[str]] = mapped_column(String(255))
+    text: Mapped[Optional[str]] = mapped_column(Text)
     tag: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
-    media_url: Mapped[Optional[str]]
-    link: Mapped[Optional[str]]
+    media_url: Mapped[Optional[str]] = mapped_column(String(500))
+    link: Mapped[Optional[str]] = mapped_column(String(500))
     is_anonymous: Mapped[Optional[bool]] = mapped_column(Boolean, default=False)
     is_agreed_to_publication: Mapped[Optional[bool]] = mapped_column(Boolean, default=False)
 
@@ -131,7 +131,7 @@ class Course(Base):
     __tablename__ = "courses"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    course_name: Mapped[Optional[str]] = mapped_column(String)
+    course_name: Mapped[Optional[str]] = mapped_column(String(255))
     description: Mapped[Optional[str]] = mapped_column(Text)
 
     parts: Mapped[List["CoursePart"]] = relationship(
@@ -145,9 +145,9 @@ class CoursePart(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     course_id: Mapped[Optional[int]] = mapped_column(ForeignKey("courses.id"))
     order_number: Mapped[Optional[int]] = mapped_column(Integer)
-    title: Mapped[Optional[str]] = mapped_column(String)
+    title: Mapped[Optional[str]] = mapped_column(String(255))
     description: Mapped[Optional[str]] = mapped_column(Text)
-    video_url: Mapped[Optional[str]] = mapped_column(String)
+    video_url: Mapped[Optional[str]] = mapped_column(String(500))
     question: Mapped[Optional[str]] = mapped_column(Text)
 
     course: Mapped[Optional["Course"]] = relationship(
