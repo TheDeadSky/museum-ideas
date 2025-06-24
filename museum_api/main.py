@@ -69,8 +69,3 @@ async def begin_self_support_course(beginner_data: SelfSupportCourseBeginnerData
 async def send_feedback(feedback: Feedback, db: Session = Depends(get_db)) -> Feedback:
     # TODO: Save feedback to database
     return feedback
-
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host=settings.HOST, port=settings.PORT)
