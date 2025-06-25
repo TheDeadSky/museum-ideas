@@ -15,7 +15,7 @@ class ShowColleaguesStoriesScene(Scene, state="colleagues-stories"):
 
         if not history_response.success:
             await message.edit_text(
-                text=history_response.message,
+                text=escape_tg_reserved_characters(history_response.message),
                 reply_markup=merge_inline_menus(
                     GET_SUPPORT_MENU,
                     TO_MAIN_MENU_BUTTON

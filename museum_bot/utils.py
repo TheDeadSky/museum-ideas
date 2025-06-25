@@ -21,6 +21,6 @@ def escape_tg_reserved_characters(text: str) -> str:
     characters_to_escape = ['.', '!', '?', '=', '/', '-']
 
     for char in characters_to_escape:
-        text = text.replace(char, f'\\\\{char}')
+        text = text.replace(char, f'\\{char}')
 
     return text
