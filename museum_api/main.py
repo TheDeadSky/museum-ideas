@@ -140,16 +140,24 @@ async def get_random_history(sm_id: str, db: Session = Depends(get_db)):
     viewed_story_ids = [story_id[0] for story_id in viewed_story_ids]
 
     unseen_stories = db.query(Story).filter(
-        ~Story.id.in_(viewed_story_ids)
+        ~Story.id.in_(viewed_story_ids) & (Story.is_agreed_to_publication)
     ).all()
 
     if not unseen_stories:
         return {"success": False, "message": "К сожалению, нет новых историй"}
 
-    random_story = random.choice(unseen_stories)
+    random_story: Story = random.choice(unseen_stories)
+
+    if random_story.is_anonymous:
+        history_author = "Анонимный автор"
+    else:
+        if random_story.user_id:
+            history_author = f"{random_story.user.first_name} {random_story.user.last_name}"
+        else:
+            history_author = random_story.user_name
 
     history_data = {
-        "author": escape_tg_reserved_characters(random_story.author),
+        "author": escape_tg_reserved_characters(history_author),
         "title": escape_tg_reserved_characters(random_story.title),
         "text": escape_tg_reserved_characters(random_story.text) or None,
         "media_url": random_story.media_url or None,

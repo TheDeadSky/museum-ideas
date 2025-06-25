@@ -30,7 +30,7 @@ class ShowColleaguesStoriesScene(Scene, state="colleagues-stories"):
         if story.title:
             display_text += f"{story.title}\n"
 
-        if story.author:
+        if story.author and not story.is_anonymous:
             display_text += f"{story.author}\n"
 
         if story.text:
