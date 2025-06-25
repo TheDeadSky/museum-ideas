@@ -68,16 +68,17 @@ def show_table_structure():
     """Show the current structure of all tables"""
     try:
         with engine.connect() as connection:
-            # Get all table names
-            result = connection.execute("SHOW TABLES")
+            # Get all table names using SQLAlchemy text()
+            from sqlalchemy import text
+            result = connection.execute(text("SHOW TABLES"))
             tables = [row[0] for row in result]
 
             for table in tables:
                 print(f"\n📋 Table: {table}")
                 print("-" * 50)
 
-                # Get table structure
-                result = connection.execute(f"DESCRIBE {table}")
+                # Get table structure using SQLAlchemy text()
+                result = connection.execute(text(f"DESCRIBE {table}"))
                 columns = result.fetchall()
 
                 for column in columns:
