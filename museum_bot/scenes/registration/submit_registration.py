@@ -1,4 +1,3 @@
-from aiogram import F
 from aiogram.fsm.scene import Scene, on
 from aiogram.types import (
     Message,
