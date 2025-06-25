@@ -8,8 +8,10 @@ from services.api_service import get_random_history
 
 class ShowColleaguesStoriesScene(Scene, state="colleagues-stories"):
     @on.message.enter()
-    async def on_enter(self, message: Message):
-        history_response = await get_random_history(str(message.from_user.id))
+    async def on_enter(self, message: Message, tg_user_id: int):
+        history_response = await get_random_history(
+            str(tg_user_id)
+        )
 
         if not history_response.success:
             await message.edit_text(
@@ -63,4 +65,4 @@ class ShowColleaguesStoriesScene(Scene, state="colleagues-stories"):
     @on.callback_query.enter()
     async def on_enter_callback(self, callback_query: CallbackQuery):
         await callback_query.answer()
-        await self.on_enter(callback_query.message)
+        await self.on_enter(callback_query.message, callback_query.from_user.id)
