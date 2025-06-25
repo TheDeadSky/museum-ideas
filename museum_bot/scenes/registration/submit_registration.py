@@ -1,6 +1,9 @@
+from aiogram import F
 from aiogram.fsm.scene import Scene, on
 from aiogram.types import (
-    Message
+    Message,
+    CallbackQuery,
+    User
 )
 
 from actions.registration import make_registration_button
@@ -11,13 +14,13 @@ from services.api_service import register
 
 class SubmitRegistrationScene(Scene, state="submit-registration"):
     @on.message.enter()
-    async def on_enter(self, message: Message):
+    async def on_enter(self, message: Message, from_user: User):
         raw_data = {
             **await self.wizard.get_data(),
-            "telegram_id": str(message.from_user.id),
-            "tg_username": str(message.from_user.username),
-            "first_name": str(message.from_user.first_name),
-            "last_name": str(message.from_user.last_name)
+            "telegram_id": str(from_user.id),
+            "tg_username": str(from_user.username),
+            "first_name": str(from_user.first_name),
+            "last_name": str(from_user.last_name)
         }
 
         registration_data = RegistrationData(**raw_data)
@@ -32,3 +35,8 @@ class SubmitRegistrationScene(Scene, state="submit-registration"):
                 "Не удалось зарегистрироваться.",
                 reply_markup=registration_button
             )
+
+    @on.callback_query(F.data == "registration_again")
+    async def on_registration_again(self, callback_query: CallbackQuery):
+        await callback_query.answer()
+        await self.on_enter(callback_query.message, callback_query.from_user)

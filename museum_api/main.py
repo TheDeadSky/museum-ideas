@@ -14,7 +14,6 @@ from sqlalchemy.orm import Session
 from db.models import Course, CoursePart, Story, StoryHistory, User
 from services.registration.actions import registration
 from services.registration.exceptions import RegistrationException
-from utils import escape_tg_reserved_characters
 from schemas import (
     Feedback,
     HistoryData,
@@ -70,7 +69,7 @@ async def bot_text(keys: Annotated[List[str], Query(max_length=100)]):
         if key not in bot_texts:
             return Response(status_code=404, content={"error": f"Key {key} not found in bot_texts"})
 
-    return {key: escape_tg_reserved_characters(bot_texts[key]) for key in keys}
+    return {key: bot_texts[key] for key in keys}
 
 
 @app.post("/begin-self-support-course")
@@ -162,9 +161,9 @@ async def get_random_history(sm_id: str, db: Session = Depends(get_db)):
         if random_story.is_agreed_to_publication is not None else False
 
     history_data = {
-        "author": escape_tg_reserved_characters(history_author) if history_author else None,
-        "title": escape_tg_reserved_characters(random_story.title) if random_story.title else None,
-        "text": escape_tg_reserved_characters(random_story.text) if random_story.text else None,
+        "author": history_author if history_author else None,
+        "title": random_story.title if random_story.title else None,
+        "text": random_story.text if random_story.text else None,
         "media_url": random_story.media_url or None,
         "link": random_story.link or None,
         "is_anonymous": is_anonymous,

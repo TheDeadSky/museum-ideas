@@ -1,8 +1,6 @@
 from pydantic import BaseModel, Field, field_validator
 from typing import List
 
-from utils import escape_tg_reserved_characters
-
 
 class BaseResponse(BaseModel):
     success: bool
@@ -30,15 +28,11 @@ class SelfSupportCourse(BaseModel):
         if len(v) > 255:
             raise ValueError("Text of the course must be less than 255 characters")
 
-        v = escape_tg_reserved_characters(v)
-
     @field_validator("description", mode="before")
     @classmethod
     def description_validator(cls, v, info):
         if len(v) > 4096:
             raise ValueError("Text of the course must be less than 4096 characters")
-
-        v = escape_tg_reserved_characters(v)
 
         return v
 
@@ -47,8 +41,6 @@ class SelfSupportCourse(BaseModel):
     def course_text_validator(cls, v):
         if len(v) > 4096:
             raise ValueError("Text of the course must be less than 4096 characters")
-
-        v = escape_tg_reserved_characters(v)
 
         return v
 
