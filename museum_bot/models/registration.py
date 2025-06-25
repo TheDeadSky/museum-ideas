@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 class RegistrationData(BaseModel):
     name: str
-    is_museum_worker: bool
+    is_museum_worker: bool = False
     museum: str | None
     occupation: str | None
     telegram_id: str | None
