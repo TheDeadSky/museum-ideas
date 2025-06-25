@@ -28,6 +28,8 @@ class RegistrationOccupationScene(Scene, state="registration_occupation"):
             "last_name": str(message.from_user.last_name)
         }
 
+        print("RAW DATA:", raw_data)
+
         registration_data = RegistrationData(**raw_data)
 
         await register(registration_data)
