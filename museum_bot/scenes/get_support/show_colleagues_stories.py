@@ -1,7 +1,8 @@
+from aiogram import F
 from aiogram.fsm.scene import Scene, on
 from aiogram.types import Message, CallbackQuery
 
-from menus import TO_MAIN_MENU_BUTTON, GET_SUPPORT_MENU
+from menus import TO_MAIN_MENU_BUTTON, GET_SUPPORT_MENU, ONE_MORE_STORY_BUTTON
 from utils import merge_inline_menus
 from services.api_service import get_random_history
 
@@ -50,7 +51,9 @@ class ShowColleaguesStoriesScene(Scene, state="colleagues-stories"):
             )
             await message.answer_audio(
                 story.media_url,
-                reply_markup=TO_MAIN_MENU_BUTTON
+                reply_markup=merge_inline_menus(
+                    TO_MAIN_MENU_BUTTON
+                )
             )
 
         elif story.content_type == "video":
@@ -59,10 +62,19 @@ class ShowColleaguesStoriesScene(Scene, state="colleagues-stories"):
             )
             await message.answer_video(
                 story.media_url,
-                reply_markup=TO_MAIN_MENU_BUTTON
+                reply_markup=merge_inline_menus(
+                    ONE_MORE_STORY_BUTTON,
+                    TO_MAIN_MENU_BUTTON
+                )
             )
 
     @on.callback_query.enter()
     async def on_enter_callback(self, callback_query: CallbackQuery):
         await callback_query.answer()
+        await self.on_enter(callback_query.message, callback_query.from_user.id)
+
+    @on.callback_query.filter(F.data == "one_more_story")
+    async def on_one_more_story(self, callback_query: CallbackQuery):
+        await callback_query.answer()
+        await callback_query.message.delete_reply_markup()
         await self.on_enter(callback_query.message, callback_query.from_user.id)

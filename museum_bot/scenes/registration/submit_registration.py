@@ -25,7 +25,7 @@ class SubmitRegistrationScene(Scene, state="submit-registration"):
         result = await register(registration_data)
 
         if result["success"]:
-            self.wizard.goto(MainMenuScene)
+            await self.wizard.goto(MainMenuScene)
         else:
             registration_button = make_registration_button("Попробовать снова")
             await message.answer(

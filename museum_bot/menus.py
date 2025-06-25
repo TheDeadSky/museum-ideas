@@ -33,3 +33,7 @@ GET_SUPPORT_MENU = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="Пройти курс самоподдержки", callback_data="self_support")],
     [InlineKeyboardButton(text="Узнать истории коллег", callback_data="colleagues_stories")],
 ])
+
+ONE_MORE_STORY_BUTTON = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text="Узнать ещё историю", callback_data="one_more_story")],
+])
