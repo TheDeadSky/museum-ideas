@@ -182,7 +182,7 @@ class StoryHistory(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     story_id: Mapped[Optional[int]] = mapped_column(ForeignKey("stories.id"))
     user_id: Mapped[Optional[int]] = mapped_column(ForeignKey("user.id"))
-    date: Mapped[Optional[DateTime]] = mapped_column(DateTime)
+    date: Mapped[Optional[DateTime]] = mapped_column(DateTime, default=datetime.now())
 
     user: Mapped[Optional["User"]] = relationship(
         "User", back_populates="story_history"

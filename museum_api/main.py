@@ -1,4 +1,5 @@
 import json
+import random
 from typing import Annotated, List
 from contextlib import asynccontextmanager
 from fastapi import (
@@ -10,12 +11,14 @@ from fastapi import (
 )
 from sqlalchemy.orm import Session
 
-from db.models import Course, CoursePart, User
+from db.models import Course, CoursePart, Story, StoryHistory, User
 from services.registration.actions import registration
 from services.registration.exceptions import RegistrationException
 from utils import escape_tg_reserved_characters
 from schemas import (
     Feedback,
+    HistoryData,
+    HistoryResponse,
     SelfSupportCourse,
     SelfSupportCourseBeginnerData,
     RegistrationData,
@@ -118,6 +121,56 @@ async def is_registered(sm_id: str, db: Session = Depends(get_db)) -> dict:
         return {"is_registered": True, "message": "User is registered"}
     else:
         return {"is_registered": False, "message": "User is not registered"}
+
+
+@app.get("/random-history/{sm_id}")
+async def get_random_history(sm_id: str, db: Session = Depends(get_db)):
+    """Get a random unseen story for a user"""
+
+    user = db.query(User).filter(
+        (User.telegram_id == sm_id) | (User.vk_id == sm_id)
+    ).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    viewed_story_ids = db.query(StoryHistory.story_id).filter(
+        StoryHistory.user_id == user.id
+    ).all()
+    viewed_story_ids = [story_id[0] for story_id in viewed_story_ids]
+
+    unseen_stories = db.query(Story).filter(
+        ~Story.id.in_(viewed_story_ids)
+    ).all()
+
+    if not unseen_stories:
+        return {"success": False, "message": "К сожалению, нет новых историй"}
+
+    random_story = random.choice(unseen_stories)
+
+    history_data = {
+        "author": random_story.author,
+        "title": random_story.title,
+        "text": random_story.text or None,
+        "media_url": random_story.media_url or None,
+        "link": random_story.link or None,
+        "is_anonymous": random_story.is_anonymous,
+        "is_agreed_to_publication": random_story.is_agreed_to_publication,
+        "content_type": random_story.content_type,
+    }
+    history_data = HistoryData(**history_data)
+
+    history_response = HistoryResponse(
+        success=True,
+        message="История успешно получена",
+        history=history_data
+    )
+
+    story_history = StoryHistory(story_id=random_story.id, user_id=user.id)
+    db.add(story_history)
+    db.commit()
+
+    return history_response
 
 
 @app.post("/send-feedback")
