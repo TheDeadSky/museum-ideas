@@ -56,8 +56,10 @@ log/
 *.sqlite3
 
 # Alembic
-alembic/versions/*.py
-!alembic/versions/__init__.py
+# Ignore Alembic cache and temporary files
+.mypy_cache/
+alembic.ini.bak
+# Keep migration files tracked in version control for team collaboration
 
 # Environment variables
 .env
