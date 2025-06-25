@@ -28,10 +28,10 @@ class RegistrationWhichMuseumScene(Scene, state="registration_which_museum"):
 
         raw_data = {
             **await self.wizard.get_data(),
-            "telegram_id": message.from_user.id,
-            "tg_username": message.from_user.username,
-            "first_name": message.from_user.first_name,
-            "last_name": message.from_user.last_name
+            "telegram_id": str(message.from_user.id),
+            "tg_username": str(message.from_user.username),
+            "first_name": str(message.from_user.first_name),
+            "last_name": str(message.from_user.last_name)
         }
 
         registration_data = RegistrationData(**raw_data)
@@ -46,10 +46,10 @@ class RegistrationWhichMuseumScene(Scene, state="registration_which_museum"):
 
         raw_data = {
             **await self.wizard.get_data(),
-            "telegram_id": callback_query.from_user.id,
-            "tg_username": callback_query.from_user.username,
-            "first_name": callback_query.from_user.first_name,
-            "last_name": callback_query.from_user.last_name
+            "telegram_id": str(callback_query.from_user.id),
+            "tg_username": str(callback_query.from_user.username),
+            "first_name": str(callback_query.from_user.first_name),
+            "last_name": str(callback_query.from_user.last_name)
         }
 
         registration_data = RegistrationData(**raw_data)

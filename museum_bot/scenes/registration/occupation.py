@@ -22,10 +22,10 @@ class RegistrationOccupationScene(Scene, state="registration_occupation"):
 
         raw_data = {
             **await self.wizard.get_data(),
-            "telegram_id": message.from_user.id,
-            "tg_username": message.from_user.username,
-            "first_name": message.from_user.first_name,
-            "last_name": message.from_user.last_name
+            "telegram_id": str(message.from_user.id),
+            "tg_username": str(message.from_user.username),
+            "first_name": str(message.from_user.first_name),
+            "last_name": str(message.from_user.last_name)
         }
 
         registration_data = RegistrationData(**raw_data)
