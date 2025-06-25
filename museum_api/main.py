@@ -157,9 +157,9 @@ async def get_random_history(sm_id: str, db: Session = Depends(get_db)):
             history_author = random_story.user_name
 
     history_data = {
-        "author": escape_tg_reserved_characters(history_author),
-        "title": escape_tg_reserved_characters(random_story.title),
-        "text": escape_tg_reserved_characters(random_story.text) or None,
+        "author": escape_tg_reserved_characters(history_author) if history_author else None,
+        "title": escape_tg_reserved_characters(random_story.title) if random_story.title else None,
+        "text": escape_tg_reserved_characters(random_story.text) if random_story.text else None,
         "media_url": random_story.media_url or None,
         "link": random_story.link or None,
         "is_anonymous": random_story.is_anonymous,
