@@ -1,8 +1,7 @@
 from aiogram.fsm.scene import Scene, on, After
 from aiogram.types import Message, CallbackQuery
-from models.registration import RegistrationData
-from scenes.main_menu.main_menu_scene import MainMenuScene
-from services.api_service import get_text_from_db, register
+from scenes.registration.submit_registration import SubmitRegistrationScene
+from services.api_service import get_text_from_db
 
 
 class RegistrationOccupationScene(Scene, state="registration_occupation"):
@@ -16,20 +15,6 @@ class RegistrationOccupationScene(Scene, state="registration_occupation"):
         await callback_query.answer()
         await self.on_enter(callback_query.message)
 
-    @on.message(after=After.goto(MainMenuScene))
+    @on.message(after=After.goto(SubmitRegistrationScene))
     async def on_answer(self, message: Message):
         await self.wizard.update_data(occupation=message.text)
-
-        raw_data = {
-            **await self.wizard.get_data(),
-            "telegram_id": str(message.from_user.id),
-            "tg_username": str(message.from_user.username),
-            "first_name": str(message.from_user.first_name),
-            "last_name": str(message.from_user.last_name)
-        }
-
-        print("RAW DATA:", raw_data)
-
-        registration_data = RegistrationData(**raw_data)
-
-        await register(registration_data)

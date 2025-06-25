@@ -15,11 +15,15 @@ class RegistrationNameInputScene(Scene, state="registration_name"):
     @on.message.enter()
     async def on_enter(self, message: Message):
         name_question = await get_text_from_db("name_question")
+        description = await get_text_from_db("about_project_text")
+
+        await message.answer(description)
         await message.answer(name_question)
 
     @on.callback_query.enter(F.data == "registration")
     async def on_enter_callback(self, callback_query: CallbackQuery):
         await callback_query.answer()
+        await callback_query.message.delete_reply_markup()
         await self.on_enter(callback_query.message)
 
     @on.message()

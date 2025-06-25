@@ -17,10 +17,6 @@ CONFIRMATION_MENU = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="Отмена", callback_data="not_confirm")],
 ])
 
-REGISTER_BUTTON = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="Познакомиться", callback_data="registration")],
-])
-
 SKIP_BUTTON = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="Пропустить", callback_data="skip")],
 ])

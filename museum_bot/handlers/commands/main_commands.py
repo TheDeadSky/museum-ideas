@@ -4,7 +4,7 @@ from aiogram.filters import CommandStart
 from aiogram.types import Message
 
 from actions.main_menu import default_main_menu
-from menus import REGISTER_BUTTON
+from actions.registration import make_registration_button
 from services.api_service import get_text_from_db, get_is_registered
 
 mc_router = Router()
@@ -22,7 +22,5 @@ async def command_start_handler(message: Message, scenes: ScenesManager) -> None
         return
 
     greetings = await get_text_from_db("start_greetings")
-    description = await get_text_from_db("about_project_text")
 
-    await message.answer(greetings)
-    await message.answer(description, reply_markup=REGISTER_BUTTON)
+    await message.answer(greetings, reply_markup=make_registration_button())

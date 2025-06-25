@@ -6,9 +6,8 @@ from aiogram.types import (
     Message,
 )
 from menus import SKIP_BUTTON
-from models.registration import RegistrationData
-from scenes.main_menu.main_menu_scene import MainMenuScene
-from services.api_service import get_text_from_db, register
+from scenes.registration.submit_registration import SubmitRegistrationScene
+from services.api_service import get_text_from_db
 
 
 class RegistrationWhichMuseumScene(Scene, state="registration_which_museum"):
@@ -22,36 +21,12 @@ class RegistrationWhichMuseumScene(Scene, state="registration_which_museum"):
         await callback_query.answer()
         await self.on_enter(callback_query.message)
 
-    @on.message(after=After.goto(MainMenuScene))
+    @on.message(after=After.goto(SubmitRegistrationScene))
     async def which_museum_input(self, message: Message):
         await self.wizard.update_data(museum=message.text)
 
-        raw_data = {
-            **await self.wizard.get_data(),
-            "telegram_id": str(message.from_user.id),
-            "tg_username": str(message.from_user.username),
-            "first_name": str(message.from_user.first_name),
-            "last_name": str(message.from_user.last_name)
-        }
-
-        registration_data = RegistrationData(**raw_data)
-
-        await register(registration_data)
-
-    @on.callback_query(F.data == "skip", after=After.goto(MainMenuScene))
+    @on.callback_query(F.data == "skip", after=After.goto(SubmitRegistrationScene))
     async def skip_museum(self, callback_query: CallbackQuery):
         await self.wizard.update_data(museum=None)
         await callback_query.answer()
         await callback_query.message.delete_reply_markup()
-
-        raw_data = {
-            **await self.wizard.get_data(),
-            "telegram_id": str(callback_query.from_user.id),
-            "tg_username": str(callback_query.from_user.username),
-            "first_name": str(callback_query.from_user.first_name),
-            "last_name": str(callback_query.from_user.last_name)
-        }
-
-        registration_data = RegistrationData(**raw_data)
-
-        await register(registration_data)
