@@ -85,8 +85,8 @@ class Story(Base):
     tag: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
     media_url: Mapped[Optional[str]] = mapped_column(String(500))
     link: Mapped[Optional[str]] = mapped_column(String(500))
-    is_anonymous: Mapped[Optional[bool]] = mapped_column(Boolean, default=False)
-    is_agreed_to_publication: Mapped[Optional[bool]] = mapped_column(Boolean, default=False)
+    is_anonymous: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_agreed_to_publication: Mapped[bool] = mapped_column(Boolean, default=False)
 
     user: Mapped[Optional["User"]] = relationship(
         "User", back_populates="stories"
