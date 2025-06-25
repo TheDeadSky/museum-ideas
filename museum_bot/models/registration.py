@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class RegistrationData(BaseModel, total=True):
+class RegistrationData(BaseModel):
     name: str
     is_museum_worker: bool
     museum: str | None
