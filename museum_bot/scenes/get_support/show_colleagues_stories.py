@@ -28,15 +28,15 @@ class ShowColleaguesStoriesScene(Scene, state="colleagues-stories"):
         display_text = ""
 
         if story.title:
-            display_text += f"{story.title}\n"
-
-        if story.author and not story.is_anonymous:
-            display_text += f"{story.author}\n"
+            display_text += f"<b>{story.title}</b>\n"
 
         if story.text:
             if display_text:
                 display_text += "\n"
             display_text += story.text
+
+        if story.author and not story.is_anonymous:
+            display_text += f"\n\n<i>{story.author}</i>"
 
         if story.content_type == "text":
             await message.edit_text(

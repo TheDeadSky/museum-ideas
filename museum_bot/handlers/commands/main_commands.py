@@ -18,7 +18,10 @@ async def command_start_handler(message: Message, scenes: ScenesManager) -> None
     is_registered = result["is_registered"]
 
     if is_registered:
-        await default_main_menu(message)
+        await default_main_menu(
+            message, 
+            get_text_from_db("main_menu_text")
+        )
         return
 
     greetings = await get_text_from_db("start_greetings")
