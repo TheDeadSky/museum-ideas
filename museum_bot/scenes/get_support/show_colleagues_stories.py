@@ -42,7 +42,10 @@ class ShowColleaguesStoriesScene(Scene, state="colleagues-stories"):
         if story.content_type == "text":
             await message.edit_text(
                 display_text,
-                reply_markup=TO_MAIN_MENU_BUTTON
+                reply_markup=merge_inline_menus(
+                    ONE_MORE_STORY_BUTTON,
+                    TO_MAIN_MENU_BUTTON
+                )
             )
 
         elif story.content_type == "audio":
@@ -52,6 +55,7 @@ class ShowColleaguesStoriesScene(Scene, state="colleagues-stories"):
             await message.answer_audio(
                 story.media_url,
                 reply_markup=merge_inline_menus(
+                    ONE_MORE_STORY_BUTTON,
                     TO_MAIN_MENU_BUTTON
                 )
             )
