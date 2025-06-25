@@ -2,18 +2,18 @@ from aiogram.fsm.scene import Scene, on
 from aiogram.types import Message, CallbackQuery
 
 from menus import TO_MAIN_MENU_BUTTON, GET_SUPPORT_MENU
-from actions.stories import get_random_story
 from utils import merge_inline_menus
+from services.api_service import get_random_history
 
 
 class ShowColleaguesStoriesScene(Scene, state="colleagues-stories"):
     @on.message.enter()
     async def on_enter(self, message: Message):
-        story = await get_random_story()
+        history_response = await get_random_history()
 
-        if not story:
+        if not history_response.success:
             await message.edit_text(
-                "К сожалению, сейчас нет доступных историй. Попробуйте позже.",
+                text=history_response.message,
                 reply_markup=merge_inline_menus(
                     GET_SUPPORT_MENU,
                     TO_MAIN_MENU_BUTTON
@@ -21,15 +21,42 @@ class ShowColleaguesStoriesScene(Scene, state="colleagues-stories"):
             )
             return
 
-        if story['type'] == "text":
+        story = history_response.history
+
+        display_text = ""
+
+        if story.title:
+            display_text += f"{story.title}\n"
+
+        if story.author:
+            display_text += f"{story.author}\n"
+
+        if story.text:
+            if display_text:
+                display_text += "\n"
+            display_text += story.text
+
+        if story.content_type == "text":
             await message.edit_text(
-                story['content'],
+                display_text,
                 reply_markup=TO_MAIN_MENU_BUTTON
             )
 
-        elif story['type'] == "video":
+        elif story.content_type == "audio":
             await message.edit_text(
-                story['content'],
+                display_text
+            )
+            await message.answer_audio(
+                story.media_url,
+                reply_markup=TO_MAIN_MENU_BUTTON
+            )
+
+        elif story.content_type == "video":
+            await message.edit_text(
+                display_text
+            )
+            await message.answer_video(
+                story.media_url,
                 reply_markup=TO_MAIN_MENU_BUTTON
             )
 
