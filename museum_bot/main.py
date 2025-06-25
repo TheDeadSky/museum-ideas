@@ -41,7 +41,7 @@ async def main() -> None:
         share_experience_router,
     )
 
-    bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN_V2))
+    bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
     await dispatcher.start_polling(bot)
 

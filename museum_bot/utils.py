@@ -18,7 +18,7 @@ def escape_tg_reserved_characters(text: str) -> str:
     Returns:
         str: Text with escaped characters
     """
-    characters_to_escape = ['.', '!', '?', '=', '/', '-']
+    characters_to_escape = ['.', '!', '?', '=', '/', '-', '(', ')']
 
     for char in characters_to_escape:
         text = text.replace(char, f'\\{char}')
