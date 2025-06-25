@@ -2,7 +2,7 @@ from aiogram.fsm.scene import Scene, on
 from aiogram.types import Message, CallbackQuery
 
 from menus import TO_MAIN_MENU_BUTTON, GET_SUPPORT_MENU
-from utils import merge_inline_menus
+from utils import escape_tg_reserved_characters, merge_inline_menus
 from services.api_service import get_random_history
 
 
@@ -40,13 +40,13 @@ class ShowColleaguesStoriesScene(Scene, state="colleagues-stories"):
 
         if story.content_type == "text":
             await message.edit_text(
-                display_text,
+                escape_tg_reserved_characters(display_text),
                 reply_markup=TO_MAIN_MENU_BUTTON
             )
 
         elif story.content_type == "audio":
             await message.edit_text(
-                display_text
+                escape_tg_reserved_characters(display_text)
             )
             await message.answer_audio(
                 story.media_url,
@@ -55,7 +55,7 @@ class ShowColleaguesStoriesScene(Scene, state="colleagues-stories"):
 
         elif story.content_type == "video":
             await message.edit_text(
-                display_text
+                escape_tg_reserved_characters(display_text)
             )
             await message.answer_video(
                 story.media_url,
