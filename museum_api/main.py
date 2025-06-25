@@ -102,7 +102,7 @@ async def begin_self_support_course(
 async def register(registration_data: RegistrationData, db: Session = Depends(get_db)) -> RegistrationResponse:
     """Register a new user"""
     try:
-        return registration(registration_data, db)
+        return await registration(registration_data, db)
     except RegistrationException as e:
         raise HTTPException(status_code=500, detail=f"Registration failed: {e}")
 
