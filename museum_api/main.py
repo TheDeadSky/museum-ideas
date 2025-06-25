@@ -1,11 +1,24 @@
 import json
 from typing import Annotated, List
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Query, Response, Depends
+from fastapi import (
+    FastAPI,
+    HTTPException,
+    Query,
+    Response,
+    Depends
+)
 from sqlalchemy.orm import Session
 
+from db.models import Course, CoursePart, User
 from utils import escape_tg_reserved_characters
-from schemas import Feedback, SelfSupportCourse, SelfSupportCourseBeginnerData
+from schemas import (
+    Feedback,
+    SelfSupportCourse,
+    SelfSupportCourseBeginnerData,
+    UserRegistration,
+    UserRegistrationResponse
+)
 from config import settings
 from db.database import get_db, create_tables
 
@@ -56,16 +69,85 @@ async def bot_text(keys: Annotated[List[str], Query(max_length=100)]):
 
 
 @app.post("/begin-self-support-course")
-async def begin_self_support_course(beginner_data: SelfSupportCourseBeginnerData) -> SelfSupportCourse:
-    with open("db_imitation/self_support_course.json", "r", encoding="utf-8") as f:
-        self_support_course = json.load(f)
+async def begin_self_support_course(
+    beginner_data: SelfSupportCourseBeginnerData,
+    db: Session = Depends(get_db)
+) -> SelfSupportCourse:
+    course = db.query(Course).filter(Course.id == beginner_data.user_id).first()
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+
+    first_part = db.query(CoursePart).filter(
+        CoursePart.course_id == course.id
+    ).order_by(CoursePart.order_number).first()
+
+    if not first_part:
+        raise HTTPException(status_code=404, detail="No course parts found")
+
+    self_support_course = {
+        "title": course.course_name,
+        "description": course.description,
+        "video_url": first_part.video_url,
+        "course_text": first_part.description
+    }
 
     self_support_course_schema = SelfSupportCourse(**self_support_course)
 
     return self_support_course_schema
 
 
+@app.post("/register")
+async def register(user_data: UserRegistration, db: Session = Depends(get_db)) -> UserRegistrationResponse:
+    """Register a new user"""
+
+    existing_user = db.query(User).filter(
+        (User.telegram_id == user_data.telegram_id) | (User.vk_id == user_data.vk_id)
+    ).first()
+
+    if existing_user:
+        raise HTTPException(status_code=400, detail="User with this social media ID already exists")
+
+    new_user = User(
+        telegram_id=user_data.telegram_id,
+        vk_id=user_data.vk_id,
+        tg_username=user_data.tg_username,
+        firstname=user_data.firstname,
+        lastname=user_data.lastname,
+        is_museum_worker=user_data.is_museum_worker,
+        museum=user_data.museum,
+        occupation=user_data.occupation
+    )
+
+    try:
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+
+        return UserRegistrationResponse(
+            success=True,
+            message="Регистрация прошла успешно"
+        )
+    except Exception:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Failed to register user")
+
+
+@app.get("/is-registered/{sm_id}")
+async def is_registered(sm_id: str, db: Session = Depends(get_db)) -> dict:
+    """Check if a user is registered by email"""
+    user = db.query(User).filter(
+        (User.telegram_id == sm_id) | (User.vk_id == sm_id)
+    ).first()
+
+    if user:
+        return {"is_registered": True, "message": "User is registered"}
+    else:
+        return {"is_registered": False, "message": "User is not registered"}
+
+
 @app.post("/send-feedback")
 async def send_feedback(feedback: Feedback, db: Session = Depends(get_db)) -> Feedback:
+    """Send feedback to the museum"""
+
     # TODO: Save feedback to database
     return feedback

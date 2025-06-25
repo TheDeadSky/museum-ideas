@@ -149,6 +149,7 @@ class CoursePart(Base):
     description: Mapped[Optional[str]] = mapped_column(Text)
     video_url: Mapped[Optional[str]] = mapped_column(String(500))
     question: Mapped[Optional[str]] = mapped_column(Text)
+    date_of_publication: Mapped[Optional[DateTime]] = mapped_column(DateTime)
 
     course: Mapped[Optional["Course"]] = relationship(
         "Course", back_populates="parts"

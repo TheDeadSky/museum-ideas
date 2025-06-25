@@ -3,6 +3,10 @@ from typing import TypedDict
 
 class RegistrationData(TypedDict, total=True):
     name: str
-    is_working_in_museum: bool
+    is_museum_worker: bool
     museum: str | None
-    scope_of_work: str | None
+    occupation: str | None
+    telegram_id: str
+    tg_username: str | None
+    first_name: str | None
+    last_name: str | None

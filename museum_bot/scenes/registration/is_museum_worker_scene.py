@@ -7,7 +7,7 @@ from aiogram.types import (
 )
 
 from menus import YES_NO_MENU
-from .sphere_of_activity_scene import RegistrationSphereOfActivityScene
+from .occupation import RegistrationOccupationScene
 from .which_museum_scene import RegistrationWhichMuseumScene
 from services.api_service import get_text_from_db
 
@@ -29,7 +29,7 @@ class RegistrationIsMuseumWorkerScene(Scene, state="registration_is_museum_worke
         await callback_query.answer(cache_time=0)
         await callback_query.message.delete_reply_markup()
 
-    @on.callback_query(F.data == "no", after=After.goto(RegistrationSphereOfActivityScene))
+    @on.callback_query(F.data == "no", after=After.goto(RegistrationOccupationScene))
     async def no_answer(self, callback_query: CallbackQuery):
         await self.wizard.update_data(is_museum_worker=False)
         await callback_query.answer(cache_time=0)
