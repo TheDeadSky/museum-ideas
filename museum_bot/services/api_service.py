@@ -51,12 +51,12 @@ async def register(user_data: RegistrationData):
                 raise Exception(f"API error: {error_data.get('detail', 'Unknown error')}")
 
 
-async def get_random_history() -> HistoryResponse:
+async def get_random_history(tg_id: str) -> HistoryResponse:
     """Get random history from the museum API."""
     api_base_url = os.getenv("API_BASE_URL", "http://museum_api:8000")
 
     async with aiohttp.ClientSession() as session:
-        async with session.get(f"{api_base_url}/random-history") as response:
+        async with session.get(f"{api_base_url}/random-history/{tg_id}") as response:
             if response.status == 200:
                 response_data = await response.json()
                 return HistoryResponse(**response_data)

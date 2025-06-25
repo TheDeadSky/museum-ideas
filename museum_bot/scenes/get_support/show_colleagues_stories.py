@@ -9,7 +9,7 @@ from services.api_service import get_random_history
 class ShowColleaguesStoriesScene(Scene, state="colleagues-stories"):
     @on.message.enter()
     async def on_enter(self, message: Message):
-        history_response = await get_random_history()
+        history_response = await get_random_history(str(message.from_user.id))
 
         if not history_response.success:
             await message.edit_text(
