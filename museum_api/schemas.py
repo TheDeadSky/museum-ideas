@@ -53,7 +53,7 @@ class Feedback(BaseModel):
     feedback: str = Field(description="User's feedback.")
 
 
-class UserRegistration(BaseModel):
+class RegistrationData(BaseModel):
     sm_type: str = Field(description="Social media type. `vk` or `tg`")
     telegram_id: str | None = None
     vk_id: str | None = None
@@ -65,6 +65,6 @@ class UserRegistration(BaseModel):
     occupation: str | None = None
 
 
-class UserRegistrationResponse(BaseModel):
+class RegistrationResponse(BaseModel):
     success: bool
     message: str

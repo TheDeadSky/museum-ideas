@@ -3,17 +3,11 @@ from sqlalchemy.orm import Session
 from db.models import User
 from schemas import RegistrationData, RegistrationResponse
 from services.registration.utils import raise_if_user_exist
-from .exceptions import RegistrationException, UserExistException
+from .exceptions import RegistrationException
 
 
 async def registration(registration_data: RegistrationData, db: Session) -> RegistrationResponse:
-    try:
-        raise_if_user_exist(registration_data, db)
-    except UserExistException:
-        return RegistrationResponse(
-            success=False,
-            message="Пользователь с таким ID уже зарегистрирован.",
-        )
+    raise_if_user_exist(db, registration_data)
 
     new_user = User(
         telegram_id=registration_data.telegram_id,

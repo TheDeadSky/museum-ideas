@@ -18,8 +18,8 @@ from schemas import (
     Feedback,
     SelfSupportCourse,
     SelfSupportCourseBeginnerData,
-    UserRegistration,
-    UserRegistrationResponse
+    RegistrationData,
+    RegistrationResponse
 )
 from config import settings
 from db.database import get_db, create_tables
@@ -99,7 +99,7 @@ async def begin_self_support_course(
 
 
 @app.post("/register")
-async def register(registration_data: UserRegistration, db: Session = Depends(get_db)) -> UserRegistrationResponse:
+async def register(registration_data: RegistrationData, db: Session = Depends(get_db)) -> RegistrationResponse:
     """Register a new user"""
     try:
         return registration(registration_data, db)

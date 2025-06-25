@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Session
 
 from db.models import User
-from schemas import UserRegistration
+from schemas import RegistrationData
 from .exceptions import RegistrationException, UserExistException
 
 
-def raise_if_user_exist(registration_data: UserRegistration, db: Session) -> None:
+def raise_if_user_exist(registration_data: RegistrationData, db: Session) -> None:
     sm_id: str
 
     if registration_data.sm_type == "tg":
