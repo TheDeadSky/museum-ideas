@@ -1,7 +1,7 @@
-from typing import TypedDict
+from pydantic import BaseModel
 
 
-class RegistrationData(TypedDict, total=True):
+class RegistrationData(BaseModel, total=True):
     name: str
     is_museum_worker: bool
     museum: str | None
