@@ -73,7 +73,7 @@ class ShowColleaguesStoriesScene(Scene, state="colleagues-stories"):
         await callback_query.answer()
         await self.on_enter(callback_query.message, callback_query.from_user.id)
 
-    @on.callback_query.filter(F.data == "one_more_story")
+    @on.callback_query(F.data == "one_more_story")
     async def on_one_more_story(self, callback_query: CallbackQuery):
         await callback_query.answer()
         await callback_query.message.delete_reply_markup()
