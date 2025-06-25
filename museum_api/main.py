@@ -11,6 +11,8 @@ from fastapi import (
 from sqlalchemy.orm import Session
 
 from db.models import Course, CoursePart, User
+from services.registration.actions import registration
+from services.registration.exceptions import RegistrationException
 from utils import escape_tg_reserved_characters
 from schemas import (
     Feedback,
@@ -97,39 +99,12 @@ async def begin_self_support_course(
 
 
 @app.post("/register")
-async def register(user_data: UserRegistration, db: Session = Depends(get_db)) -> UserRegistrationResponse:
+async def register(registration_data: UserRegistration, db: Session = Depends(get_db)) -> UserRegistrationResponse:
     """Register a new user"""
-
-    existing_user = db.query(User).filter(
-        (User.telegram_id == user_data.telegram_id) | (User.vk_id == user_data.vk_id)
-    ).first()
-
-    if existing_user:
-        raise HTTPException(status_code=400, detail="User with this social media ID already exists")
-
-    new_user = User(
-        telegram_id=user_data.telegram_id,
-        vk_id=user_data.vk_id,
-        tg_username=user_data.tg_username,
-        firstname=user_data.firstname,
-        lastname=user_data.lastname,
-        is_museum_worker=user_data.is_museum_worker,
-        museum=user_data.museum,
-        occupation=user_data.occupation
-    )
-
     try:
-        db.add(new_user)
-        db.commit()
-        db.refresh(new_user)
-
-        return UserRegistrationResponse(
-            success=True,
-            message="Регистрация прошла успешно"
-        )
-    except Exception:
-        db.rollback()
-        raise HTTPException(status_code=500, detail="Failed to register user")
+        return registration(registration_data, db)
+    except RegistrationException as e:
+        raise HTTPException(status_code=500, detail=f"Registration failed: {e}")
 
 
 @app.get("/is-registered/{sm_id}")
