@@ -19,7 +19,7 @@ async def command_start_handler(message: Message, scenes: ScenesManager) -> None
 
     if is_registered:
         await default_main_menu(
-            message, 
+            message,
             get_text_from_db("main_menu_text")
         )
         return
