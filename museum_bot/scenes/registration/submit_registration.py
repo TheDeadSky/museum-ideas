@@ -36,7 +36,7 @@ class SubmitRegistrationScene(Scene, state="submit-registration"):
                 reply_markup=registration_button
             )
 
-    @on.callback_query(F.data == "registration_again")
-    async def on_registration_again(self, callback_query: CallbackQuery):
+    @on.callback_query.enter()
+    async def on_enter_callback(self, callback_query: CallbackQuery):
         await callback_query.answer()
         await self.on_enter(callback_query.message, callback_query.from_user)
