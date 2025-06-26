@@ -22,13 +22,17 @@ class SelfSupportCourseScene(Scene, state="self-support-course"):
 
             await self.wizard.update_data(part_id=part_data.id)
 
+            course_title = f"<b>{course_data.title}</b>"
+            course_description = f"<i>{course_data.description}</i>"
+            await message.answer(f"{course_title}\n{course_description}")
+
             if part_data.image_url:
                 await message.answer_photo(
                     photo=part_data.image_url
                 )
-            title = f"<b>{course_data.title}</b>"
-            description = f"<i>{course_data.description}</i>"
-            await message.answer(f"{title}\n{description}")
+            part_title = f"<b>{part_data.title}</b>"
+            part_description = f"<i>{part_data.description}</i>"
+            await message.answer(f"{part_title}\n{part_description}")
 
             if part_data.video_url:
                 await message.answer(part_data.video_url)

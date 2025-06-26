@@ -13,7 +13,10 @@ from services.api_service import register
 
 class SubmitRegistrationScene(Scene, state="submit-registration"):
     @on.message.enter()
-    async def on_enter(self, message: Message, from_user: User):
+    async def on_enter(self, message: Message, from_user: User = None):
+        if from_user is None:
+            from_user = message.from_user
+
         raw_data = {
             **await self.wizard.get_data(),
             "telegram_id": str(from_user.id),
