@@ -1,5 +1,5 @@
 from aiogram.fsm.scene import Scene, on
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, User
 
 from menus import NEXT_PART_BUTTON, TO_MAIN_MENU_BUTTON
 from services.api_service import (
@@ -13,8 +13,8 @@ from utils import merge_inline_menus
 
 class SelfSupportCourseScene(Scene, state="self-support-course"):
     @on.message.enter()
-    async def on_enter(self, message: Message):
-        self_support_course_response = await get_self_support_course_part(message.from_user.id)
+    async def on_enter(self, message: Message, from_user: User):
+        self_support_course_response = await get_self_support_course_part(from_user.id)
 
         if self_support_course_response.success:
             course_data = self_support_course_response.course_data
@@ -47,7 +47,7 @@ class SelfSupportCourseScene(Scene, state="self-support-course"):
     @on.callback_query.enter()
     async def on_enter_callback(self, callback_query: CallbackQuery):
         await callback_query.answer()
-        await self.on_enter(callback_query.message)
+        await self.on_enter(callback_query.message, callback_query.from_user)
 
     @on.message()
     async def on_user_answer(self, message: Message):
