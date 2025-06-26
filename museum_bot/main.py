@@ -59,11 +59,9 @@ async def main() -> None:
     webhook_handler = SimpleRequestHandler(dispatcher=dispatcher, bot=bot)
     webhook_handler.register(app, path=WEBHOOK_PATH)
 
-    # Setup application
     setup_application(app, dispatcher, bot=bot)
 
-    # Start webhook
-    await web.run_app(app, host=WEBAPP_HOST, port=WEBAPP_PORT)
+    web.run_app(app, host=WEBAPP_HOST, port=WEBAPP_PORT)
 
 
 if __name__ == "__main__":
