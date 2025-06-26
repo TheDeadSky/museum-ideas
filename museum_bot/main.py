@@ -10,6 +10,8 @@ from handlers.commands.main_commands import mc_router
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
+from aiohttp import web
 
 from scenes.registration import registration_scenes_router, registration_scenes_registry
 from scenes.main_menu import main_menu_router, main_menu_scenes_registry
@@ -17,6 +19,10 @@ from scenes.get_support import get_support_router, get_support_scenes_registry
 from scenes.share_experience import share_experience_router, share_experience_scenes_registry
 
 TOKEN = getenv("BOT_TOKEN")
+WEBHOOK_URL = getenv("WEBHOOK_URL")
+WEBHOOK_PATH = getenv("WEBHOOK_PATH", "/webhook")
+WEBAPP_HOST = getenv("WEBAPP_HOST", "0.0.0.0")
+WEBAPP_PORT = int(getenv("WEBAPP_PORT", "8000"))
 
 
 async def main() -> None:
@@ -43,7 +49,21 @@ async def main() -> None:
 
     bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
-    await dispatcher.start_polling(bot)
+    # Set webhook
+    await bot.set_webhook(url=WEBHOOK_URL)
+
+    # Create aiohttp application
+    app = web.Application()
+
+    # Create webhook handler
+    webhook_handler = SimpleRequestHandler(dispatcher=dispatcher, bot=bot)
+    webhook_handler.register(app, path=WEBHOOK_PATH)
+
+    # Setup application
+    setup_application(app, dispatcher, bot=bot)
+
+    # Start webhook
+    await web.run_app(app, host=WEBAPP_HOST, port=WEBAPP_PORT)
 
 
 if __name__ == "__main__":

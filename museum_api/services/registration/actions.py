@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
 
 from db.models import User
+from db.utils import get_user_by_sm_id
 from schemas import RegistrationData, RegistrationResponse
-from services.registration.utils import raise_if_user_exist
+from .utils import raise_if_user_exist
 from .exceptions import RegistrationException, UserExistException
 
 
@@ -38,3 +39,16 @@ async def registration(registration_data: RegistrationData, db: Session) -> Regi
     except Exception as e:
         db.rollback()
         raise RegistrationException(f"Failed to register user: {e}")
+
+
+async def is_user_registered(sm_id: str, db: Session) -> RegistrationResponse:
+    user = get_user_by_sm_id(db, sm_id)
+    if not user:
+        return RegistrationResponse(
+            success=False,
+            message="Пользователь не найден"
+        )
+    return RegistrationResponse(
+        success=True,
+        message="Пользователь найден"
+    )

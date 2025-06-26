@@ -15,7 +15,7 @@ async def command_start_handler(message: Message, scenes: ScenesManager) -> None
     await scenes.close()
 
     result = await get_is_registered(str(message.from_user.id))
-    is_registered = result["is_registered"]
+    is_registered = result["success"]
 
     if is_registered:
         await default_main_menu(

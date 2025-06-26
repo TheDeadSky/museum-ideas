@@ -15,9 +15,7 @@ class RegistrationNameInputScene(Scene, state="registration_name"):
     @on.message.enter()
     async def on_enter(self, message: Message):
         name_question = await get_text_from_db("name_question")
-        description = await get_text_from_db("about_project_text")
 
-        await message.answer(description)
         await message.answer(name_question)
 
     @on.callback_query.enter(F.data == "registration")

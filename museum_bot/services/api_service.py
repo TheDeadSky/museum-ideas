@@ -1,18 +1,44 @@
 import json
 import os
+import random
 import aiohttp
 
+from models.base import BaseResponse
 from models.registration import RegistrationData
 from models.stories import HistoryResponse
+from models.course import SelfSupportCourseResponse, CourseUserAnswer
 
 
-async def get_self_support_course():
-    # async with aiohttp.ClientSession() as session:
-    #     async with session.get("https://api.example.com/self-support-course") as response:
-    #         return await response.json()
+async def get_self_support_course_part(tg_id: str) -> SelfSupportCourseResponse:
+    api_base_url = os.getenv("API_BASE_URL", "http://museum_api:8000")
 
-    with open("src/self_support_course.json", "r", encoding="utf-8") as file:
-        return json.load(file)
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"{api_base_url}/self-support-course/{tg_id}") as response:
+            if response.status == 200:
+                response_data = await response.json()
+                return SelfSupportCourseResponse(**response_data)
+            else:
+                error_data = await response.json()
+                raise Exception(f"API error: {error_data.get('detail', 'Unknown error')}")
+
+
+async def self_support_course_answer(tg_id: str, part_id: int, answer: str) -> SelfSupportCourseResponse:
+    api_base_url = os.getenv("API_BASE_URL", "http://museum_api:8000")
+    async with aiohttp.ClientSession() as session:
+        async with session.post(
+            url=f"{api_base_url}/self-support-course/{tg_id}/answer",
+            json=CourseUserAnswer(
+                sm_id=tg_id,
+                part_id=part_id,
+                answer=answer
+            ).model_dump()
+        ) as response:
+            if response.status == 200:
+                response_data = await response.json()
+                return BaseResponse(**response_data)
+            else:
+                error_data = await response.json()
+                raise Exception(f"API error: {error_data.get('detail', 'Unknown error')}")
 
 
 async def get_text_from_db(text_key: str):
@@ -20,9 +46,9 @@ async def get_text_from_db(text_key: str):
         return json.load(file)[text_key]
 
 
-async def get_achievement_photo_url():
-    with open("src/achievement_photo_url.json", "r", encoding="utf-8") as file:
-        return json.load(file)["achievement_photo_url"]
+async def get_random_achievement_photo_url():
+    achievement_photo_url = "https://ideasformuseums.com/botimages/ach-{}.png"
+    return achievement_photo_url.format(random.randint(1, 6))
 
 
 async def get_is_registered(sm_id: str):

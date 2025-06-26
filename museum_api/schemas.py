@@ -1,4 +1,5 @@
-from pydantic import BaseModel, Field, field_validator
+from datetime import datetime
+from pydantic import BaseModel, Field
 from typing import List
 
 
@@ -15,34 +16,32 @@ class SelfSupportCourseBeginnerData(BaseModel):
     user_id: str
 
 
-class SelfSupportCourse(BaseModel):
+class SelfSupportCoursePartData(BaseModel):
+    id: int
     title: str
     description: str
-    video_url: str
-    course_text: str = Field(description="Text of the course", max_length=4096)
-    question: str
+    video_url: str | None = None
+    image_url: str | None = None
+    course_text: str | None = Field(default=None, description="Text of the course", max_length=4096)
+    question: str | None = Field(default=None, description="Question for the user", max_length=4096)
+    publication_date: datetime
 
-    @field_validator("title", mode="before")
-    @classmethod
-    def title_validator(cls, v, info):
-        if len(v) > 255:
-            raise ValueError("Text of the course must be less than 255 characters")
 
-    @field_validator("description", mode="before")
-    @classmethod
-    def description_validator(cls, v, info):
-        if len(v) > 4096:
-            raise ValueError("Text of the course must be less than 4096 characters")
+class SelfSupportCourseData(BaseModel):
+    id: int
+    title: str
+    description: str
 
-        return v
 
-    @field_validator("course_text", mode="before")
-    @classmethod
-    def course_text_validator(cls, v):
-        if len(v) > 4096:
-            raise ValueError("Text of the course must be less than 4096 characters")
+class SelfSupportCourseResponse(BaseResponse):
+    course_data: SelfSupportCourseData | None = None
+    part_data: SelfSupportCoursePartData | None = None
 
-        return v
+
+class CourseUserAnswer(BaseModel):
+    answer: str | None = None
+    part_id: int
+    sm_id: int
 
 
 class Feedback(BaseModel):
