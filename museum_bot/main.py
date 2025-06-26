@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from os import getenv
 
@@ -25,7 +24,14 @@ WEBAPP_HOST = getenv("WEBAPP_HOST", "0.0.0.0")
 WEBAPP_PORT = int(getenv("WEBAPP_PORT", "8000"))
 
 
-async def main() -> None:
+async def on_startup(bot: Bot) -> None:
+    await bot.set_webhook(
+        f"{WEBHOOK_URL}",
+        secret_token="ad23wad5sg4fg5bdf1s2vda5wca5s445ca",
+    )
+
+
+def main() -> None:
     dispatcher = Dispatcher(
         events_isolation=SimpleEventIsolation(),
     )
@@ -47,15 +53,12 @@ async def main() -> None:
         share_experience_router,
     )
 
+    dispatcher.startup.register(on_startup)
+
     bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
-    # Set webhook
-    await bot.set_webhook(url=WEBHOOK_URL)
-
-    # Create aiohttp application
     app = web.Application()
 
-    # Create webhook handler
     webhook_handler = SimpleRequestHandler(dispatcher=dispatcher, bot=bot)
     webhook_handler.register(app, path=WEBHOOK_PATH)
 
@@ -66,4 +69,4 @@ async def main() -> None:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    asyncio.run(main())
+    main()
