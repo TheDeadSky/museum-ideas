@@ -65,6 +65,10 @@ services:
     restart: unless-stopped
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
+      - WEBHOOK_URL=${WEBHOOK_URL}
+      - WEBHOOK_PATH=${WEBHOOK_PATH}
+      - WEBAPP_HOST=${WEBAPP_HOST}
+      - WEBAPP_PORT=${WEBAPP_PORT}
       - API_BASE_URL=http://museum_api:8000
     depends_on:
       museum_api:
