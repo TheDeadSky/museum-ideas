@@ -158,7 +158,7 @@ async def register(registration_data: RegistrationData, db: Session = Depends(ge
 
 
 @app.get("/is-registered/{sm_id}")
-async def is_registered(sm_id: str, db: Session = Depends(get_db)) -> dict:
+async def is_registered(sm_id: str, db: Session = Depends(get_db)) -> RegistrationResponse:
     """Check if a user is registered by email"""
     return await is_user_registered(sm_id, db)
 
