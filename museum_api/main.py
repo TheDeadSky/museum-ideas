@@ -1,27 +1,25 @@
-import json
-import random
-from typing import Annotated, List
 from contextlib import asynccontextmanager
 from fastapi import (
     FastAPI,
-    HTTPException,
-    Query,
-    Response,
-    Depends
+    Depends,
+    HTTPException
 )
 from sqlalchemy.orm import Session
+from datetime import datetime
 
-from db.models import Course, CoursePart, Story, StoryHistory, User
-from services.registration.actions import registration
-from services.registration.exceptions import RegistrationException
+from db.models import Course, CoursePart, UserCourseProgress
+from db.utils import get_user_by_sm_id
+from services.registration import registration, RegistrationException, is_user_registered
+from services.history import get_random_history, HistoryException
 from schemas import (
     Feedback,
-    HistoryData,
-    HistoryResponse,
-    SelfSupportCourse,
-    SelfSupportCourseBeginnerData,
+    SelfSupportCourseData,
     RegistrationData,
-    RegistrationResponse
+    RegistrationResponse,
+    SelfSupportCoursePartData,
+    SelfSupportCourseResponse,
+    CourseUserAnswer,
+    BaseResponse
 )
 from config import settings
 from db.database import get_db, create_tables
@@ -44,11 +42,6 @@ app = FastAPI(
 )
 
 
-@app.get("/")
-async def index():
-    return {"message": "Hello World from FastAPI"}
-
-
 @app.get("/health")
 async def health_check(db: Session = Depends(get_db)):
     """Health check endpoint"""
@@ -60,44 +53,99 @@ async def health_check(db: Session = Depends(get_db)):
         return {"status": "unhealthy", "database": "disconnected", "error": str(e)}
 
 
-@app.get("/get-bot-text")
-async def bot_text(keys: Annotated[List[str], Query(max_length=100)]):
-    with open("db_imitation/bot_texts.json", "r", encoding="utf-8") as f:
-        bot_texts = json.load(f)
-
-    for key in keys:
-        if key not in bot_texts:
-            return Response(status_code=404, content={"error": f"Key {key} not found in bot_texts"})
-
-    return {key: bot_texts[key] for key in keys}
-
-
-@app.post("/begin-self-support-course")
-async def begin_self_support_course(
-    beginner_data: SelfSupportCourseBeginnerData,
+@app.post("/self-support-course/{sm_id}")
+async def get_self_support_course(
+    sm_id: str,
     db: Session = Depends(get_db)
-) -> SelfSupportCourse:
-    course = db.query(Course).filter(Course.id == beginner_data.user_id).first()
+) -> SelfSupportCourseResponse:
+    """Get a self-support course for a user"""
+    user = get_user_by_sm_id(db, sm_id)
+    if not user:
+        raise HTTPException(status_code=404, detail=f"User not found by sm_id({sm_id})")
+
+    course = db.query(Course).first()
+
     if not course:
         raise HTTPException(status_code=404, detail="Course not found")
 
-    first_part = db.query(CoursePart).filter(
-        CoursePart.course_id == course.id
-    ).order_by(CoursePart.order_number).first()
+    user_progress = db.query(UserCourseProgress).filter(
+        UserCourseProgress.user_id == user.id
+    ).order_by(UserCourseProgress.date.desc()).first()
 
-    if not first_part:
+    if not user_progress:
+        next_course_part = db.query(CoursePart).filter(
+            CoursePart.course_id == course.id
+        ).order_by(CoursePart.order_number).first()
+
+    else:
+        finished_course_part = db.query(CoursePart).filter(
+            CoursePart.course_id == course.id,
+            CoursePart.id == user_progress.part_id
+        ).first()
+
+        next_course_part = db.query(CoursePart).filter(
+            CoursePart.course_id == course.id,
+            CoursePart.order_number == finished_course_part.order_number + 1,
+        ).first()
+
+    if next_course_part.date_of_publication > datetime.now():
+        return BaseResponse(
+            success=False,
+            message=f"Следующая лекция выйдет {next_course_part.date_of_publication.strftime('%d.%m.%Y')}"
+        )
+
+    if not next_course_part:
         raise HTTPException(status_code=404, detail="No course parts found")
 
-    self_support_course = {
-        "title": course.course_name,
-        "description": course.description,
-        "video_url": first_part.video_url,
-        "course_text": first_part.description
-    }
+    course_data = SelfSupportCourseData(
+        id=course.id,
+        title=course.course_name,
+        description=course.description
+    )
 
-    self_support_course_schema = SelfSupportCourse(**self_support_course)
+    part_data = SelfSupportCoursePartData(
+        id=next_course_part.id,
+        title=next_course_part.title,
+        description=next_course_part.description,
+        video_url=next_course_part.video_url,
+        image_url=next_course_part.image_url,
+        course_text=next_course_part.description,
+        question=next_course_part.question,
+        publication_date=next_course_part.date_of_publication
+    )
+
+    self_support_course_schema = SelfSupportCourseResponse(
+        success=True,
+        message="Начата новая часть курса",
+        course_data=course_data,
+        part_data=part_data
+    )
 
     return self_support_course_schema
+
+
+@app.post("/self-support-course/{sm_id}/answer")
+async def answer_self_support_course(
+    answer_data: CourseUserAnswer,
+    db: Session = Depends(get_db)
+) -> SelfSupportCourseResponse:
+    """Answer a self-support course question"""
+    user = get_user_by_sm_id(db, answer_data.sm_id)
+    if not user:
+        raise HTTPException(status_code=404, detail=f"User not found by sm_id({answer_data.sm_id})")
+
+    user_progress = UserCourseProgress(
+        user_id=user.id,
+        part_id=answer_data.part_id,
+        answer=answer_data.answer
+    )
+    db.add(user_progress)
+    db.commit()
+
+    return BaseResponse(
+        success=True,
+        message="Ответ сохранен"
+    )
 
 
 @app.post("/register")
@@ -112,77 +160,16 @@ async def register(registration_data: RegistrationData, db: Session = Depends(ge
 @app.get("/is-registered/{sm_id}")
 async def is_registered(sm_id: str, db: Session = Depends(get_db)) -> dict:
     """Check if a user is registered by email"""
-    user = db.query(User).filter(
-        (User.telegram_id == sm_id) | (User.vk_id == sm_id)
-    ).first()
-
-    if user:
-        return {"is_registered": True, "message": "User is registered"}
-    else:
-        return {"is_registered": False, "message": "User is not registered"}
+    return await is_user_registered(sm_id, db)
 
 
 @app.get("/random-history/{sm_id}")
-async def get_random_history(sm_id: str, db: Session = Depends(get_db)):
+async def get_random_history_endpoint(sm_id: str, db: Session = Depends(get_db)):
     """Get a random unseen story for a user"""
-
-    user = db.query(User).filter(
-        (User.telegram_id == sm_id) | (User.vk_id == sm_id)
-    ).first()
-
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    viewed_story_ids = db.query(StoryHistory.story_id).filter(
-        StoryHistory.user_id == user.id
-    ).all()
-    viewed_story_ids = [story_id[0] for story_id in viewed_story_ids]
-
-    unseen_stories = db.query(Story).filter(
-        ~Story.id.in_(viewed_story_ids) & (Story.is_agreed_to_publication)
-    ).all()
-
-    if not unseen_stories:
-        return {"success": False, "message": "К сожалению, нет новых историй"}
-
-    random_story: Story = random.choice(unseen_stories)
-
-    if random_story.is_anonymous:
-        history_author = "Анонимный автор"
-    else:
-        if random_story.user_id:
-            history_author = f"{random_story.user.first_name} {random_story.user.last_name}"
-        else:
-            history_author = random_story.user_name
-
-    is_anonymous = random_story.is_anonymous \
-        if random_story.is_anonymous is not None else False
-    is_agreed_to_publication = random_story.is_agreed_to_publication \
-        if random_story.is_agreed_to_publication is not None else False
-
-    history_data = {
-        "author": history_author if history_author else None,
-        "title": random_story.title if random_story.title else None,
-        "text": random_story.text if random_story.text else None,
-        "media_url": random_story.media_url or None,
-        "link": random_story.link or None,
-        "is_anonymous": is_anonymous,
-        "is_agreed_to_publication": is_agreed_to_publication,
-        "content_type": random_story.content_type,
-    }
-    history_data = HistoryData(**history_data)
-
-    history_response = HistoryResponse(
-        success=True,
-        message="История успешно получена",
-        history=history_data
-    )
-
-    story_history = StoryHistory(story_id=random_story.id, user_id=user.id)
-    db.add(story_history)
-    db.commit()
-
-    return history_response
+    try:
+        return await get_random_history(sm_id, db)
+    except HistoryException as e:
+        raise HTTPException(status_code=404, detail=str(e))
 
 
 @app.post("/send-feedback")
