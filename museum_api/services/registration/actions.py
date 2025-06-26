@@ -43,12 +43,16 @@ async def registration(registration_data: RegistrationData, db: Session) -> Regi
 
 async def is_user_registered(sm_id: str, db: Session) -> RegistrationResponse:
     user = get_user_by_sm_id(db, sm_id)
-    if not user:
+
+    print(user)
+
+    if user:
         return RegistrationResponse(
-            success=False,
-            message="Пользователь не найден"
+            success=True,
+            message="Пользователь найден"
         )
+
     return RegistrationResponse(
-        success=True,
-        message="Пользователь найден"
+        success=False,
+        message=f"Пользователь не найден. sm_id: {sm_id}"
     )
