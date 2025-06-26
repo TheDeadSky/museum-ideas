@@ -13,7 +13,7 @@ async def get_self_support_course_part(tg_id: str) -> SelfSupportCourseResponse:
     api_base_url = os.getenv("API_BASE_URL", "http://museum_api:8000")
 
     async with aiohttp.ClientSession() as session:
-        async with session.get(f"{api_base_url}/self-support-course/{tg_id}") as response:
+        async with session.post(f"{api_base_url}/self-support-course/{tg_id}") as response:
             if response.status == 200:
                 response_data = await response.json()
                 return SelfSupportCourseResponse(**response_data)
