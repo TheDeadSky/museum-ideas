@@ -1,13 +1,14 @@
 from aiogram.fsm.scene import Scene, on
 from aiogram.types import Message, CallbackQuery
 
-from scenes.main_menu import MainMenuScene
+from menus import NEXT_PART_BUTTON, TO_MAIN_MENU_BUTTON
 from services.api_service import (
     get_random_achievement_photo_url,
     get_self_support_course_part,
     get_text_from_db,
     self_support_course_answer
 )
+from utils import merge_inline_menus
 
 
 class SelfSupportCourseScene(Scene, state="self-support-course"):
@@ -36,6 +37,12 @@ class SelfSupportCourseScene(Scene, state="self-support-course"):
                 await message.answer(part_data.question)
             else:
                 await self.complete_course_part(message)
+        else:
+            await message.answer(self_support_course_response.message)
+            await message.answer(
+                "В ожидании следующей лекции вы можете узнать истории коллег.",
+                reply_markup=TO_MAIN_MENU_BUTTON
+            )
 
     @on.callback_query.enter()
     async def on_enter_callback(self, callback_query: CallbackQuery):
@@ -49,7 +56,22 @@ class SelfSupportCourseScene(Scene, state="self-support-course"):
         congratulations_text = await get_text_from_db("congratulations_text")
         achievement_photo = await get_random_achievement_photo_url()
 
-        await message.answer_photo(achievement_photo, congratulations_text)
+        next_part = await get_self_support_course_part(message.from_user.id)
+
+        markup = TO_MAIN_MENU_BUTTON
+
+        if next_part.success:
+            markup = merge_inline_menus(
+                NEXT_PART_BUTTON,
+                TO_MAIN_MENU_BUTTON,
+            )
+
+        await message.answer_photo(
+            photo=achievement_photo,
+            caption=congratulations_text,
+            reply_markup=markup
+        )
+
         await self.complete_course_part(message, user_answer)
 
     async def complete_course_part(self, message: Message, user_answer: str = None):
@@ -58,5 +80,3 @@ class SelfSupportCourseScene(Scene, state="self-support-course"):
             part_id=await self.wizard.get("part_id"),
             answer=user_answer
         )
-
-        await self.wizard.goto(MainMenuScene)
