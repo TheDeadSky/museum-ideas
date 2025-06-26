@@ -71,6 +71,8 @@ services:
         condition: service_healthy
     networks:
       - museum_network
+    ports:
+      - "9000:9000"
     volumes:
       - ./museum_bot:/app
     healthcheck:
