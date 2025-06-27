@@ -1,7 +1,7 @@
 import random
 from sqlalchemy.orm import Session
 from db.models import Story, StoryHistory
-from schemas import HistoryData, HistoryResponse
+from .schemas import HistoryData, HistoryResponse
 from services.history.exceptions import HistoryException
 from services.history.utils import (
     get_viewed_story_ids,

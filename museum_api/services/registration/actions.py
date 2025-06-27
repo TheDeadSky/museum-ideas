@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from db.models import User
 from db.utils import get_user_by_sm_id
-from schemas import RegistrationData, RegistrationResponse
+from .schemas import RegistrationData, RegistrationResponse
 from .utils import raise_if_user_exist
 from .exceptions import RegistrationException, UserExistException
 
@@ -43,8 +43,6 @@ async def registration(registration_data: RegistrationData, db: Session) -> Regi
 
 async def is_user_registered(sm_id: str, db: Session) -> RegistrationResponse:
     user = get_user_by_sm_id(db, sm_id)
-
-    print(user)
 
     if user:
         return RegistrationResponse(

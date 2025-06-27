@@ -11,16 +11,14 @@ from db.models import Course, CoursePart, UserCourseProgress
 from db.utils import get_user_by_sm_id
 from services.registration import registration, RegistrationException, is_user_registered
 from services.history import get_random_history, HistoryException
-from schemas import (
-    Feedback,
+from services.self_support_course.schemas import (
     SelfSupportCourseData,
-    RegistrationData,
-    RegistrationResponse,
     SelfSupportCoursePartData,
     SelfSupportCourseResponse,
-    CourseUserAnswer,
-    BaseResponse
+    CourseUserAnswer
 )
+from services.registration.schemas import RegistrationData, RegistrationResponse
+from schemas import Feedback, BaseResponse
 from config import settings
 from db.database import get_db, create_tables
 
