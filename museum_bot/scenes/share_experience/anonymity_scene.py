@@ -9,7 +9,7 @@ from menus import TO_MAIN_MENU_BUTTON, YES_NO_MENU
 class AnonymityScene(Scene, state="share-experience-anonymity"):
     @on.message.enter()
     async def on_enter(self, message: CallbackQuery):
-        anonymous_question = await get_text_from_db("anonymous_question")
+        anonymous_question = await get_text_from_db("anonymous_message_question")
         await message.edit_text(anonymous_question, reply_markup=YES_NO_MENU)
 
     @on.callback_query.enter()
