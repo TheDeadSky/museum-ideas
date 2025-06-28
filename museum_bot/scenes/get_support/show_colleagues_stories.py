@@ -40,7 +40,7 @@ class ShowColleaguesStoriesScene(Scene, state="colleagues-stories"):
             display_text += f"\n\n<i>{story.author}</i>"
 
         if story.content_type == "text":
-            await message.edit_text(
+            await message.answer(
                 display_text,
                 reply_markup=merge_inline_menus(
                     ONE_MORE_STORY_BUTTON,
@@ -49,7 +49,7 @@ class ShowColleaguesStoriesScene(Scene, state="colleagues-stories"):
             )
 
         elif story.content_type == "audio":
-            await message.edit_text(
+            await message.answer(
                 display_text
             )
             await message.answer_audio(
@@ -61,7 +61,7 @@ class ShowColleaguesStoriesScene(Scene, state="colleagues-stories"):
             )
 
         elif story.content_type == "video":
-            await message.edit_text(
+            await message.answer(
                 display_text
             )
             await message.answer_video(

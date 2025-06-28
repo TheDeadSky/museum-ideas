@@ -21,7 +21,7 @@ TOKEN = getenv("BOT_TOKEN")
 WEBHOOK_URL = getenv("WEBHOOK_URL")
 WEBHOOK_PATH = getenv("WEBHOOK_PATH", "/webhook")
 WEBAPP_HOST = getenv("WEBAPP_HOST", "0.0.0.0")
-WEBAPP_PORT = int(getenv("WEBAPP_PORT", "8000"))
+WEBAPP_PORT = int(getenv("WEBAPP_PORT", "3000"))
 
 
 async def on_startup(bot: Bot) -> None:

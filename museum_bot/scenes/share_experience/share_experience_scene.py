@@ -20,4 +20,8 @@ class ShareExperienceScene(Scene, state="share-experience"):
 
     @on.message(F.text | F.voice | F.audio, after=After.goto(ConfirmationScene))
     async def handle_message(self, message: Message):
+        print("message.text:", message.text)
+        print("message.voice:", message.voice)
+        print("message.audio:", message.audio)
+
         await self.wizard.update_data(user_message=message.text or message.voice or message.audio)
