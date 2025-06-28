@@ -2,6 +2,7 @@ from aiogram import Router
 from aiogram.fsm.scene import ScenesManager
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message
+from aiogram import Bot
 
 from actions.main_menu import default_main_menu
 from actions.registration import make_registration_button
@@ -35,4 +36,15 @@ async def command_dev_menu_handler(message: Message) -> None:
         message,
         await get_text_from_db("main_menu_text"),
         mode="dev"
+    )
+
+
+@mc_router.message(Command("send_voice"))
+async def send_voice_message(message: Message, bot: Bot) -> None:
+    args = message.text.split()[1:]
+
+    file = await bot.get_file(args[0])
+
+    await message.answer_voice(
+        voice=file.file_path
     )
