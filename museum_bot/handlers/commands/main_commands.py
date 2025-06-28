@@ -29,7 +29,7 @@ async def command_start_handler(message: Message, scenes: ScenesManager) -> None
     await message.answer(greetings, reply_markup=make_registration_button())
 
 
-@mc_router.message(Command("dev-menu"))
+@mc_router.message(Command("dev_menu"))
 async def command_dev_menu_handler(message: Message) -> None:
     await default_main_menu(
         message,
