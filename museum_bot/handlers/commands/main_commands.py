@@ -3,6 +3,7 @@ from aiogram.fsm.scene import ScenesManager
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message
 from aiogram import Bot
+from aiogram.types import URLInputFile
 
 from actions.main_menu import default_main_menu
 from actions.registration import make_registration_button
@@ -46,5 +47,5 @@ async def send_voice_message(message: Message, bot: Bot) -> None:
     file = await bot.get_file(args[0])
 
     await message.answer_voice(
-        voice=file.file_path
+        voice=URLInputFile(file.file_path)
     )
