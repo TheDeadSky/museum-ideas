@@ -10,7 +10,7 @@ from menus import YES_NO_MENU
 class PublicationScene(Scene, state="share-experience-publication"):
     @on.message.enter()
     async def on_enter(self, message: CallbackQuery):
-        publish_question = await get_text_from_db("publish_question")
+        publish_question = await get_text_from_db("publish_message_question")
         await message.edit_text(publish_question, reply_markup=YES_NO_MENU)
 
     @on.callback_query.enter()
