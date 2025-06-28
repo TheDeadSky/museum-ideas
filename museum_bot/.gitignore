@@ -94,3 +94,5 @@ session_data/
 downloads/
 uploads/
 media/ 
+
+templates/

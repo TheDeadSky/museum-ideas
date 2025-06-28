@@ -1,6 +1,6 @@
 from aiogram import Router
 from aiogram.fsm.scene import ScenesManager
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, Command
 from aiogram.types import Message
 
 from actions.main_menu import default_main_menu
@@ -27,3 +27,11 @@ async def command_start_handler(message: Message, scenes: ScenesManager) -> None
     greetings = await get_text_from_db("start_greetings")
 
     await message.answer(greetings, reply_markup=make_registration_button())
+
+
+@mc_router.message(Command("dev-menu"))
+async def command_dev_menu_handler(message: Message) -> None:
+    await default_main_menu(
+        message,
+        await get_text_from_db("main_menu_text")
+    )
