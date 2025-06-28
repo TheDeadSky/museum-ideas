@@ -33,5 +33,6 @@ async def command_start_handler(message: Message, scenes: ScenesManager) -> None
 async def command_dev_menu_handler(message: Message) -> None:
     await default_main_menu(
         message,
-        await get_text_from_db("main_menu_text")
+        await get_text_from_db("main_menu_text"),
+        mode="dev"
     )
