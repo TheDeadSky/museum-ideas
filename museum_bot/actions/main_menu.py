@@ -16,10 +16,10 @@ async def default_main_menu(message: Message, main_menu_text: str = "Главн�
         if main_menu_data:
             ordered_buttons = sorted(main_menu_data["buttons"], key=lambda x: x["order"])
             buttons = [
-                InlineKeyboardButton(
+                [InlineKeyboardButton(
                     text=button["text"],
                     callback_data=button["callback_data"]
-                ) for button in ordered_buttons if mode in button["modes"]
+                )] for button in ordered_buttons if mode in button["modes"]
             ]
             await message.answer(main_menu_text, reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons))
         else:
