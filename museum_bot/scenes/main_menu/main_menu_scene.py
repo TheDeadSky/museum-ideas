@@ -20,6 +20,8 @@ class MainMenuScene(Scene, state="main-menu"):
     @on.callback_query.enter()
     async def on_callback_enter(self, callback: CallbackQuery):
         await callback.answer()
+        await callback.message.delete_reply_markup()
+
         main_menu_text = await get_text_from_db("main_menu_text")
         await default_main_menu(callback.message, main_menu_text=main_menu_text)
 
