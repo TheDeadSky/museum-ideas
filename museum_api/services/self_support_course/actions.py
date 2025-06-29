@@ -83,6 +83,7 @@ async def save_self_support_course_answer(answer_data: CourseUserAnswer, db: Ses
     user_progress = UserCourseProgress(
         user_id=user.id,
         part_id=answer_data.part_id,
+        date=datetime.now(),
         answer=answer_data.answer
     )
     db.add(user_progress)
