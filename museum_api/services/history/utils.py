@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from db.models import Story, StoryHistory
+from services.share_experience.enums import ExperienceStatus
 
 
 def get_viewed_story_ids(db: Session, user_id: int) -> list[int]:
@@ -13,7 +14,9 @@ def get_viewed_story_ids(db: Session, user_id: int) -> list[int]:
 def get_unseen_stories(db: Session, viewed_story_ids: list[int]) -> list[Story]:
     """Get stories that user hasn't viewed yet and are agreed to publication"""
     return db.query(Story).filter(
-        ~Story.id.in_(viewed_story_ids) & (Story.is_agreed_to_publication)
+        ~Story.id.in_(viewed_story_ids)
+        & (Story.is_agreed_to_publication)
+        & (Story.status == ExperienceStatus.ACCEPTED)
     ).all()
 
 
