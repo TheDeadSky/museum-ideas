@@ -35,7 +35,7 @@ class SelfSupportCourseScene(Scene, state="self-support-course"):
             await message.answer(f"{part_title}\n{part_description}")
 
             if part_data.video_url:
-                await message.answer(part_data.video_url)
+                await message.answer_video(part_data.video_url)
 
             if part_data.question:
                 await message.answer(part_data.question)
