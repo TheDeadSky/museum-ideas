@@ -44,10 +44,8 @@ class SelfSupportCourseScene(Scene, state="self-support-course"):
                 file = BufferedInputFile(video_data, "video.mp4")
                 await message.answer_video(file)
 
-            if part_data.question:
-                await message.answer(part_data.question)
-            else:
-                await self.complete_course_part(message)
+            await message.answer(f"<blockquote>❓ {part_data.question}</blockquote>")
+
         else:
             await message.answer(self_support_course_response.message)
             await message.answer(
