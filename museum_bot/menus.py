@@ -2,7 +2,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 MAIN_MENU = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="Получить поддержку", callback_data="get_support")],
-    # [InlineKeyboardButton(text="Поделиться опытом", callback_data="share_experience")],
+    [InlineKeyboardButton(text="Поделиться опытом", callback_data="share_experience")],
     # [InlineKeyboardButton(text="Обратная связь", callback_data="feedback")],
     [InlineKeyboardButton(text="О проекте", callback_data="about_project")]
 ])
@@ -39,5 +39,5 @@ ONE_MORE_STORY_BUTTON = InlineKeyboardMarkup(inline_keyboard=[
 ])
 
 NEXT_PART_BUTTON = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="Смотреть следующую лекцию", callback_data="self_support")],
+    [InlineKeyboardButton(text="Смотреть следующую лекцию", callback_data="self_support_next_part")],
 ])
