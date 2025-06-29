@@ -11,7 +11,7 @@ class SubmitShareExperienceScene(Scene, state="share-experience-submit"):
     async def on_enter(self, message: CallbackQuery):
         data = await self.wizard.get_data()
 
-        valid_data = ShareExperienceData({
+        valid_data = ShareExperienceData(**{
             **data,
             "sm_id": message.from_user.id
         })
