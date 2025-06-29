@@ -1,5 +1,7 @@
+import io
+
 from aiogram.fsm.scene import Scene, on
-from aiogram.types import Message, CallbackQuery, User
+from aiogram.types import Message, CallbackQuery, User, BufferedInputFile
 
 from menus import NEXT_PART_BUTTON, TO_MAIN_MENU_BUTTON
 from services.api_service import (
@@ -35,7 +37,11 @@ class SelfSupportCourseScene(Scene, state="self-support-course"):
             await message.answer(f"{part_title}\n{part_description}")
 
             if part_data.video_url:
-                await message.answer_video(part_data.video_url)
+                bytes_io = io.BytesIO()
+                bytes_io.write(part_data.video_url.encode("utf-8"))
+                file = BufferedInputFile(bytes_io.getvalue(), "video.mp4")
+
+                await message.answer_video(file)
 
             if part_data.question:
                 await message.answer(part_data.question)
