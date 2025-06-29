@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from db.models import UserCourseProgress, Course, CoursePart
-from utils import get_user_by_sm_id
+from db.utils import get_user_by_sm_id
 from schemas import BaseResponse
 from .schemas import CourseUserAnswer, SelfSupportCourseData, SelfSupportCoursePartData, SelfSupportCourseResponse
 
