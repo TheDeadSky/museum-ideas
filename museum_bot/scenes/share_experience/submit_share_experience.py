@@ -12,8 +12,8 @@ class SubmitShareExperienceScene(Scene, state="share-experience-submit"):
         data = await self.wizard.get_data()
 
         valid_data = ShareExperienceData(**{
-            **data,
-            "sm_id": message.from_user.id
+            "sm_id": str(message.from_user.id),
+            **data
         })
 
         response = await send_experience(valid_data)
