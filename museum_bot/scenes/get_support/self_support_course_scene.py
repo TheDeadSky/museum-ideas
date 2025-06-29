@@ -1,6 +1,7 @@
 from aiogram.fsm.scene import Scene, on
 from aiogram.types import Message, CallbackQuery, User, BufferedInputFile
 import aiohttp
+from aiogram import F
 
 from menus import NEXT_PART_BUTTON, TO_MAIN_MENU_BUTTON
 from services.api_service import (
@@ -92,3 +93,10 @@ class SelfSupportCourseScene(Scene, state="self-support-course"):
             part_id=data["part_id"],
             answer=user_answer
         )
+
+    @on.callback_query(F.data == "self_support_next_part")
+    async def next_part(self, callback: CallbackQuery):
+        await callback.answer()
+        await callback.message.delete_reply_markup()
+
+        await self.on_enter(callback.message, callback.from_user)
