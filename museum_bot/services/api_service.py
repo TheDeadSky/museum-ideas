@@ -4,6 +4,7 @@ import random
 import aiohttp
 
 from models.base import BaseResponse
+from models.experience import ShareExperienceData
 from models.registration import RegistrationData
 from models.stories import HistoryResponse
 from models.course import SelfSupportCourseResponse, CourseUserAnswer
@@ -86,6 +87,18 @@ async def get_random_history(tg_id: str) -> HistoryResponse:
             if response.status == 200:
                 response_data = await response.json()
                 return HistoryResponse(**response_data)
+            else:
+                error_data = await response.json()
+                raise Exception(f"API error: {error_data.get('detail', 'Unknown error')}")
+
+
+async def send_experience(data: ShareExperienceData):
+    api_base_url = os.getenv("API_BASE_URL", "http://museum_api:8000")
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post(f"{api_base_url}/share-experience", json=data.model_dump()) as response:
+            if response.status == 200:
+                return await response.json()
             else:
                 error_data = await response.json()
                 raise Exception(f"API error: {error_data.get('detail', 'Unknown error')}")

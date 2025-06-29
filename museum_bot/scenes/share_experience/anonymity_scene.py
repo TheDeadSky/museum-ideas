@@ -1,9 +1,10 @@
-from aiogram.fsm.scene import Scene, on
+from aiogram.fsm.scene import Scene, on, After
 from aiogram.types import CallbackQuery
 from aiogram import F
 
 from services.api_service import get_text_from_db
-from menus import TO_MAIN_MENU_BUTTON, YES_NO_MENU
+from menus import YES_NO_MENU
+from scenes.share_experience.submit_share_experience import SubmitShareExperienceScene
 
 
 class AnonymityScene(Scene, state="share-experience-anonymity"):
@@ -17,18 +18,9 @@ class AnonymityScene(Scene, state="share-experience-anonymity"):
         await callback.answer()
         await self.on_enter(callback.message)
 
-    @on.callback_query(F.data.in_(["yes", "no"]))
+    @on.callback_query(F.data.in_(["yes", "no"]), after=After.goto(SubmitShareExperienceScene))
     async def handle_anonymous(self, callback: CallbackQuery):
         await callback.answer()
+        await callback.message.delete_reply_markup()
         is_anonymous = callback.data == "yes"
-        await self.wizard.update_data(anonymous=is_anonymous)
-
-        data = await self.wizard.get_data()
-        final_message = await get_text_from_db("final_thank_message")
-        await callback.message.edit_text(
-            f"{final_message}\n\n"
-            f"Ваше сообщение:  {data['user_message']}\n"
-            f"Публикация: {'Да' if data.get('publish') else 'Нет'}\n"
-            f"Анонимно: {'Да' if is_anonymous else 'Нет'}",
-            reply_markup=TO_MAIN_MENU_BUTTON
-        )
+        await self.wizard.update_data(is_anonymous=is_anonymous)

@@ -68,6 +68,15 @@ class Story(Base):
         nullable=True
     )
     user_name: Mapped[Optional[str]] = mapped_column(String(255))
+    status: Mapped[Optional[str]] = mapped_column(String(50))
+    content_type: Mapped[Optional[str]] = mapped_column(String(50))
+    title: Mapped[Optional[str]] = mapped_column(String(255))
+    text: Mapped[Optional[str]] = mapped_column(Text)
+    tag: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    media_url: Mapped[Optional[str]] = mapped_column(String(500))
+    link: Mapped[Optional[str]] = mapped_column(String(500))
+    is_anonymous: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_agreed_to_publication: Mapped[bool] = mapped_column(Boolean, default=False)
     updated: Mapped[Optional[DateTime]] = mapped_column(
         DateTime,
         default=datetime.now(),
@@ -78,15 +87,6 @@ class Story(Base):
         default=datetime.now(),
         onupdate=datetime.now()
     )
-    status: Mapped[Optional[str]] = mapped_column(String(50))
-    content_type: Mapped[Optional[str]] = mapped_column(String(50))
-    title: Mapped[Optional[str]] = mapped_column(String(255))
-    text: Mapped[Optional[str]] = mapped_column(Text)
-    tag: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
-    media_url: Mapped[Optional[str]] = mapped_column(String(500))
-    link: Mapped[Optional[str]] = mapped_column(String(500))
-    is_anonymous: Mapped[bool] = mapped_column(Boolean, default=False)
-    is_agreed_to_publication: Mapped[bool] = mapped_column(Boolean, default=False)
 
     user: Mapped[Optional["User"]] = relationship(
         "User", back_populates="stories"

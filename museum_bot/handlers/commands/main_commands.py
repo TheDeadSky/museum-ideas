@@ -5,7 +5,7 @@ from aiogram.fsm.scene import ScenesManager
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message
 from aiogram import Bot
-from aiogram.types import URLInputFile, BufferedInputFile
+from aiogram.types import BufferedInputFile
 
 from actions.main_menu import default_main_menu
 from actions.registration import make_registration_button

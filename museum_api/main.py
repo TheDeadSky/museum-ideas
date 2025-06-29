@@ -5,22 +5,17 @@ from fastapi import (
     HTTPException
 )
 from sqlalchemy.orm import Session
-from datetime import datetime
 
-from db.models import Course, CoursePart, UserCourseProgress
-from db.utils import get_user_by_sm_id
 from services.registration import registration, RegistrationException, is_user_registered
 from services.history import get_random_history, HistoryException
-from services.self_support_course.schemas import (
-    SelfSupportCourseData,
-    SelfSupportCoursePartData,
-    SelfSupportCourseResponse,
-    CourseUserAnswer
-)
+from services.self_support_course.schemas import SelfSupportCourseResponse, CourseUserAnswer
 from services.registration.schemas import RegistrationData, RegistrationResponse
-from schemas import Feedback, BaseResponse
+from schemas import BaseResponse, Feedback
 from config import settings
 from db.database import get_db, create_tables
+from services.self_support_course.actions import load_self_support_course, save_self_support_course_answer
+from services.share_experience.actions import save_user_experience
+from services.share_experience.schemas import ShareExperienceData
 
 
 @asynccontextmanager
@@ -44,7 +39,6 @@ app = FastAPI(
 async def health_check(db: Session = Depends(get_db)):
     """Health check endpoint"""
     try:
-        # Test database connection
         db.execute("SELECT 1")
         return {"status": "healthy", "database": "connected"}
     except Exception as e:
@@ -57,69 +51,9 @@ async def get_self_support_course(
     db: Session = Depends(get_db)
 ) -> SelfSupportCourseResponse:
     """Get a self-support course for a user"""
-    user = get_user_by_sm_id(db, sm_id)
-    if not user:
-        raise HTTPException(status_code=404, detail=f"User not found by sm_id({sm_id})")
+    self_support_course = load_self_support_course(sm_id, db)
 
-    course = db.query(Course).first()
-
-    if not course:
-        raise HTTPException(status_code=404, detail="Course not found")
-
-    user_progress = db.query(UserCourseProgress).filter(
-        UserCourseProgress.user_id == user.id
-    ).order_by(UserCourseProgress.date.desc()).first()
-
-    if not user_progress:
-        next_course_part = db.query(CoursePart).filter(
-            CoursePart.course_id == course.id
-        ).order_by(CoursePart.order_number).first()
-
-    else:
-        finished_course_part = db.query(CoursePart).filter(
-            CoursePart.course_id == course.id,
-            CoursePart.id == user_progress.part_id
-        ).first()
-
-        next_course_part = db.query(CoursePart).filter(
-            CoursePart.course_id == course.id,
-            CoursePart.order_number == finished_course_part.order_number + 1,
-        ).first()
-
-    if next_course_part.date_of_publication > datetime.now():
-        return BaseResponse(
-            success=False,
-            message=f"Следующая лекция выйдет {next_course_part.date_of_publication.strftime('%d.%m.%Y')}"
-        )
-
-    if not next_course_part:
-        raise HTTPException(status_code=404, detail="No course parts found")
-
-    course_data = SelfSupportCourseData(
-        id=course.id,
-        title=course.course_name,
-        description=course.description
-    )
-
-    part_data = SelfSupportCoursePartData(
-        id=next_course_part.id,
-        title=next_course_part.title,
-        description=next_course_part.description,
-        video_url=next_course_part.video_url,
-        image_url=next_course_part.image_url,
-        course_text=next_course_part.description,
-        question=next_course_part.question,
-        publication_date=next_course_part.date_of_publication
-    )
-
-    self_support_course_schema = SelfSupportCourseResponse(
-        success=True,
-        message="Начата новая часть курса",
-        course_data=course_data,
-        part_data=part_data
-    )
-
-    return self_support_course_schema
+    return self_support_course
 
 
 @app.post("/self-support-course/{sm_id}/answer")
@@ -128,22 +62,7 @@ async def answer_self_support_course(
     db: Session = Depends(get_db)
 ) -> SelfSupportCourseResponse:
     """Answer a self-support course question"""
-    user = get_user_by_sm_id(db, answer_data.sm_id)
-    if not user:
-        raise HTTPException(status_code=404, detail=f"User not found by sm_id({answer_data.sm_id})")
-
-    user_progress = UserCourseProgress(
-        user_id=user.id,
-        part_id=answer_data.part_id,
-        answer=answer_data.answer
-    )
-    db.add(user_progress)
-    db.commit()
-
-    return BaseResponse(
-        success=True,
-        message="Ответ сохранен"
-    )
+    return save_self_support_course_answer(answer_data, db)
 
 
 @app.post("/register")
@@ -176,3 +95,8 @@ async def send_feedback(feedback: Feedback, db: Session = Depends(get_db)) -> Fe
 
     # TODO: Save feedback to database
     return feedback
+
+
+@app.post("/share-experience")
+async def share_experience(data: ShareExperienceData, db: Session = Depends(get_db)) -> BaseResponse:
+    return save_user_experience(data, db)

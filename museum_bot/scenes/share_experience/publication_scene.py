@@ -18,12 +18,7 @@ class PublicationScene(Scene, state="share-experience-publication"):
         await callback.answer()
         await self.on_enter(callback.message)
 
-    @on.callback_query(F.data == "yes", after=After.goto(AnonymityScene))
+    @on.callback_query(F.data.in_(["yes", "no"]), after=After.goto(AnonymityScene))
     async def publish_yes(self, callback: CallbackQuery):
         await callback.answer()
-        await self.wizard.update_data(publish=True)
-
-    @on.callback_query(F.data == "no", after=After.goto(AnonymityScene))
-    async def publish_no(self, callback: CallbackQuery):
-        await callback.answer()
-        await self.wizard.update_data(publish=False)
+        await self.wizard.update_data(publish=callback.data == "yes")
