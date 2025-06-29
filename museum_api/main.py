@@ -51,7 +51,7 @@ async def get_self_support_course(
     db: Session = Depends(get_db)
 ) -> SelfSupportCourseResponse:
     """Get a self-support course for a user"""
-    self_support_course = load_self_support_course(sm_id, db)
+    self_support_course = await load_self_support_course(sm_id, db)
 
     return self_support_course
 
@@ -62,7 +62,7 @@ async def answer_self_support_course(
     db: Session = Depends(get_db)
 ) -> SelfSupportCourseResponse:
     """Answer a self-support course question"""
-    return save_self_support_course_answer(answer_data, db)
+    return await save_self_support_course_answer(answer_data, db)
 
 
 @app.post("/register")
@@ -99,4 +99,4 @@ async def send_feedback(feedback: Feedback, db: Session = Depends(get_db)) -> Fe
 
 @app.post("/share-experience")
 async def share_experience(data: ShareExperienceData, db: Session = Depends(get_db)) -> BaseResponse:
-    return save_user_experience(data, db)
+    return await save_user_experience(data, db)
