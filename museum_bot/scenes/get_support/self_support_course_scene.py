@@ -79,8 +79,10 @@ class SelfSupportCourseScene(Scene, state="self-support-course"):
         await self.complete_course_part(message, user_answer)
 
     async def complete_course_part(self, message: Message, user_answer: str = None):
+        data = await self.wizard.get_data()
+
         await self_support_course_answer(
             tg_id=str(message.from_user.id),
-            part_id=await self.wizard.get("part_id"),
+            part_id=data["part_id"],
             answer=user_answer
         )
