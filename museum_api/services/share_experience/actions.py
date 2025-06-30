@@ -10,8 +10,13 @@ from .enums import ExperienceStatus
 async def save_user_experience(data: ShareExperienceData, db: Session) -> BaseResponse:
     user = get_user_by_sm_id(db, data.sm_id)
 
+    user_name = user.first_name
+    if user.last_name:
+        user_name += " " + user.last_name
+
     story = Story(
         user_id=user.id,
+        user_name=user_name,
         status=ExperienceStatus.MODERATION,
         text=data.experience,
         is_anonymous=data.is_anonymous,
