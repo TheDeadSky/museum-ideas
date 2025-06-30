@@ -26,13 +26,13 @@ class RegistrationNameInputScene(Scene, state="registration_name"):
 
     @on.message()
     async def on_answer(self, message: Message):
-        await self.wizard.update_data(name=message.text)
+        await self.wizard.update_data(firstname=message.text)
         name_confirmation_message = await get_text_from_db("name_confirmation_message")
         await message.answer(name_confirmation_message.format(message.text), reply_markup=CONFIRMATION_MENU)
 
     @on.callback_query(F.data == "not_confirm")
     async def not_confirm(self, callback_query: CallbackQuery):
-        await self.wizard.update_data(name=None)
+        await self.wizard.update_data(firstname=None)
         await callback_query.answer("Введите Ваше имя заново.")
 
     @on.callback_query(F.data == "confirm", after=After.goto(RegistrationIsMuseumWorkerScene))

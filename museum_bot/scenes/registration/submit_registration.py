@@ -20,9 +20,7 @@ class SubmitRegistrationScene(Scene, state="submit-registration"):
         raw_data = {
             **await self.wizard.get_data(),
             "telegram_id": str(from_user.id),
-            "tg_username": str(from_user.username),
-            "first_name": str(from_user.first_name),
-            "last_name": str(from_user.last_name)
+            "tg_username": str(from_user.username)
         }
 
         registration_data = RegistrationData(**raw_data)
