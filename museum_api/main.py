@@ -6,17 +6,18 @@ from fastapi import (
 )
 from sqlalchemy.orm import Session
 
+from schemas import BaseResponse
+from config import settings
+from db.database import get_db, create_tables
 from services.registration import registration, RegistrationException, is_user_registered
 from services.history import get_random_history, HistoryException
 from services.self_support_course.schemas import SelfSupportCourseResponse, CourseUserAnswer
 from services.registration.schemas import RegistrationData, RegistrationResponse
-from schemas import BaseResponse, Feedback
-from config import settings
-from db.database import get_db, create_tables
 from services.self_support_course.actions import load_self_support_course, save_self_support_course_answer
 from services.share_experience.actions import save_user_experience
 from services.share_experience.schemas import ShareExperienceData
 from services.feedback.actions import save_user_feedback
+from services.feedback.schemas import Feedback
 
 
 @asynccontextmanager
