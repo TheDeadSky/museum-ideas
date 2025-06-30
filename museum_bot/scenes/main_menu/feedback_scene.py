@@ -28,7 +28,7 @@ class FeedbackScene(Scene, state="feedback"):
     async def handle_feedback(self, message: Message):
         await self.wizard.update_data(feedback_text=message.text)
         await message.answer(
-            "Подтвердите отправку отзыва:",
+            "Подтвердите отправку сообщения:",
             reply_markup=CONFIRMATION_MENU
         )
 
