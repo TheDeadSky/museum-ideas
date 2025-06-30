@@ -1,14 +1,4 @@
 from pydantic import BaseModel, Field
-from typing import List
-
-
-class BaseResponse(BaseModel):
-    success: bool
-    message: str | None = None
-
-
-class BotTextRequest(BaseModel):
-    keys: List[str]
 
 
 class Feedback(BaseModel):

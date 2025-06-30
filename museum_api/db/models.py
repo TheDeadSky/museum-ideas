@@ -114,10 +114,9 @@ class UserQuestion(Base):
         default=datetime.now()
     )
     answer_date: Mapped[Optional[DateTime]] = mapped_column(
-        DateTime,
-        default=datetime.now()
+        DateTime
     )
-    viewed: Mapped[Optional[DateTime]] = mapped_column(DateTime, default=datetime.now())
+    viewed: Mapped[Optional[DateTime]] = mapped_column(DateTime)
 
     user: Mapped[Optional["User"]] = relationship(
         "User", back_populates="questions"

@@ -5,6 +5,7 @@ import aiohttp
 
 from models.base import BaseResponse
 from models.experience import ShareExperienceData
+from models.feedback import Feedback
 from models.registration import RegistrationData
 from models.stories import HistoryResponse
 from models.course import SelfSupportCourseResponse, CourseUserAnswer
@@ -97,6 +98,18 @@ async def send_experience(data: ShareExperienceData):
 
     async with aiohttp.ClientSession() as session:
         async with session.post(f"{api_base_url}/share-experience", json=data.model_dump()) as response:
+            if response.status == 200:
+                return await response.json()
+            else:
+                error_data = await response.json()
+                raise Exception(f"API error: {error_data.get('detail', 'Unknown error')}")
+
+
+async def send_feedback(data: Feedback):
+    api_base_url = os.getenv("API_BASE_URL", "http://museum_api:8000")
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post(f"{api_base_url}/send-feedback", json=data.model_dump()) as response:
             if response.status == 200:
                 return await response.json()
             else:
