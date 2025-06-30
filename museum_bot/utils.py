@@ -1,4 +1,4 @@
-from aiogram.types import InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
 def merge_inline_menus(first_menu: InlineKeyboardMarkup, second_menu: InlineKeyboardMarkup) -> InlineKeyboardMarkup:
@@ -24,3 +24,9 @@ def escape_tg_reserved_characters(text: str) -> str:
         text = text.replace(char, f'\\{char}')
 
     return text
+
+
+def make_one_button_menu(button_text, callback_data):
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text=button_text, callback_data=callback_data)],
+    ])
