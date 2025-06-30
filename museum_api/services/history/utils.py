@@ -26,6 +26,6 @@ def get_history_author(story: Story) -> str:
         return "Анонимный автор"
 
     if story.user_id and story.user:
-        return f"{story.user.first_name} {story.user.last_name}"
+        return f"{story.user.firstname} {story.user.lastname}"
 
     return story.user_name or "Неизвестный автор"
