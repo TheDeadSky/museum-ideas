@@ -1,7 +1,7 @@
 from enum import StrEnum
 
 
-class ExperienceType(StrEnum):
+class ContentType(StrEnum):
     TEXT = "text"
     AUDIO = "audio"
 

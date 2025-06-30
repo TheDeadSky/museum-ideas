@@ -4,7 +4,7 @@ from db.models import Story
 from db.utils import get_user_by_sm_id
 from schemas import BaseResponse
 from .schemas import ShareExperienceData
-from .enums import ExperienceStatus
+from .enums import ExperienceStatus, ContentType
 
 
 async def save_user_experience(data: ShareExperienceData, db: Session) -> BaseResponse:
@@ -18,6 +18,7 @@ async def save_user_experience(data: ShareExperienceData, db: Session) -> BaseRe
         user_id=user.id,
         user_name=user_name,
         status=ExperienceStatus.MODERATION,
+        content_type=ContentType.TEXT,
         text=data.experience,
         is_anonymous=data.is_anonymous,
         is_agreed_to_publication=data.publish
