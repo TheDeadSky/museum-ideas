@@ -43,10 +43,12 @@ class FeedbackScene(Scene, state="feedback"):
             str(await self.wizard.get_data())
         )
 
+        data = await self.wizard.get_data()
+
         await send_feedback(
             Feedback(
                 sm_id=callback_query.from_user.id,
-                feedback=await self.wizard.get_data()["feedback_text"]
+                feedback=data["feedback_text"]
             )
         )
 
