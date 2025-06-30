@@ -35,7 +35,7 @@ GET_SUPPORT_MENU = InlineKeyboardMarkup(inline_keyboard=[
 ])
 
 ONE_MORE_STORY_BUTTON = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="Узнать ещё историю", callback_data="one_more_story")],
+    [InlineKeyboardButton(text="Узнать еще одну историю", callback_data="one_more_story")],
 ])
 
 NEXT_PART_BUTTON = InlineKeyboardMarkup(inline_keyboard=[
