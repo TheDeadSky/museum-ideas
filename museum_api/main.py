@@ -92,7 +92,7 @@ async def get_random_history_endpoint(sm_id: str, db: Session = Depends(get_db))
 
 
 @app.post("/send-feedback")
-async def send_feedback(feedback: Feedback, db: Session = Depends(get_db)) -> Feedback:
+async def send_feedback(feedback: Feedback, db: Session = Depends(get_db)) -> BaseResponse:
     """Send feedback to the museum"""
 
     return await save_user_feedback(feedback, db)
