@@ -26,7 +26,7 @@ def escape_tg_reserved_characters(text: str) -> str:
     return text
 
 
-def make_one_button_menu(button_text, callback_data):
+def make_one_button_menu(text: str, callback_data: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text=button_text, callback_data=callback_data)],
+        [InlineKeyboardButton(text=text, callback_data=callback_data)],
     ])
