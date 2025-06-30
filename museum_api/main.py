@@ -95,8 +95,8 @@ async def send_feedback(feedback: Feedback, db: Session = Depends(get_db)) -> Fe
     """Send feedback to the museum"""
 
     user_question = UserQuestion(
-        user_id=feedback.user_id,
-        question=feedback.message
+        user_id=feedback.sm_id,
+        question=feedback.feedback
     )
 
     db.add(user_question)
