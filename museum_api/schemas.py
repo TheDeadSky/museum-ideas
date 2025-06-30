@@ -1,16 +1,6 @@
-from pydantic import BaseModel, Field
-from typing import List
+from pydantic import BaseModel
 
 
 class BaseResponse(BaseModel):
     success: bool
     message: str | None = None
-
-
-class BotTextRequest(BaseModel):
-    keys: List[str]
-
-
-class Feedback(BaseModel):
-    sm_id: str = Field(description="User's social media ID.")
-    feedback: str = Field(description="User's feedback.")

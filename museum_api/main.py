@@ -16,7 +16,7 @@ from db.database import get_db, create_tables
 from services.self_support_course.actions import load_self_support_course, save_self_support_course_answer
 from services.share_experience.actions import save_user_experience
 from services.share_experience.schemas import ShareExperienceData
-from db.models import UserQuestion
+from services.feedback.actions import save_user_feedback
 
 
 @asynccontextmanager
@@ -94,19 +94,7 @@ async def get_random_history_endpoint(sm_id: str, db: Session = Depends(get_db))
 async def send_feedback(feedback: Feedback, db: Session = Depends(get_db)) -> Feedback:
     """Send feedback to the museum"""
 
-    user_question = UserQuestion(
-        user_id=feedback.sm_id,
-        question=feedback.feedback
-    )
-
-    db.add(user_question)
-    db.commit()
-    db.refresh(user_question)
-
-    return BaseResponse(
-        success=True,
-        message="Спасибо за ваш отзыв!"
-    )
+    return await save_user_feedback(feedback, db)
 
 
 @app.post("/share-experience")
