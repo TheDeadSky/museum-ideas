@@ -7,7 +7,7 @@ from .schemas import Feedback
 
 
 async def save_user_feedback(feedback: Feedback, db: Session):
-    user = get_user_by_sm_id(feedback.sm_id, db)
+    user = get_user_by_sm_id(db, feedback.sm_id)
 
     user_question = UserQuestion(
         user_id=user.id,
