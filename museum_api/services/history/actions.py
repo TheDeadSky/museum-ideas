@@ -25,7 +25,7 @@ async def get_random_history(sm_id: str, db: Session) -> HistoryResponse:
     if not unseen_stories:
         return HistoryResponse(
             success=False,
-            message="К сожалению, нет новых историй"
+            message="Вы узнали все истории. Скоро мы добавим новые. Возможно, Вы хотите добавить свою?"
         )
 
     random_story: Story = random.choice(unseen_stories)

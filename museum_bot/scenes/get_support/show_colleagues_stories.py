@@ -3,7 +3,7 @@ from aiogram.fsm.scene import Scene, on
 from aiogram.types import Message, CallbackQuery
 
 from menus import TO_MAIN_MENU_BUTTON, ONE_MORE_STORY_BUTTON
-from utils import merge_inline_menus
+from utils import merge_inline_menus, make_one_button_menu
 from services.api_service import get_random_history
 
 
@@ -17,7 +17,10 @@ class ShowColleaguesStoriesScene(Scene, state="colleagues-stories"):
         if not history_response.success:
             await message.answer(
                 text=history_response.message,
-                reply_markup=TO_MAIN_MENU_BUTTON
+                reply_markup=merge_inline_menus(
+                    make_one_button_menu("Добавить историю", "share_experience"),
+                    TO_MAIN_MENU_BUTTON
+                )
             )
             return
 
