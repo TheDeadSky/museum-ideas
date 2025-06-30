@@ -47,7 +47,7 @@ class FeedbackScene(Scene, state="feedback"):
 
         await send_feedback(
             Feedback(
-                sm_id=callback_query.from_user.id,
+                sm_id=str(callback_query.from_user.id),
                 feedback=data["feedback_text"]
             )
         )
