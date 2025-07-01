@@ -1,6 +1,8 @@
 import logging
 from os import getenv
 
+import sentry_sdk
+
 from aiogram.fsm.scene import SceneRegistry
 from aiogram.fsm.storage.memory import SimpleEventIsolation
 
@@ -16,6 +18,8 @@ from scenes.registration import registration_scenes_router, registration_scenes_
 from scenes.main_menu import main_menu_router, main_menu_scenes_registry
 from scenes.get_support import get_support_router, get_support_scenes_registry
 from scenes.share_experience import share_experience_router, share_experience_scenes_registry
+
+sentry_sdk.init("https://9485268e8cff4009a5e148f812472fad@errors.asarta.ru/12")
 
 TOKEN = getenv("BOT_TOKEN")
 WEBHOOK_URL = getenv("WEBHOOK_URL")
