@@ -19,7 +19,7 @@ class SubmitShareExperienceScene(Scene, state="share-experience-submit"):
         response = await send_experience(valid_data)
         print(response)
 
-        await message.answer(
+        await message.edit_text(
             response["message"],
             reply_markup=TO_MAIN_MENU_BUTTON
         )

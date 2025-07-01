@@ -3,6 +3,7 @@ from aiogram.types import CallbackQuery
 from aiogram import F
 
 from scenes.share_experience.anonymity_scene import AnonymityScene
+from scenes.share_experience.submit_share_experience import SubmitShareExperienceScene
 from services.api_service import get_text_from_db
 from menus import YES_NO_MENU
 
@@ -18,7 +19,12 @@ class PublicationScene(Scene, state="share-experience-publication"):
         await callback.answer()
         await self.on_enter(callback.message)
 
-    @on.callback_query(F.data.in_(["yes", "no"]), after=After.goto(AnonymityScene))
+    @on.callback_query(F.data.in_(["yes"]), after=After.goto(AnonymityScene))
     async def publish_yes(self, callback: CallbackQuery):
         await callback.answer()
         await self.wizard.update_data(publish=callback.data == "yes")
+
+    @on.callback_query(F.data.in_(["no"]), after=After.goto(SubmitShareExperienceScene))
+    async def publish_no(self, callback: CallbackQuery):
+        await callback.answer()
+        await self.wizard.update_data(publish=callback.data == "no", anonymous=True)
