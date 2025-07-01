@@ -12,6 +12,11 @@ YES_NO_MENU = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="🚫 Нет", callback_data="no")],
 ])
 
+YES_NO_MENU_SWAPPED_ICONS = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text="🚫 Да", callback_data="yes")],
+    [InlineKeyboardButton(text="✅ Нет", callback_data="no")],
+])
+
 CONFIRMATION_MENU = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="Подтвердить", callback_data="confirm")],
     [InlineKeyboardButton(text="Отмена", callback_data="not_confirm")],
