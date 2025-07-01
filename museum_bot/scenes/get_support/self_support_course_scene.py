@@ -1,4 +1,4 @@
-from aiogram.fsm.scene import Scene, on
+from aiogram.fsm.scene import Scene, on, After
 from aiogram.types import Message, CallbackQuery, User, BufferedInputFile
 import aiohttp
 from aiogram import F
@@ -10,7 +10,8 @@ from services.api_service import (
     get_text_from_db,
     self_support_course_answer
 )
-from utils import merge_inline_menus
+from utils import make_one_button_menu, merge_inline_menus
+from scenes.get_support.show_colleagues_stories import ShowColleaguesStoriesScene
 
 
 class SelfSupportCourseScene(Scene, state="self-support-course"):
@@ -37,6 +38,7 @@ class SelfSupportCourseScene(Scene, state="self-support-course"):
             await message.answer(f"{part_title}\n{part_description}")
 
             if part_data.video_url:
+                await message.answer("🎥 Видео:")
                 async with aiohttp.ClientSession() as session:
                     async with session.get(part_data.video_url) as response:
                         video_data = await response.read()
@@ -50,7 +52,10 @@ class SelfSupportCourseScene(Scene, state="self-support-course"):
             await message.answer(self_support_course_response.message)
             await message.answer(
                 "В ожидании следующей лекции вы можете узнать истории коллег.",
-                reply_markup=TO_MAIN_MENU_BUTTON
+                reply_markup=merge_inline_menus(
+                    make_one_button_menu("Узнать истории коллег", "colleagues_stories"),
+                    TO_MAIN_MENU_BUTTON
+                )
             )
 
     @on.callback_query.enter()
@@ -98,3 +103,8 @@ class SelfSupportCourseScene(Scene, state="self-support-course"):
         await callback.message.delete_reply_markup()
 
         await self.on_enter(callback.message, callback.from_user)
+
+    @on.callback_query(F.data == "colleagues_stories", after=After.goto(ShowColleaguesStoriesScene))
+    async def on_colleagues_stories(self, callback: CallbackQuery):
+        await callback.answer()
+        await callback.message.delete_reply_markup()
