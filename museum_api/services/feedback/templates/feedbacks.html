@@ -182,6 +182,7 @@
                         <div class="col-md-6">
                             <label class="form-label fw-bold">ID обратной связи:</label>
                             <p id="replyModalId"></p>
+                            <input type="hidden" id="replyModalUserId" name="user_id">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Автор:</label>
@@ -265,6 +266,7 @@
         const viewModal = new bootstrap.Modal(document.getElementById('viewModal'));
         const replyFeedbackId = document.getElementById('replyFeedbackId');
         const replyFeedbackText = document.getElementById('replyFeedbackText');
+        const replyModalUserId = document.getElementById('replyModalUserId');
         const replyText = document.getElementById('replyText');
         const replyError = document.getElementById('replyError');
         const submitReplyBtn = document.getElementById('submitReplyBtn');
@@ -508,6 +510,7 @@
             replyText.value = '';
             replyError.style.display = 'none';
             replyFeedbackId.value = feedbackId;
+            replyModalUserId.value = feedback.user_id;
             replyModal.show();
         }
         
@@ -547,7 +550,8 @@
                     },
                     body: JSON.stringify({
                         feedback_id: currentFeedbackId,
-                        answer: answerText
+                        answer: answerText,
+                        user_id: replyModalUserId.value
                     })
                 });
                 
