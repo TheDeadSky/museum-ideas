@@ -38,9 +38,9 @@ async def get_feedbacks(
 
     if status:
         if status == "answered":
-            filters.append(UserQuestion.answer is not None)
+            filters.append(UserQuestion.answer.isnot(None))
         elif status == "pending":
-            filters.append(UserQuestion.answer is None)
+            filters.append(UserQuestion.answer.is_(None))
 
     if search:
         filters.append(UserQuestion.question.like(f"%{search}%"))
