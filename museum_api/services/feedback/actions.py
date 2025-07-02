@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from db.utils import get_user_by_sm_id
@@ -44,7 +45,9 @@ async def get_feedbacks(
     if search:
         filters.append(UserQuestion.question.like(f"%{search}%"))
 
-    feedbacks = db.query(UserQuestion).filter(*filters).offset((page - 1) * per_page).limit(per_page).all()
+    feedbacks = db.query(UserQuestion).filter(
+        and_(*filters)
+    ).offset((page - 1) * per_page).limit(per_page).all()
 
     response = FeedbackListResponse(
         success=True,
