@@ -79,32 +79,20 @@
                     </button>
                 </div>
                 
-                <div class="dropdown me-2">
-                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="statusFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-funnel"></i> Статус
+                <div class="btn-group me-2" role="group" aria-label="Фильтр по статусу">
+                    <input type="checkbox" class="btn-check" value="pending" id="statusPending" checked>
+                    <label class="btn btn-outline-secondary" for="statusPending">
+                        <i class="bi bi-clock"></i> Ожидает ответа
+                    </label>
+                    
+                    <input type="checkbox" class="btn-check" value="answered" id="statusAnswered" checked>
+                    <label class="btn btn-outline-secondary" for="statusAnswered">
+                        <i class="bi bi-check-circle"></i> Отвечено
+                    </label>
+                    
+                    <button class="btn btn-primary" id="applyStatusFilter">
+                        <i class="bi bi-funnel"></i> Применить
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="statusFilterDropdown" id="statusFilterMenu">
-                        <li>
-                            <div class="form-check ms-2">
-                                <input class="form-check-input" type="checkbox" value="pending" id="statusPending" checked>
-                                <label class="form-check-label" for="statusPending">
-                                    Ожидает ответа
-                                </label>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="form-check ms-2">
-                                <input class="form-check-input" type="checkbox" value="answered" id="statusAnswered" checked>
-                                <label class="form-check-label" for="statusAnswered">
-                                    Отвечено
-                                </label>
-                            </div>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <button class="dropdown-item" id="applyStatusFilter">Применить</button>
-                        </li>
-                    </ul>
                 </div>
                 <button class="btn btn-primary" id="refreshBtn">
                     <i class="bi bi-arrow-clockwise"></i> Обновить
@@ -234,7 +222,7 @@
             
             // Обработчики для фильтра по статусу
             document.getElementById('applyStatusFilter').addEventListener('click', () => {
-                const checkboxes = document.querySelectorAll('#statusFilterMenu .form-check-input');
+                const checkboxes = document.querySelectorAll('.btn-check');
                 selectedStatuses = [];
                 
                 checkboxes.forEach(checkbox => {
@@ -245,14 +233,6 @@
                 
                 currentPage = 1;
                 loadFeedbacks();
-            });
-            
-            // Закрытие dropdown при клике вне его
-            document.addEventListener('click', (e) => {
-                if (!e.target.closest('.dropdown')) {
-                    const dropdown = bootstrap.Dropdown.getInstance(document.getElementById('statusFilterDropdown'));
-                    if (dropdown) dropdown.hide();
-                }
             });
         });
         
