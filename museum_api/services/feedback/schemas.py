@@ -16,9 +16,9 @@ class Feedback(BaseModel):
     user_name: str = Field(description="User's name.")
     question: str = Field(description="User's feedback.")
     question_date: datetime = Field(description="Date of feedback.")
-    answer: str = Field(description="Answer to the feedback.")
-    answer_date: datetime = Field(description="Date of answer.")
-    viewed: datetime = Field(description="Date of viewing.")
+    answer: str | None = Field(description="Answer to the feedback.")
+    answer_date: datetime | None = Field(description="Date of answer.")
+    viewed: datetime | None = Field(description="Date of viewing.")
 
 
 class FeedbackListResponse(BaseResponse):
