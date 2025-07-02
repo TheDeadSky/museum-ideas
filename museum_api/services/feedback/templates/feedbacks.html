@@ -207,7 +207,6 @@
         // Элементы DOM
         const tableBody = document.getElementById('feedbackTableBody');
         const pagination = document.getElementById('pagination');
-        const viewModal = new bootstrap.Modal(document.getElementById('viewModal'));
         const replyModal = new bootstrap.Modal(document.getElementById('replyModal'));
         const viewAuthor = document.getElementById('viewAuthor');
         const viewText = document.getElementById('viewText');
@@ -328,12 +327,7 @@
                 
                 tableBody.appendChild(row);
             });
-            
-            // Добавление обработчиков событий для кнопок
-            document.querySelectorAll('.view-btn').forEach(btn => {
-                btn.addEventListener('click', () => openViewModal(btn.dataset.id));
-            });
-            
+
             document.querySelectorAll('.reply-btn').forEach(btn => {
                 btn.addEventListener('click', () => openReplyModal(btn.dataset.id));
             });
