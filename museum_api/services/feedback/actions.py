@@ -27,11 +27,13 @@ async def save_user_feedback(feedback: IncomingFeedback, db: Session):
 
 
 async def get_feedbacks(page: int, per_page: int, search: str, status: str, db: Session):
+    status_filter = None
 
-    if status == "answered":
-        status_filter = UserQuestion.answer is not None
-    else:
-        status_filter = UserQuestion.answer is None
+    if status is not None:
+        if status == "answered":
+            status_filter = UserQuestion.answer is not None
+        else:
+            status_filter = UserQuestion.answer is None
 
     feedbacks = db.query(UserQuestion).filter(
         UserQuestion.question.like(f"%{search}%"),
