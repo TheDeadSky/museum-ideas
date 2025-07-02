@@ -39,6 +39,8 @@ async def get_feedbacks(page: int, per_page: int, search: str, status: str, db: 
     ).offset((page - 1) * per_page).limit(per_page).all()
 
     response = FeedbackListResponse(
+        success=True,
+        message="Отзывы получены",
         feedbacks=[Feedback(
             id=fb.id,
             user_id=fb.user_id,
