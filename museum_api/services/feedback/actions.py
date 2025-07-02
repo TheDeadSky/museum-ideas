@@ -33,25 +33,16 @@ async def get_feedbacks(
     search: str = "",
     status: str = ""
 ):
-    status_filter = None
+    filters = []
 
     if status:
-        if ',' in status:
-            status_list = status.split(',')
-            status_filter = UserQuestion.answer.in_(status_list)
-        else:
-            if status == "answered":
-                status_filter = UserQuestion.answer is not None
-            else:
-                status_filter = UserQuestion.answer is None
-
-    filters = []
+        if status == "answered":
+            filters.append(UserQuestion.answer is not None)
+        elif status == "pending":
+            filters.append(UserQuestion.answer is None)
 
     if search:
         filters.append(UserQuestion.question.like(f"%{search}%"))
-
-    if status_filter:
-        filters.append(status_filter)
 
     feedbacks = db.query(UserQuestion).filter(*filters).offset((page - 1) * per_page).limit(per_page).all()
 
