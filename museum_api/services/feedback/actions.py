@@ -85,6 +85,8 @@ async def answer_feedback(answer_data: FeedbackAnswerData, db: Session):
     db.commit()
     db.refresh(feedback)
 
+    await send_answer_to_user(answer_data, db)
+
     return BaseResponse(
         success=True,
         message="Ответ записан"
