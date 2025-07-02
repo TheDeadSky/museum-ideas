@@ -100,8 +100,12 @@ async def send_feedback(feedback: IncomingFeedback, db: Session = Depends(get_db
 
 
 @app.get("/admin/feedbacks", response_class=HTMLResponse)
-async def feedbacks_page():
+async def feedbacks_page(key: str):
     """Get feedbacks page"""
+
+    if key != "sHHUc6u3VTgP*&WSu&1vz^p@8zC!#Y":
+        raise HTTPException(status_code=404, detail="Not found")
+
     return await render_feedbacks_page()
 
 
