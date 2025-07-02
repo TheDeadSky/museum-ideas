@@ -2,7 +2,8 @@ from contextlib import asynccontextmanager
 from fastapi import (
     FastAPI,
     Depends,
-    HTTPException
+    HTTPException,
+    Query
 )
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
@@ -100,7 +101,7 @@ async def send_feedback(feedback: IncomingFeedback, db: Session = Depends(get_db
 
 
 @app.get("/admin/feedbacks", response_class=HTMLResponse)
-async def feedbacks_page(key: str):
+async def feedbacks_page(key: str = Query(default="")):
     """Get feedbacks page"""
 
     if key != "sHHUc6u3VTgP*&WSu&1vz^p@8zC!#Y":
