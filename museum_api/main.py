@@ -4,6 +4,7 @@ from fastapi import (
     Depends,
     HTTPException
 )
+from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 
 from schemas import BaseResponse
@@ -16,8 +17,8 @@ from services.registration.schemas import RegistrationData, RegistrationResponse
 from services.self_support_course.actions import load_self_support_course, save_self_support_course_answer
 from services.share_experience.actions import save_user_experience
 from services.share_experience.schemas import ShareExperienceData
-from services.feedback.actions import save_user_feedback
-from services.feedback.schemas import Feedback
+from services.feedback.actions import answer_feedback, get_feedbacks, render_feedbacks_page, save_user_feedback
+from services.feedback.schemas import FeedbackAnswerData, FeedbackListResponse, IncomingFeedback
 
 
 @asynccontextmanager
@@ -92,10 +93,34 @@ async def get_random_history_endpoint(sm_id: str, db: Session = Depends(get_db))
 
 
 @app.post("/send-feedback")
-async def send_feedback(feedback: Feedback, db: Session = Depends(get_db)) -> BaseResponse:
+async def send_feedback(feedback: IncomingFeedback, db: Session = Depends(get_db)) -> BaseResponse:
     """Send feedback to the museum"""
 
     return await save_user_feedback(feedback, db)
+
+
+@app.get("/admin/feedbacks", response_class=HTMLResponse)
+async def feedbacks_page():
+    """Get feedbacks page"""
+    return await render_feedbacks_page()
+
+
+@app.get("/feedback/list")
+async def get_feedbacks_list(
+    page: int = 1,
+    per_page: int = 10,
+    search: str = "",
+    status: str = "",
+    db: Session = Depends(get_db)
+) -> FeedbackListResponse:
+    """Get feedbacks list"""
+    return await get_feedbacks(page, per_page, search, status, db)
+
+
+@app.get("/feedback/answer")
+async def answer_feedback_endpoint(answer_data: FeedbackAnswerData, db: Session = Depends(get_db)) -> BaseResponse:
+    """Answer feedback"""
+    return await answer_feedback(answer_data, db)
 
 
 @app.post("/share-experience")

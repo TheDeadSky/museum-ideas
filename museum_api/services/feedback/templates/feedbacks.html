@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обратная связь</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .status-badge {
+            font-size: 0.9rem;
+            padding: 0.4em 0.7em;
+        }
+        .preview-text {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 300px;
+        }
+        .modal-content {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .feedback-text {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .action-buttons .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        .table-container {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+        }
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            padding: 1rem 0;
+        }
+        .form-error {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        .loader {
+            display: flex;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <!-- Заголовок -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold">Обратная связь</h1>
+            <div class="d-flex">
+                <div class="input-group me-2" style="max-width: 300px;">
+                    <input type="text" class="form-control" placeholder="Поиск..." id="searchInput">
+                    <button class="btn btn-outline-secondary" type="button">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+                
+                <div class="dropdown me-2">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="statusFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-funnel"></i> Статус
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="statusFilterDropdown" id="statusFilterMenu">
+                        <li>
+                            <div class="form-check ms-2">
+                                <input class="form-check-input" type="checkbox" value="pending" id="statusPending" checked>
+                                <label class="form-check-label" for="statusPending">
+                                    Ожидает ответа
+                                </label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="form-check ms-2">
+                                <input class="form-check-input" type="checkbox" value="answered" id="statusAnswered" checked>
+                                <label class="form-check-label" for="statusAnswered">
+                                    Отвечено
+                                </label>
+                            </div>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <button class="dropdown-item" id="applyStatusFilter">Применить</button>
+                        </li>
+                    </ul>
+                </div>
+                <button class="btn btn-primary" id="refreshBtn">
+                    <i class="bi bi-arrow-clockwise"></i> Обновить
+                </button>
+            </div>
+        </div>
+
+        <!-- Таблица отзывов -->
+        <div class="table-container bg-white">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Текст отзыва</th>
+                            <th scope="col">Автор</th>
+                            <th scope="col">Статус</th>
+                            <th scope="col" class="text-end">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="feedbackTableBody">
+                        <!-- Данные будут загружены через JavaScript -->
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <div class="loader">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Загрузка...</span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Пагинация -->
+            <div class="pagination-container bg-light border-top">
+                <nav aria-label="Навигация по страницам">
+                    <ul class="pagination mb-0" id="pagination">
+                        <!-- Пагинация будет сгенерирована через JavaScript -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно ответа на отзыв (расширенное) -->
+    <div class="modal fade" id="replyModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ответить на отзыв</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">ID отзыва:</label>
+                            <p id="replyModalId"></p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Автор:</label>
+                            <p id="replyModalAuthor"></p>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Текст отзыва:</label>
+                        <div class="feedback-text" id="replyFeedbackText"></div>
+                        <input type="hidden" id="replyFeedbackId" name="feedback_id">
+                    </div>
+                    <div class="mb-3">
+                        <label for="replyText" class="form-label fw-bold">Ваш ответ:</label>
+                        <textarea class="form-control" id="replyText" rows="6" placeholder="Введите ваш ответ (минимум 10 символов)"></textarea>
+                        <div class="form-error" id="replyError">Ответ должен содержать не менее 10 символов</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" id="submitReplyBtn">Отправить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Конфигурация
+        const API_BASE_URL = 'https://deadsky-dev.ru';
+        const PER_PAGE = 10;
+        
+        // Состояние приложения
+        let currentPage = 1;
+        let totalPages = 1;
+        let currentFeedbackId = null;
+        let feedbacks = [];
+        let selectedStatuses = ['pending', 'answered'];
+        
+        // Элементы DOM
+        const tableBody = document.getElementById('feedbackTableBody');
+        const pagination = document.getElementById('pagination');
+        const viewModal = new bootstrap.Modal(document.getElementById('viewModal'));
+        const replyModal = new bootstrap.Modal(document.getElementById('replyModal'));
+        const viewAuthor = document.getElementById('viewAuthor');
+        const viewText = document.getElementById('viewText');
+        const replyFeedbackId = document.getElementById('replyFeedbackId');
+        const replyFeedbackText = document.getElementById('replyFeedbackText');
+        const replyText = document.getElementById('replyText');
+        const replyError = document.getElementById('replyError');
+        const submitReplyBtn = document.getElementById('submitReplyBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFeedbacks();
+            
+            // Настройка обработчиков событий
+            submitReplyBtn.addEventListener('click', handleReplySubmit);
+            refreshBtn.addEventListener('click', () => {
+                currentPage = 1;
+                loadFeedbacks();
+            });
+            
+            searchInput.addEventListener('input', debounce(() => {
+                currentPage = 1;
+                loadFeedbacks();
+            }, 300));
+            
+            // Обработчики для фильтра по статусу
+            document.getElementById('applyStatusFilter').addEventListener('click', () => {
+                const checkboxes = document.querySelectorAll('#statusFilterMenu .form-check-input');
+                selectedStatuses = [];
+                
+                checkboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        selectedStatuses.push(checkbox.value);
+                    }
+                });
+                
+                currentPage = 1;
+                loadFeedbacks();
+            });
+            
+            // Закрытие dropdown при клике вне его
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.dropdown')) {
+                    const dropdown = bootstrap.Dropdown.getInstance(document.getElementById('statusFilterDropdown'));
+                    if (dropdown) dropdown.hide();
+                }
+            });
+        });
+        
+        // Загрузка отзывов
+        async function loadFeedbacks() {
+            showLoader();
+            
+            try {
+                const searchTerm = searchInput.value.trim();
+                const statusParams = selectedStatuses.join(',');
+                const url = `${API_BASE_URL}/feedback/list?page=${currentPage}&per_page=${PER_PAGE}&search=${encodeURIComponent(searchTerm)}&status=${statusParams}`;
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Ошибка загрузки данных');
+                
+                const data = await response.json();
+                feedbacks = data.data;
+                totalPages = Math.ceil(data.total / PER_PAGE);
+                
+                renderTable();
+                renderPagination();
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showError('Не удалось загрузить отзывы. Пожалуйста, попробуйте позже.');
+            } finally {
+                hideLoader();
+            }
+        }
+        
+        // Отображение таблицы
+        function renderTable() {
+            tableBody.innerHTML = '';
+            
+            if (feedbacks.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center py-4">
+                            <div class="d-flex flex-column align-items-center">
+                                <i class="bi bi-inbox" style="font-size: 3rem; opacity: 0.3;"></i>
+                                <p class="mt-3 mb-0">Отзывы не найдены</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            feedbacks.forEach(feedback => {
+                const previewText = feedback.text.length > 50 
+                    ? feedback.text.substring(0, 50) + '...' 
+                    : feedback.text;
+                
+                const statusBadge = feedback.is_answered 
+                    ? '<span class="badge bg-success status-badge">Отвечено</span>'
+                    : '<span class="badge bg-danger status-badge">Ожидает ответа</span>';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${feedback.id}</td>
+                    <td><div class="preview-text">${previewText}</div></td>
+                    <td>${feedback.author}</td>
+                    <td>${statusBadge}</td>
+                    <td class="text-end action-buttons">
+                        <button class="btn btn-sm btn-outline-success reply-btn" data-id="${feedback.id}" ${feedback.is_answered ? 'disabled' : ''}>
+                            <i class="bi bi-pencil"></i> Ответить
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Добавление обработчиков событий для кнопок
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', () => openViewModal(btn.dataset.id));
+            });
+            
+            document.querySelectorAll('.reply-btn').forEach(btn => {
+                btn.addEventListener('click', () => openReplyModal(btn.dataset.id));
+            });
+        }
+        
+        // Отображение пагинации
+        function renderPagination() {
+            pagination.innerHTML = '';
+            
+            if (totalPages <= 1) return;
+            
+            // Кнопка "Назад"
+            const prevDisabled = currentPage === 1 ? 'disabled' : '';
+            pagination.innerHTML += `
+                <li class="page-item ${prevDisabled}">
+                    <a class="page-link" href="#" aria-label="Предыдущая" data-page="${currentPage - 1}">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            `;
+            
+            // Страницы
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const active = i === currentPage ? 'active' : '';
+                pagination.innerHTML += `
+                    <li class="page-item ${active}">
+                        <a class="page-link" href="#" data-page="${i}">${i}</a>
+                    </li>
+                `;
+            }
+            
+            // Кнопка "Вперед"
+            const nextDisabled = currentPage === totalPages ? 'disabled' : '';
+            pagination.innerHTML += `
+                <li class="page-item ${nextDisabled}">
+                    <a class="page-link" href="#" aria-label="Следующая" data-page="${currentPage + 1}">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            `;
+            
+            // Обработчики событий для пагинации
+            document.querySelectorAll('.page-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const page = parseInt(link.dataset.page);
+                    if (page !== currentPage) {
+                        currentPage = page;
+                        loadFeedbacks();
+                    }
+                });
+            });
+        }
+        
+        // Открытие модального окна ответа (расширенного с информацией для просмотра)
+        function openReplyModal(feedbackId) {
+            const feedback = feedbacks.find(f => f.id == feedbackId);
+            if (!feedback) return;
+            
+            currentFeedbackId = feedbackId;
+            // Добавляем всю информацию для просмотра
+            document.getElementById('replyModalAuthor').textContent = feedback.author;
+            document.getElementById('replyModalId').textContent = feedback.id;
+            replyFeedbackText.textContent = feedback.text;
+            replyText.value = '';
+            replyError.style.display = 'none';
+            replyFeedbackId.value = feedbackId;
+            replyModal.show();
+        }
+        
+        // Обработка отправки ответа
+        async function handleReplySubmit() {
+            const answerText = replyText.value.trim();
+            
+            // Валидация
+            if (answerText.length < 10) {
+                replyError.style.display = 'block';
+                return;
+            }
+            
+            replyError.style.display = 'none';
+            submitReplyBtn.disabled = true;
+            submitReplyBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Отправка...';
+            
+            try {
+                // Отправка ответа на сервер
+                const response = await fetch(`${API_BASE_URL}/feedback/answer`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        feedbackId: currentFeedbackId,
+                        answer: answerText
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Ошибка отправки ответа');
+                }
+                
+                // Обновление UI
+                const feedbackIndex = feedbacks.findIndex(f => f.id == currentFeedbackId);
+                if (feedbackIndex !== -1) {
+                    feedbacks[feedbackIndex].is_answered = true;
+                    renderTable();
+                }
+                
+                replyModal.hide();
+                showSuccessToast('Ответ успешно отправлен!');
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert(`Ошибка: ${error.message}`);
+            } finally {
+                submitReplyBtn.disabled = false;
+                submitReplyBtn.innerHTML = 'Отправить';
+            }
+        }
+        
+        // Вспомогательные функции
+        function showLoader() {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center py-5">
+                        <div class="loader">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Загрузка...</span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        function hideLoader() {
+            // Загрузка скрывается автоматически при обновлении таблицы
+        }
+        
+        function showError(message) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center py-5">
+                        <div class="d-flex flex-column align-items-center">
+                            <i class="bi bi-exclamation-circle text-danger" style="font-size: 3rem;"></i>
+                            <p class="mt-3 mb-0">${message}</p>
+                            <button class="btn btn-outline-primary mt-3" id="retryBtn">Попробовать снова</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            
+            document.getElementById('retryBtn').addEventListener('click', loadFeedbacks);
+        }
+        
+        function showSuccessToast(message) {
+            // Создаем тост
+            const toastContainer = document.createElement('div');
+            toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast show';
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            toast.innerHTML = `
+                <div class="toast-header bg-success text-white">
+                    <strong class="me-auto">Успешно!</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Закрыть"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            document.body.appendChild(toastContainer);
+            
+            // Автоматическое закрытие через 3 секунды
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(toastContainer);
+                }, 300);
+            }, 3000);
+        }
+        
+        function debounce(func, wait) {
+            let timeout;
+            return function() {
+                const context = this;
+                const args = arguments;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    func.apply(context, args);
+                }, wait);
+            };
+        }
+
+        // Переопределение функций API для использования мок-данных
+        async function loadFeedbacks() {
+            showLoader();
+            
+            try {
+                const searchTerm = searchInput.value.trim();
+                const data = await window.fetchFeedbacks(currentPage, PER_PAGE, searchTerm);
+                
+                feedbacks = data.data;
+                totalPages = Math.ceil(data.total / PER_PAGE);
+                
+                renderTable();
+                renderPagination();
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showError('Не удалось загрузить отзывы. Пожалуйста, попробуйте позже.');
+            } finally {
+                hideLoader();
+            }
+        }
+    </script>
+</body>
+</html>
