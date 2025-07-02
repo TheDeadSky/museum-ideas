@@ -111,15 +111,16 @@ async def send_answer_to_user(feedback_answer: FeedbackAnswerData, db: Session):
             message="Обратная связь не найдена"
         )
 
+    print(
+        "send_answer_to_user",
+        {
+            "sm_id": user.telegram_id,
+            "answer_text": feedback_answer.answer,
+            "feedback_text": feedback.question
+        }
+    )
+
     async with aiohttp.ClientSession() as session:
-        print(
-            "send_answer_to_user",
-            {
-                "sm_id": user.telegram_id,
-                "answer_text": feedback_answer.answer,
-                "feedback_text": feedback.question
-            }
-        )
         async with session.post(
             "http://museum_bot:9000/api/send-feedback-answer",
             json={
