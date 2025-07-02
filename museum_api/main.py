@@ -118,7 +118,7 @@ async def get_feedbacks_list(
     page: int = 1,
     per_page: int = 10,
     search: str = "",
-    status: str = "",
+    status: str = "pending",
     db: Session = Depends(get_db)
 ) -> FeedbackListResponse:
     """Get feedbacks list"""
