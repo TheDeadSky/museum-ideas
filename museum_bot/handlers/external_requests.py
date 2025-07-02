@@ -18,10 +18,12 @@ class ExternalRequestHandler:
             data = await request.json()
             feedback_request = FeedbackAnswer(**data)
 
+            answer_text = f"<blockquote>{feedback_request.feedback_text}</blockquote>\n\n{feedback_request.answer_text}"
+
             # Send message to user
             await self.bot.send_message(
-                chat_id=feedback_request.user_id,
-                text=feedback_request.response_text
+                chat_id=feedback_request.sm_id,
+                text=answer_text
             )
 
             logger.info(f"Feedback response sent to user {feedback_request.user_id}")
@@ -44,7 +46,7 @@ class ExternalRequestHandler:
         """Generic endpoint to send any message to a user"""
         try:
             data = await request.json()
-            user_id = data.get("user_id")
+            user_id = data.get("sm_id")
             message_text = data.get("message")
 
             if not user_id or not message_text:
