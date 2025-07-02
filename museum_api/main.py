@@ -114,7 +114,7 @@ async def get_feedbacks_list(
     db: Session = Depends(get_db)
 ) -> FeedbackListResponse:
     """Get feedbacks list"""
-    return await get_feedbacks(page, per_page, search, status, db)
+    return await get_feedbacks(db, page, per_page, search, status)
 
 
 @app.get("/feedback/answer")
