@@ -107,7 +107,7 @@ async def feedbacks_page(key: str = Query(default="")):
 
     logging.info(key)
 
-    if key == "sHHUc6u3VTgP*&WSu&1vz^p@8zC!Y":
+    if key == "sHHUc6u3VTgP*WSu&1vz^p@8zC!Y":
         return await render_feedbacks_page()
 
     raise HTTPException(status_code=404, detail="Not found")
