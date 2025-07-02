@@ -269,13 +269,15 @@
                 if (!response.ok) throw new Error('Ошибка загрузки данных');
                 
                 const data = await response.json();
-                feedbacks = data.data;
-                totalPages = Math.ceil(data.total / PER_PAGE);
+                feedbacks = data.data || [];
+                totalPages = Math.ceil((data.total || 0) / PER_PAGE);
                 
                 renderTable();
                 renderPagination();
             } catch (error) {
                 console.error('Ошибка:', error);
+                feedbacks = [];
+                totalPages = 1;
                 showError('Не удалось загрузить отзывы. Пожалуйста, попробуйте позже.');
             } finally {
                 hideLoader();
@@ -285,6 +287,11 @@
         // Отображение таблицы
         function renderTable() {
             tableBody.innerHTML = '';
+            
+            // Ensure feedbacks is always an array
+            if (!Array.isArray(feedbacks)) {
+                feedbacks = [];
+            }
             
             if (feedbacks.length === 0) {
                 tableBody.innerHTML = `
