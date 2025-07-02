@@ -26,19 +26,30 @@ async def save_user_feedback(feedback: IncomingFeedback, db: Session):
     )
 
 
-async def get_feedbacks(page: int, per_page: int, search: str, status: str, db: Session):
+async def get_feedbacks(
+    db: Session,
+    page: int = 1,
+    per_page: int = 10,
+    search: str = "",
+    status: str = ""
+):
     status_filter = None
 
-    if status is not None:
+    if status:
         if status == "answered":
             status_filter = UserQuestion.answer is not None
         else:
             status_filter = UserQuestion.answer is None
 
-    feedbacks = db.query(UserQuestion).filter(
-        UserQuestion.question.like(f"%{search}%"),
-        status_filter
-    ).offset((page - 1) * per_page).limit(per_page).all()
+    filters = []
+
+    if search:
+        filters.append(UserQuestion.question.like(f"%{search}%"))
+
+    if status_filter:
+        filters.append(status_filter)
+
+    feedbacks = db.query(UserQuestion).filter(*filters).offset((page - 1) * per_page).limit(per_page).all()
 
     response = FeedbackListResponse(
         success=True,
