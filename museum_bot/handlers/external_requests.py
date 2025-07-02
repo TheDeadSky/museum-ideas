@@ -80,5 +80,5 @@ def setup_external_routes(app: web.Application, bot: Bot) -> None:
     handler = ExternalRequestHandler(bot)
 
     # Add routes for external requests
-    app.router.add_post("/api/send-feedback-response", handler.send_feedback_response)
+    app.router.add_post("/api/send-feedback-answer", handler.send_feedback_response)
     app.router.add_post("/api/send-message", handler.send_message_to_user)
