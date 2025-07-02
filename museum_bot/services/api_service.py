@@ -115,3 +115,40 @@ async def send_feedback(data: Feedback):
             else:
                 error_data = await response.json()
                 raise Exception(f"API error: {error_data.get('detail', 'Unknown error')}")
+
+
+async def send_feedback_response_to_user(user_id: str, response_text: str, feedback_id: str = None):
+    """Send feedback response to user via bot's external API endpoint"""
+    api_base_url = os.getenv("API_BASE_URL", "http://localhost:3000")
+
+    payload = {
+        "user_id": user_id,
+        "response_text": response_text,
+        "feedback_id": feedback_id
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post(f"{api_base_url}/api/send-feedback-response", json=payload) as response:
+            if response.status == 200:
+                return await response.json()
+            else:
+                error_data = await response.json()
+                raise Exception(f"API error: {error_data.get('error', 'Unknown error')}")
+
+
+async def send_message_to_user(user_id: str, message: str):
+    """Send any message to user via bot's external API endpoint"""
+    api_base_url = os.getenv("API_BASE_URL", "http://localhost:3000")
+
+    payload = {
+        "user_id": user_id,
+        "message": message
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post(f"{api_base_url}/api/send-message", json=payload) as response:
+            if response.status == 200:
+                return await response.json()
+            else:
+                error_data = await response.json()
+                raise Exception(f"API error: {error_data.get('error', 'Unknown error')}")

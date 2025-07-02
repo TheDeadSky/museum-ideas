@@ -18,6 +18,7 @@ from scenes.registration import registration_scenes_router, registration_scenes_
 from scenes.main_menu import main_menu_router, main_menu_scenes_registry
 from scenes.get_support import get_support_router, get_support_scenes_registry
 from scenes.share_experience import share_experience_router, share_experience_scenes_registry
+from handlers.external_requests import setup_external_routes
 
 sentry_sdk.init("https://9485268e8cff4009a5e148f812472fad@errors.asarta.ru/12")
 
@@ -65,6 +66,9 @@ def main() -> None:
 
     webhook_handler = SimpleRequestHandler(dispatcher=dispatcher, bot=bot)
     webhook_handler.register(app, path=WEBHOOK_PATH)
+
+    # Setup external request routes
+    setup_external_routes(app, bot)
 
     setup_application(app, dispatcher, bot=bot)
 
