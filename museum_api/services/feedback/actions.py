@@ -27,9 +27,15 @@ async def save_user_feedback(feedback: IncomingFeedback, db: Session):
 
 
 async def get_feedbacks(page: int, per_page: int, search: str, status: str, db: Session):
+
+    if status == "answered":
+        status_filter = UserQuestion.answer != None
+    else:
+        status_filter = UserQuestion.answer == None
+
     feedbacks = db.query(UserQuestion).filter(
         UserQuestion.question.like(f"%{search}%"),
-        UserQuestion.status == status
+        status_filter
     ).offset((page - 1) * per_page).limit(per_page).all()
 
     response = FeedbackListResponse(
