@@ -207,6 +207,7 @@
         // Элементы DOM
         const tableBody = document.getElementById('feedbackTableBody');
         const pagination = document.getElementById('pagination');
+        const viewModal = new bootstrap.Modal(document.getElementById('viewModal'));
         const replyModal = new bootstrap.Modal(document.getElementById('replyModal'));
         const viewAuthor = document.getElementById('viewAuthor');
         const viewText = document.getElementById('viewText');
@@ -327,7 +328,12 @@
                 
                 tableBody.appendChild(row);
             });
-
+            
+            // Добавление обработчиков событий для кнопок
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', () => openViewModal(btn.dataset.id));
+            });
+            
             document.querySelectorAll('.reply-btn').forEach(btn => {
                 btn.addEventListener('click', () => openReplyModal(btn.dataset.id));
             });
@@ -537,7 +543,9 @@
             
             try {
                 const searchTerm = searchInput.value.trim();
-                const data = await window.fetchFeedbacks(currentPage, PER_PAGE, searchTerm);
+                const data = await fetch(
+                    `${API_BASE_URL}/feedback/list?page=${currentPage}&per_page=${PER_PAGE}&search=${encodeURIComponent(searchTerm)}&status=${selectedStatuses.join(',')}`
+                );
                 
                 feedbacks = data.data;
                 totalPages = Math.ceil(data.total / PER_PAGE);
@@ -549,6 +557,41 @@
                 showError('Не удалось загрузить отзывы. Пожалуйста, попробуйте позже.');
             } finally {
                 hideLoader();
+            }
+        }
+        
+        async function handleReplySubmit() {
+            const answerText = replyText.value.trim();
+            
+            // Валидация
+            if (answerText.length < 10) {
+                replyError.style.display = 'block';
+                return;
+            }
+            
+            replyError.style.display = 'none';
+            submitReplyBtn.disabled = true;
+            submitReplyBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Отправка...';
+            
+            try {
+                // Отправка ответа на сервер
+                await window.postAnswer(currentFeedbackId, answerText);
+                
+                // Обновление UI
+                const feedbackIndex = feedbacks.findIndex(f => f.id == currentFeedbackId);
+                if (feedbackIndex !== -1) {
+                    feedbacks[feedbackIndex].is_answered = true;
+                    renderTable();
+                }
+                
+                replyModal.hide();
+                showSuccessToast('Ответ успешно отправлен!');
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert(`Ошибка: ${error.message}`);
+            } finally {
+                submitReplyBtn.disabled = false;
+                submitReplyBtn.innerHTML = 'Отправить';
             }
         }
     </script>

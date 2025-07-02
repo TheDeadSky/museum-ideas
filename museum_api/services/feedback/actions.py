@@ -36,10 +36,14 @@ async def get_feedbacks(
     status_filter = None
 
     if status:
-        if status == "answered":
-            status_filter = UserQuestion.answer is not None
+        if ',' in status:
+            status_list = status.split(',')
+            status_filter = UserQuestion.answer.in_(status_list)
         else:
-            status_filter = UserQuestion.answer is None
+            if status == "answered":
+                status_filter = UserQuestion.answer is not None
+            else:
+                status_filter = UserQuestion.answer is None
 
     filters = []
 
