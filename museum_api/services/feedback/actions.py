@@ -112,7 +112,7 @@ async def send_answer_to_user(feedback_answer: FeedbackAnswerData, db: Session):
 
     async with aiohttp.ClientSession() as session:
         async with session.post(
-            "http://museum_bot:3000/api/send-feedback-answer",
+            "http://museum_bot:9000/api/send-feedback-answer",
             json={
                 "sm_id": user.telegram_id,
                 "answer_text": feedback_answer.answer,
