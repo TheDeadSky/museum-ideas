@@ -129,6 +129,7 @@ async def get_feedbacks_list(
 @app.post("/feedback/answer")
 async def answer_feedback_endpoint(answer_data: FeedbackAnswerData, db: Session = Depends(get_db)) -> BaseResponse:
     """Answer feedback"""
+
     return await answer_feedback(answer_data, db)
 
 

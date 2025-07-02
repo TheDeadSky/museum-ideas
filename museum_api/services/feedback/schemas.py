@@ -27,4 +27,5 @@ class FeedbackListResponse(BaseResponse):
 
 class FeedbackAnswerData(BaseModel):
     feedback_id: int = Field(description="Feedback ID.")
+    user_id: int = Field(description="User ID.")
     answer: str = Field(description="Answer to the feedback.")

@@ -1,5 +1,7 @@
 from datetime import datetime
 
+import aiohttp
+
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
@@ -87,3 +89,32 @@ async def answer_feedback(answer_data: FeedbackAnswerData, db: Session):
         success=True,
         message="Ответ записан"
     )
+
+
+async def send_answer_to_user(feedback_answer: FeedbackAnswerData, db: Session):
+    user = get_user_by_sm_id(db, feedback_answer.user_id)
+
+    if not user:
+        return BaseResponse(
+            success=False,
+            message="Пользователь не найден"
+        )
+
+    feedback = db.query(UserQuestion).filter(UserQuestion.id == feedback_answer.feedback_id).first()
+
+    if not feedback:
+        return BaseResponse(
+            success=False,
+            message="Обратная связь не найдена"
+        )
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post(
+            "http://museum_bot:3000/api/send-feedback-answer",
+            json={
+                "sm_id": user.telegram_id,
+                "answer_text": feedback_answer.answer,
+                "feedback_text": feedback.question
+            }
+        ) as response:
+            return await response.json()
