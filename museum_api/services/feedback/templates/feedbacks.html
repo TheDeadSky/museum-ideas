@@ -64,6 +64,28 @@
             width: 3rem;
             height: 3rem;
         }
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+        .sortable:hover {
+            background-color: #e9ecef;
+        }
+        .sort-icon {
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+            opacity: 0.5;
+        }
+        .sortable.active .sort-icon {
+            opacity: 1;
+        }
+        .sortable.asc .sort-icon::before {
+            content: "\F12C";
+        }
+        .sortable.desc .sort-icon::before {
+            content: "\F12F";
+        }
     </style>
 </head>
 <body>
@@ -234,6 +256,7 @@
         let currentFeedbackId = null;
         let feedbacks = [];
         let selectedStatuses = ['pending', 'answered'];
+        let currentSort = { field: 'id', direction: 'desc' };
         
         // Элементы DOM
         const tableBody = document.getElementById('feedbackTableBody');
@@ -250,6 +273,7 @@
         
         // Инициализация
         document.addEventListener('DOMContentLoaded', () => {
+            updateSortIndicators();
             loadFeedbacks();
             
             // Настройка обработчиков событий
@@ -278,6 +302,21 @@
                 currentPage = 1;
                 loadFeedbacks();
             });
+            
+            // Обработчики для сортировки
+            document.querySelectorAll('.sortable').forEach(th => {
+                th.addEventListener('click', () => {
+                    const field = th.dataset.sort;
+                    if (currentSort.field === field) {
+                        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSort.field = field;
+                        currentSort.direction = 'asc';
+                    }
+                    updateSortIndicators();
+                    sortFeedbacks();
+                });
+            });
         });
         
         // Загрузка отзывов
@@ -297,7 +336,7 @@
                 feedbacks = data.feedbacks || [];
                 totalPages = Math.ceil((data.total || 0) / PER_PAGE);
                 
-                renderTable();
+                sortFeedbacks();
                 renderPagination();
             } catch (error) {
                 console.error('Ошибка:', error);
@@ -307,6 +346,43 @@
             } finally {
                 hideLoader();
             }
+        }
+        
+        // Обновление индикаторов сортировки
+        function updateSortIndicators() {
+            document.querySelectorAll('.sortable').forEach(th => {
+                th.classList.remove('active', 'asc', 'desc');
+                const field = th.dataset.sort;
+                if (field === currentSort.field) {
+                    th.classList.add('active', currentSort.direction);
+                }
+            });
+        }
+        
+        // Сортировка отзывов
+        function sortFeedbacks() {
+            if (!Array.isArray(feedbacks)) return;
+            
+            feedbacks.sort((a, b) => {
+                let aVal = a[currentSort.field];
+                let bVal = b[currentSort.field];
+                
+                // Обработка специальных случаев
+                if (currentSort.field === 'answer') {
+                    // Для статуса: null/undefined = false, любое значение = true
+                    aVal = aVal ? 1 : 0;
+                    bVal = bVal ? 1 : 0;
+                } else if (typeof aVal === 'string') {
+                    aVal = aVal.toLowerCase();
+                    bVal = bVal.toLowerCase();
+                }
+                
+                if (aVal < bVal) return currentSort.direction === 'asc' ? -1 : 1;
+                if (aVal > bVal) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+            
+            renderTable();
         }
         
         // Отображение таблицы
