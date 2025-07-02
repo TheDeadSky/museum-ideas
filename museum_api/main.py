@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import logging
 from fastapi import (
     FastAPI,
     Depends,
@@ -104,10 +105,12 @@ async def send_feedback(feedback: IncomingFeedback, db: Session = Depends(get_db
 async def feedbacks_page(key: str = Query(default="")):
     """Get feedbacks page"""
 
-    if key != "sHHUc6u3VTgP*&WSu&1vz^p@8zC!#Y":
-        raise HTTPException(status_code=404, detail="Not found")
+    logging.info(key)
 
-    return await render_feedbacks_page()
+    if key == "sHHUc6u3VTgP*&WSu&1vz^p@8zC!#Y":
+        return await render_feedbacks_page()
+
+    raise HTTPException(status_code=404, detail="Not found")
 
 
 @app.get("/feedback/list")
