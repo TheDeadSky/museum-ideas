@@ -13,7 +13,7 @@ class IncomingFeedback(BaseModel):
 class Feedback(BaseModel):
     id: int = Field(description="Feedback ID.")
     user_id: int = Field(description="User ID.")
-    user_name: str = Field(description="User's name.")
+    user_name: str | None = Field(description="User's name.")
     question: str = Field(description="User's feedback.")
     question_date: datetime = Field(description="Date of feedback.")
     answer: str | None = Field(description="Answer to the feedback.")
