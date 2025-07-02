@@ -269,7 +269,8 @@
                 if (!response.ok) throw new Error('Ошибка загрузки данных');
                 
                 const data = await response.json();
-                feedbacks = data.data || [];
+                console.log('API Response:', data); // Debug log
+                feedbacks = data.feedbacks || [];
                 totalPages = Math.ceil((data.total || 0) / PER_PAGE);
                 
                 renderTable();
@@ -308,11 +309,11 @@
             }
             
             feedbacks.forEach(feedback => {
-                const previewText = feedback.text.length > 50 
-                    ? feedback.text.substring(0, 50) + '...' 
-                    : feedback.text;
+                const previewText = feedback.question.length > 50 
+                    ? feedback.question.substring(0, 50) + '...' 
+                    : feedback.question;
                 
-                const statusBadge = feedback.is_answered 
+                const statusBadge = feedback.answer 
                     ? '<span class="badge bg-success status-badge">Отвечено</span>'
                     : '<span class="badge bg-danger status-badge">Ожидает ответа</span>';
                 
@@ -320,10 +321,10 @@
                 row.innerHTML = `
                     <td>${feedback.id}</td>
                     <td><div class="preview-text">${previewText}</div></td>
-                    <td>${feedback.author}</td>
+                    <td>${feedback.user_name || 'Неизвестно'}</td>
                     <td>${statusBadge}</td>
                     <td class="text-end action-buttons">
-                        <button class="btn btn-sm btn-outline-success reply-btn" data-id="${feedback.id}" ${feedback.is_answered ? 'disabled' : ''}>
+                        <button class="btn btn-sm btn-outline-success reply-btn" data-id="${feedback.id}" ${feedback.answer ? 'disabled' : ''}>
                             <i class="bi bi-pencil"></i> Ответить
                         </button>
                     </td>
@@ -397,9 +398,9 @@
             
             currentFeedbackId = feedbackId;
             // Добавляем всю информацию для просмотра
-            document.getElementById('replyModalAuthor').textContent = feedback.author;
+            document.getElementById('replyModalAuthor').textContent = feedback.user_name || 'Неизвестно';
             document.getElementById('replyModalId').textContent = feedback.id;
-            replyFeedbackText.textContent = feedback.text;
+            replyFeedbackText.textContent = feedback.question;
             replyText.value = '';
             replyError.style.display = 'none';
             replyFeedbackId.value = feedbackId;
@@ -422,15 +423,8 @@
             
             try {
                 // Отправка ответа на сервер
-                const response = await fetch(`${API_BASE_URL}/feedback/answer`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        feedbackId: currentFeedbackId,
-                        answer: answerText
-                    })
+                const response = await fetch(`${API_BASE_URL}/feedback/answer?feedback_id=${currentFeedbackId}&answer=${encodeURIComponent(answerText)}`, {
+                    method: 'GET'
                 });
                 
                 if (!response.ok) {
@@ -441,7 +435,7 @@
                 // Обновление UI
                 const feedbackIndex = feedbacks.findIndex(f => f.id == currentFeedbackId);
                 if (feedbackIndex !== -1) {
-                    feedbacks[feedbackIndex].is_answered = true;
+                    feedbacks[feedbackIndex].answer = answerText;
                     renderTable();
                 }
                 
