@@ -122,6 +122,7 @@ async def get_feedbacks_list(
     db: Session = Depends(get_db)
 ) -> FeedbackListResponse:
     """Get feedbacks list"""
+    print("page, per_page, search, status", page, per_page, search, status)
     return await get_feedbacks(db, page, per_page, search, status)
 
 
