@@ -423,8 +423,15 @@
             
             try {
                 // Отправка ответа на сервер
-                const response = await fetch(`${API_BASE_URL}/feedback/answer?feedback_id=${currentFeedbackId}&answer=${encodeURIComponent(answerText)}`, {
-                    method: 'GET'
+                const response = await fetch(`${API_BASE_URL}/feedback/answer`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        feedback_id: currentFeedbackId,
+                        answer: answerText
+                    })
                 });
                 
                 if (!response.ok) {
