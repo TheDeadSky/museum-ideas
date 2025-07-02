@@ -106,10 +106,18 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th scope="col">ID</th>
-                            <th scope="col">Текст отзыва</th>
-                            <th scope="col">Автор</th>
-                            <th scope="col">Статус</th>
+                            <th scope="col" class="sortable" data-sort="id">
+                                ID <i class="bi bi-arrow-down-up sort-icon"></i>
+                            </th>
+                            <th scope="col" class="sortable" data-sort="question">
+                                Текст обратной связи <i class="bi bi-arrow-down-up sort-icon"></i>
+                            </th>
+                            <th scope="col" class="sortable" data-sort="user_name">
+                                Автор <i class="bi bi-arrow-down-up sort-icon"></i>
+                            </th>
+                            <th scope="col" class="sortable" data-sort="answer">
+                                Статус <i class="bi bi-arrow-down-up sort-icon"></i>
+                            </th>
                             <th scope="col" class="text-end">Действия</th>
                         </tr>
                     </thead>
@@ -144,13 +152,13 @@
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Ответить на отзыв</h5>
+                    <h5 class="modal-title">Ответить на обратную связь</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">ID отзыва:</label>
+                            <label class="form-label fw-bold">ID обратной связи:</label>
                             <p id="replyModalId"></p>
                         </div>
                         <div class="col-md-6">
@@ -159,7 +167,7 @@
                         </div>
                     </div>
                     <div class="mb-4">
-                        <label class="form-label fw-bold">Текст отзыва:</label>
+                        <label class="form-label fw-bold">Текст обратной связи:</label>
                         <div class="feedback-text" id="replyFeedbackText"></div>
                         <input type="hidden" id="replyFeedbackId" name="feedback_id">
                     </div>
@@ -172,6 +180,41 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
                     <button type="button" class="btn btn-primary" id="submitReplyBtn">Отправить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно просмотра ответа -->
+    <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Просмотр обратной связи</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">ID обратной связи:</label>
+                            <p id="viewModalId"></p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Автор:</label>
+                            <p id="viewModalAuthor"></p>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Текст отзыва:</label>
+                        <div class="feedback-text" id="viewFeedbackText"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Ответ:</label>
+                        <div class="feedback-text bg-light" id="viewAnswerText"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
                 </div>
             </div>
         </div>
@@ -196,6 +239,7 @@
         const tableBody = document.getElementById('feedbackTableBody');
         const pagination = document.getElementById('pagination');
         const replyModal = new bootstrap.Modal(document.getElementById('replyModal'));
+        const viewModal = new bootstrap.Modal(document.getElementById('viewModal'));
         const replyFeedbackId = document.getElementById('replyFeedbackId');
         const replyFeedbackText = document.getElementById('replyFeedbackText');
         const replyText = document.getElementById('replyText');
@@ -304,8 +348,8 @@
                     <td>${feedback.user_name || 'Неизвестно'}</td>
                     <td>${statusBadge}</td>
                     <td class="text-end action-buttons">
-                        <button class="btn btn-sm btn-outline-success reply-btn" data-id="${feedback.id}" ${feedback.answer ? 'disabled' : ''}>
-                            <i class="bi bi-pencil"></i> Ответить
+                        <button class="btn btn-sm ${feedback.answer ? 'btn-outline-info' : 'btn-outline-success'} ${feedback.answer ? 'view-btn' : 'reply-btn'}" data-id="${feedback.id}">
+                            <i class="bi ${feedback.answer ? 'bi-eye' : 'bi-pencil'}"></i> ${feedback.answer ? 'Посмотреть' : 'Ответить'}
                         </button>
                     </td>
                 `;
@@ -316,6 +360,10 @@
             // Добавление обработчиков событий для кнопок
             document.querySelectorAll('.reply-btn').forEach(btn => {
                 btn.addEventListener('click', () => openReplyModal(btn.dataset.id));
+            });
+            
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', () => openViewModal(btn.dataset.id));
             });
         }
         
@@ -385,6 +433,19 @@
             replyError.style.display = 'none';
             replyFeedbackId.value = feedbackId;
             replyModal.show();
+        }
+        
+        // Открытие модального окна просмотра ответа
+        function openViewModal(feedbackId) {
+            const feedback = feedbacks.find(f => f.id == feedbackId);
+            if (!feedback) return;
+            
+            // Заполняем информацию для просмотра
+            document.getElementById('viewModalAuthor').textContent = feedback.user_name || 'Неизвестно';
+            document.getElementById('viewModalId').textContent = feedback.id;
+            document.getElementById('viewFeedbackText').textContent = feedback.question;
+            document.getElementById('viewAnswerText').textContent = feedback.answer;
+            viewModal.show();
         }
         
         // Обработка отправки ответа
