@@ -6,7 +6,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from db.utils import get_user_by_sm_id
-from db.models import UserQuestion
+from db.models import User, UserQuestion
 from schemas import BaseResponse
 from .schemas import Feedback, FeedbackAnswerData, FeedbackListResponse, IncomingFeedback
 
@@ -97,7 +97,7 @@ async def answer_feedback(answer_data: FeedbackAnswerData, db: Session):
 async def send_answer_to_user(feedback_answer: FeedbackAnswerData, db: Session):
     print("feedback_answer", feedback_answer)
 
-    user = get_user_by_sm_id(db, feedback_answer.user_id)
+    user = db.query(User).filter(User.id == feedback_answer.user_id).first()
 
     if not user:
         return BaseResponse(
