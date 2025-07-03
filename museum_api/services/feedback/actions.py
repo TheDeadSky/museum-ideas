@@ -95,6 +95,8 @@ async def answer_feedback(answer_data: FeedbackAnswerData, db: Session):
 
 
 async def send_answer_to_user(feedback_answer: FeedbackAnswerData, db: Session):
+    print("feedback_answer", feedback_answer)
+
     user = get_user_by_sm_id(db, feedback_answer.user_id)
 
     if not user:
