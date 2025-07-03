@@ -549,7 +549,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        feedback_id: currentFeedbackId,
+                        feedback_id: replyFeedbackId.value,
                         answer: answerText,
                         user_id: replyModalUserId.value
                     })
