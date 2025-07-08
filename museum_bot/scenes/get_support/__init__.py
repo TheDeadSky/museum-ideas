@@ -8,6 +8,7 @@ get_support_router = Router()
 
 get_support_router.callback_query.register(GetSupportScene.as_handler(), F.data == "get_support")
 get_support_router.message.register(GetSupportScene.as_handler(), F.text.casefold() == "получить поддержку")
+get_support_router.callback_query.register(SelfSupportCourseScene.as_handler(), F.data == "self_support_course")
 
 get_support_scenes_registry = (
     GetSupportScene,

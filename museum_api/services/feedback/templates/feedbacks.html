@@ -86,6 +86,21 @@
         .sortable.desc .sort-icon::before {
             content: "\F12F";
         }
+        .btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #000;
+        }
+        .btn-warning:hover {
+            background-color: #ffca2c;
+            border-color: #ffc720;
+            color: #000;
+        }
+        .btn-warning:disabled {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            opacity: 0.65;
+        }
     </style>
 </head>
 <body>
@@ -118,6 +133,9 @@
                 </div>
                 <button class="btn btn-primary" id="refreshBtn">
                     <i class="bi bi-arrow-clockwise"></i> Обновить
+                </button>
+                <button class="btn btn-warning ms-2" id="notifyUsersBtn">
+                    <i class="bi bi-bell"></i> Уведомить пользователей
                 </button>
             </div>
         </div>
@@ -272,6 +290,7 @@
         const submitReplyBtn = document.getElementById('submitReplyBtn');
         const refreshBtn = document.getElementById('refreshBtn');
         const searchInput = document.getElementById('searchInput');
+        const notifyUsersBtn = document.getElementById('notifyUsersBtn');
         
         // Инициализация
         document.addEventListener('DOMContentLoaded', () => {
@@ -284,6 +303,8 @@
                 currentPage = 1;
                 loadFeedbacks();
             });
+            
+            notifyUsersBtn.addEventListener('click', handleNotifyUsers);
             
             searchInput.addEventListener('input', debounce(() => {
                 currentPage = 1;
@@ -644,6 +665,40 @@
                     document.body.removeChild(toastContainer);
                 }, 300);
             }, 3000);
+        }
+        
+        // Обработка уведомления пользователей
+        async function handleNotifyUsers() {
+            notifyUsersBtn.disabled = true;
+            const originalText = notifyUsersBtn.innerHTML;
+            notifyUsersBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Отправка...';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/notify-users-about-course`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Ошибка отправки уведомлений');
+                }
+                
+                const data = await response.json();
+                if (data.success) {
+                    showSuccessToast(data.message || 'Уведомления успешно отправлены!');
+                } else {
+                    throw new Error(data.message || 'Ошибка отправки уведомлений');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert(`Ошибка: ${error.message}`);
+            } finally {
+                notifyUsersBtn.disabled = false;
+                notifyUsersBtn.innerHTML = originalText;
+            }
         }
         
         function debounce(func, wait) {

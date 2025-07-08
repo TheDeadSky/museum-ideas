@@ -29,3 +29,8 @@ class CourseUserAnswer(BaseModel):
     answer: str
     part_id: int
     sm_id: str
+
+
+class CourseNotificationData(BaseModel):
+    users_with_progress: list[str] = []
+    users_without_progress: list[str] = []

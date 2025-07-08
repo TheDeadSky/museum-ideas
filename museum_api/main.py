@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 import logging
+import aiohttp
 from fastapi import (
     FastAPI,
     Depends,
@@ -8,8 +9,9 @@ from fastapi import (
 )
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
+from sqlalchemy import select, and_
 
-from schemas import BaseResponse
+from schemas import BaseResponse, CourseNotificationResponse
 from config import settings
 from db.database import get_db, create_tables
 from services.registration import registration, RegistrationException, is_user_registered
@@ -21,6 +23,7 @@ from services.share_experience.actions import save_user_experience
 from services.share_experience.schemas import ShareExperienceData
 from services.feedback.actions import answer_feedback, get_feedbacks, render_feedbacks_page, save_user_feedback
 from services.feedback.schemas import FeedbackAnswerData, FeedbackListResponse, IncomingFeedback
+from db.models import User, UserCourseProgress
 
 
 @asynccontextmanager
@@ -136,3 +139,61 @@ async def answer_feedback_endpoint(answer_data: FeedbackAnswerData, db: Session 
 @app.post("/share-experience")
 async def share_experience(data: ShareExperienceData, db: Session = Depends(get_db)) -> BaseResponse:
     return await save_user_experience(data, db)
+
+
+@app.post("/notify-users-about-course")
+async def new_course_part_notification(db: Session = Depends(get_db)) -> CourseNotificationResponse:
+    """Get users telegram IDs split by course progress status"""
+
+    try:
+        # Get users with course progress
+        users_with_progress_query = select(User.telegram_id).distinct().join(
+            UserCourseProgress, User.id == UserCourseProgress.user_id
+        ).where(User.telegram_id.isnot(None))
+
+        users_with_progress = db.execute(users_with_progress_query).scalars().all()
+        users_with_progress_ids = [str(tg_id) for tg_id in users_with_progress if tg_id]
+
+        # Get users without course progress but subscribed to a course
+        users_without_progress_query = select(User.telegram_id).where(
+            and_(
+                User.telegram_id.isnot(None),
+                User.course_subscribe.isnot(None),
+                ~User.id.in_(
+                    select(UserCourseProgress.user_id).distinct()
+                )
+            )
+        )
+
+        users_without_progress = db.execute(users_without_progress_query).scalars().all()
+        users_without_progress_ids = [str(tg_id) for tg_id in users_without_progress if tg_id]
+
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                "http://museum_bot:9000/api/notify-users-about-course",
+                json={
+                    "users_with_progress": users_with_progress_ids,
+                    "users_without_progress": users_without_progress_ids
+                }
+            ) as response:
+                response_data = await response.json()
+
+        if response_data.get("success"):
+            return CourseNotificationResponse(
+                success=True,
+                message=(
+                    f"Found {len(users_with_progress_ids)} users with progress and "
+                    f"{len(users_without_progress_ids)} users without progress"
+                )
+            )
+        else:
+            return CourseNotificationResponse(
+                success=False,
+                message=response_data.get("message")
+            )
+
+    except Exception as e:
+        return CourseNotificationResponse(
+            success=False,
+            message=f"Error getting user notifications: {str(e)}"
+        )

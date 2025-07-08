@@ -1,8 +1,12 @@
 import logging
+import asyncio
 from aiohttp import web
 from aiogram import Bot
 
+from menus import TO_MAIN_MENU_BUTTON
 from models.feedback import FeedbackAnswer
+from models.course import CourseNotificationData
+from utils import make_one_button_menu, merge_inline_menus
 
 logger = logging.getLogger(__name__)
 
@@ -76,6 +80,48 @@ class ExternalRequestHandler:
                 "error": str(e)
             }, status=500)
 
+    async def notify_users_about_course(self, request: web.Request) -> web.Response:
+        """Notify users about course"""
+
+        raw_data = await request.json()
+
+        data = CourseNotificationData(**raw_data)
+
+        queue = 10
+
+        for user_id in data.users_with_progress:
+            await self.bot.send_message(
+                chat_id=user_id,
+                text="Появилась новая часть курса!",
+                reply_markup=merge_inline_menus(
+                    make_one_button_menu("Перейти к курсу", "self_support_course"),
+                    TO_MAIN_MENU_BUTTON
+                )
+            )
+            queue -= 1
+            if queue == 0:
+                await asyncio.sleep(2)
+                queue = 10
+
+        for user_id in data.users_without_progress:
+            await self.bot.send_message(
+                chat_id=user_id,
+                text="Появилась новая часть курса! Пройдите курс самоподдержки, чтобы не пропустить новые уроки!",
+                reply_markup=merge_inline_menus(
+                    make_one_button_menu("Перейти к курсу", "self_support_course"),
+                    TO_MAIN_MENU_BUTTON
+                )
+            )
+
+            queue -= 1
+            if queue == 0:
+                await asyncio.sleep(2)
+
+        return web.json_response({
+            "success": True,
+            "message": "Users notified successfully"
+        })
+
 
 def setup_external_routes(app: web.Application, bot: Bot) -> None:
     """Setup external request routes"""
@@ -84,3 +130,4 @@ def setup_external_routes(app: web.Application, bot: Bot) -> None:
     # Add routes for external requests
     app.router.add_post("/api/send-feedback-answer", handler.send_feedback_response)
     app.router.add_post("/api/send-message", handler.send_message_to_user)
+    app.router.add_post("/api/notify-users-about-course", handler.send_message_to_user)
