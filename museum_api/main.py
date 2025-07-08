@@ -158,7 +158,6 @@ async def new_course_part_notification(db: Session = Depends(get_db)) -> CourseN
         users_without_progress_query = select(User.telegram_id).where(
             and_(
                 User.telegram_id.isnot(None),
-                User.course_subscribe.isnot(None),
                 ~User.id.in_(
                     select(UserCourseProgress.user_id).distinct()
                 )
@@ -172,7 +171,7 @@ async def new_course_part_notification(db: Session = Depends(get_db)) -> CourseN
             async with session.post(
                 "http://museum_bot:9000/api/notify-users-about-course",
                 json={
-                    "users_with_progress": users_with_progress_ids,
+                    "users_with_progress": [],
                     "users_without_progress": users_without_progress_ids
                 }
             ) as response:
