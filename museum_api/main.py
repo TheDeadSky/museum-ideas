@@ -171,7 +171,7 @@ async def new_course_part_notification(db: Session = Depends(get_db)) -> CourseN
             async with session.post(
                 "http://museum_bot:9000/api/notify-users-about-course",
                 json={
-                    "users_with_progress": [],
+                    "users_with_progress": users_with_progress_ids,
                     "users_without_progress": users_without_progress_ids
                 }
             ) as response:
