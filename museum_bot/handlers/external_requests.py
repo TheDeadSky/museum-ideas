@@ -130,4 +130,4 @@ def setup_external_routes(app: web.Application, bot: Bot) -> None:
     # Add routes for external requests
     app.router.add_post("/api/send-feedback-answer", handler.send_feedback_response)
     app.router.add_post("/api/send-message", handler.send_message_to_user)
-    app.router.add_post("/api/notify-users-about-course", handler.send_message_to_user)
+    app.router.add_post("/api/notify-users-about-course", handler.notify_users_about_course)
