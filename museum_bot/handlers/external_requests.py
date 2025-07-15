@@ -90,32 +90,42 @@ class ExternalRequestHandler:
         queue = 10
 
         for user_id in data.users_with_progress:
-            await self.bot.send_message(
-                chat_id=user_id,
-                text="Появилась новая часть курса!",
-                reply_markup=merge_inline_menus(
-                    make_one_button_menu("Перейти к курсу", "self_support_course"),
-                    TO_MAIN_MENU_BUTTON
+            try:
+                await self.bot.send_message(
+                    chat_id=user_id,
+                    text="Появилась новая часть курса!",
+                    reply_markup=merge_inline_menus(
+                        make_one_button_menu("Перейти к курсу", "self_support_course"),
+                        TO_MAIN_MENU_BUTTON
+                    )
                 )
-            )
+            except Exception as e:
+                logger.error(f"Error sending message to user {user_id}: {str(e)}")
+                continue
+
             queue -= 1
             if queue == 0:
                 await asyncio.sleep(2)
                 queue = 10
 
         for user_id in data.users_without_progress:
-            await self.bot.send_message(
-                chat_id=user_id,
-                text="Появилась новая часть курса! Пройдите курс самоподдержки, чтобы не пропустить новые уроки!",
-                reply_markup=merge_inline_menus(
-                    make_one_button_menu("Перейти к курсу", "self_support_course"),
-                    TO_MAIN_MENU_BUTTON
+            try:
+                await self.bot.send_message(
+                    chat_id=user_id,
+                    text="Появилась новая часть курса! Пройдите курс самоподдержки, чтобы не пропустить новые уроки!",
+                    reply_markup=merge_inline_menus(
+                        make_one_button_menu("Перейти к курсу", "self_support_course"),
+                        TO_MAIN_MENU_BUTTON
+                    )
                 )
-            )
+            except Exception as e:
+                logger.error(f"Error sending message to user {user_id}: {str(e)}")
+                continue
 
             queue -= 1
             if queue == 0:
                 await asyncio.sleep(2)
+                queue = 10
 
         return web.json_response({
             "success": True,
