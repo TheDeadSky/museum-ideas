@@ -112,7 +112,7 @@ class ExternalRequestHandler:
             try:
                 await self.bot.send_message(
                     chat_id=user_id,
-                    text="Появилась новая часть курса! Пройдите курс самоподдержки, чтобы не пропустить новые уроки!",
+                    text="Сегодня вышла новая лекция курса. Вы получите к ней доступ по ссылке ниже, если ответили на вопросы прошлых лекций.",
                     reply_markup=merge_inline_menus(
                         make_one_button_menu("Перейти к курсу", "self_support_course"),
                         TO_MAIN_MENU_BUTTON
