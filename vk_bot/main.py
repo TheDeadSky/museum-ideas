@@ -10,7 +10,7 @@ app = FastAPI(
 )
 
 
-@app.get("/vk-bot/callback", response_class=PlainTextResponse)
+@app.post("/vk-bot/callback", response_class=PlainTextResponse)
 def vk_confirmation():
     with open("vk_response", "r") as file:
         return file.read()
