@@ -1,7 +1,12 @@
-from fastapi import FastAPI
+import configparser
+
+from fastapi import FastAPI, Request
 from fastapi.responses import PlainTextResponse
 
 from settings import APP_NAME, APP_VERSION
+
+config = configparser.ConfigParser()
+config.read("config.ini")
 
 app = FastAPI(
     title=APP_NAME,
@@ -11,6 +16,9 @@ app = FastAPI(
 
 
 @app.post("/vk-bot/callback", response_class=PlainTextResponse)
-def vk_confirmation():
+async def vk_confirmation(request: Request):
+    data = await request.json()
+    print(data)
+
     with open("vk_response", "r") as file:
         return file.read()
