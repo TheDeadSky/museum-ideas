@@ -86,7 +86,7 @@ services:
       retries: 3
       start_period: 40s
 
-  vk_ot:
+  vk_bot:
     build:
       context: ./vk_bot
       dockerfile: Dockerfile
