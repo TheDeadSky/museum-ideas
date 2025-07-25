@@ -12,4 +12,5 @@ app = FastAPI(
 
 @app.get("/vk-bot/callback", response_class=PlainTextResponse)
 def vk_confirmation():
-    return "8b80bdd3"
+    with open("vk_response", "r") as file:
+        return file.read()
