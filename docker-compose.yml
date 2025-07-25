@@ -86,6 +86,29 @@ services:
       retries: 3
       start_period: 40s
 
+  vk_ot:
+    build:
+      context: ./vk_bot
+      dockerfile: Dockerfile
+    container_name: vk_bot
+    restart: unless-stopped
+    environment:
+      - HOST=${VK_BOT_HOST:-0.0.0.0}
+      - PORT=${VK_BOT_PORT:-9000}
+      - DEBUG=${VK_DEBUG:-false}
+    ports:
+      - "9000:9000"
+    networks:
+      - museum_network
+    volumes:
+      - ./vk_bot:/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
 volumes:
   mysql_data:
     driver: local
