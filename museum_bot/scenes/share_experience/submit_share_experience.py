@@ -21,7 +21,9 @@ class SubmitShareExperienceScene(Scene, state="share-experience-submit"):
             file_id = data["experience"].file_id
             file_binary: BinaryIO = BytesIO()
             logging.info(f"Downloading file {data['experience']}")
-            await message.bot.download_file(file_id, file_binary)
+            
+            voice_file = await message.bot.get_file(file_id)
+            await message.bot.download_file(voice_file.file_path, file_binary)
             file_binary.seek(0)
 
             upload_url = "https://ideasformuseums.com/tgbot/upload-audio/"
