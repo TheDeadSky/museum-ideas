@@ -7,8 +7,14 @@ from sqlalchemy.orm import Session
 
 from db.models import UserCourseProgress, Course, CoursePart, User
 from db.utils import get_user_by_sm_id
-from schemas import BaseResponse, CourseNotificationResponse
-from .schemas import CourseUserAnswer, SelfSupportCourseData, SelfSupportCoursePartData, SelfSupportCourseResponse
+from schemas import BaseResponse
+from .schemas import (
+    CourseUserAnswer,
+    SelfSupportCourseData,
+    SelfSupportCoursePartData,
+    SelfSupportCourseResponse,
+    CourseNotificationResponse
+)
 
 
 async def load_self_support_course(sm_id: str, db: Session) -> SelfSupportCourseResponse:
