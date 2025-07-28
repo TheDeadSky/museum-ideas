@@ -1,5 +1,8 @@
+from io import BytesIO
+from typing import BinaryIO
 from aiogram.fsm.scene import Scene, on
-from aiogram.types import CallbackQuery, User
+from aiogram.types import CallbackQuery, User, Voice
+import aiohttp
 
 from models.experience import ShareExperienceData
 from services.api_service import send_experience
@@ -11,10 +14,49 @@ class SubmitShareExperienceScene(Scene, state="share-experience-submit"):
     async def on_enter(self, message: CallbackQuery, from_user: User = None):
         data = await self.wizard.get_data()
 
-        valid_data = ShareExperienceData(**{
-            "sm_id": str(from_user.id),
-            **data
-        })
+        valid_data = None
+
+        if isinstance(data["experience"], Voice):
+            file_id = data["experience"].file_id
+            file_binary: BinaryIO = BytesIO()
+            await message.bot.download_file(file_id, file_binary)
+            file_binary.seek(0)
+
+            upload_url = "https://ideasformuseums.com/tgbot/upload-audio/"
+            async with aiohttp.ClientSession() as session:
+                form = aiohttp.FormData()
+                form.add_field(
+                    name="filedata",
+                    value=file_binary,
+                    filename="voice.ogg",
+                    content_type="audio/ogg"
+                )
+                async with session.post(upload_url, data=form) as resp:
+                    upload_response = await resp.json()
+
+            if "file_id" in upload_response:
+                get_audio_url = "https://ideasformuseums.com/tgbot/get-audio/?filename="
+
+                data["experience"] = get_audio_url + upload_response["filename"]
+                data["experience_type"] = "audio"
+
+                valid_data = ShareExperienceData(
+                    **{
+                        "sm_id": str(from_user.id),
+                        **data
+                    }
+                )
+            else:
+                await message.edit_text(
+                    upload_response.get("error", "Unknown upload error"),
+                    reply_markup=TO_MAIN_MENU_BUTTON
+                )
+                return
+        else:
+            valid_data = ShareExperienceData(**{
+                "sm_id": str(from_user.id),
+                **data
+            })
 
         response = await send_experience(valid_data)
         print(response)
