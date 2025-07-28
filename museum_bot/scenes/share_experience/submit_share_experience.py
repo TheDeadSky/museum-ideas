@@ -35,9 +35,8 @@ class SubmitShareExperienceScene(Scene, state="share-experience-submit"):
                     content_type="audio/ogg"
                 )
                 async with session.post(upload_url, data=form) as resp:
+                    logging.info(f"Upload response: {await resp.text()}")
                     upload_response = await resp.json()
-
-            logging.info(f"Upload response: {upload_response}")
 
             if "filename" in upload_response:
                 get_audio_url = "https://ideasformuseums.com/tgbot/get-audio/?filename="
