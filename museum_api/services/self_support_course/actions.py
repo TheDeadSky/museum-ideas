@@ -1,11 +1,13 @@
 from datetime import datetime
 
+import aiohttp
 from fastapi import HTTPException
+from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
 
-from db.models import UserCourseProgress, Course, CoursePart
+from db.models import UserCourseProgress, Course, CoursePart, User
 from db.utils import get_user_by_sm_id
-from schemas import BaseResponse
+from schemas import BaseResponse, CourseNotificationResponse
 from .schemas import CourseUserAnswer, SelfSupportCourseData, SelfSupportCoursePartData, SelfSupportCourseResponse
 
 
@@ -93,3 +95,57 @@ async def save_self_support_course_answer(answer_data: CourseUserAnswer, db: Ses
         success=True,
         message="Ответ сохранен"
     )
+
+
+async def new_course_part_notify(db: Session) -> CourseNotificationResponse:
+    try:
+        # Get users with course progress
+        users_with_progress_query = select(User.telegram_id).distinct().join(
+            UserCourseProgress, User.id == UserCourseProgress.user_id
+        ).where(User.telegram_id.isnot(None))
+
+        users_with_progress = db.execute(users_with_progress_query).scalars().all()
+        users_with_progress_ids = [str(tg_id) for tg_id in users_with_progress if tg_id]
+
+        # Get users without course progress but subscribed to a course
+        users_without_progress_query = select(User.telegram_id).where(
+            and_(
+                User.telegram_id.isnot(None),
+                ~User.id.in_(
+                    select(UserCourseProgress.user_id).distinct()
+                )
+            )
+        )
+
+        users_without_progress = db.execute(users_without_progress_query).scalars().all()
+        users_without_progress_ids = [str(tg_id) for tg_id in users_without_progress if tg_id]
+
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                "http://museum_bot:9000/api/notify-users-about-course",
+                json={
+                    "users_with_progress": users_with_progress_ids,
+                    "users_without_progress": users_without_progress_ids
+                }
+            ) as response:
+                response_data = await response.json()
+
+        if response_data.get("success"):
+            return CourseNotificationResponse(
+                success=True,
+                message=(
+                    f"Found {len(users_with_progress_ids)} users with progress and "
+                    f"{len(users_without_progress_ids)} users without progress"
+                )
+            )
+        else:
+            return CourseNotificationResponse(
+                success=False,
+                message=response_data.get("message")
+            )
+
+    except Exception as e:
+        return CourseNotificationResponse(
+            success=False,
+            message=f"Error getting user notifications: {str(e)}"
+        )

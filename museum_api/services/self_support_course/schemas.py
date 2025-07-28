@@ -35,3 +35,7 @@ class CourseUserAnswer(BaseModel):
     answer: str | None = None
     part_id: int
     sm_id: int
+
+
+class CourseNotificationResponse(BaseResponse):
+    pass
