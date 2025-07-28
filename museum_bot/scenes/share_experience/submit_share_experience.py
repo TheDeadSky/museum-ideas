@@ -1,4 +1,5 @@
 from io import BytesIO
+import logging
 from typing import BinaryIO
 from aiogram.fsm.scene import Scene, on
 from aiogram.types import CallbackQuery, User, Voice
@@ -19,6 +20,7 @@ class SubmitShareExperienceScene(Scene, state="share-experience-submit"):
         if isinstance(data["experience"], Voice):
             file_id = data["experience"].file_id
             file_binary: BinaryIO = BytesIO()
+            logging.info(f"Downloading file {data['experience']}")
             await message.bot.download_file(file_id, file_binary)
             file_binary.seek(0)
 
