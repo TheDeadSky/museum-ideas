@@ -112,12 +112,16 @@ class ExternalRequestHandler:
             try:
                 await self.bot.send_message(
                     chat_id=user_id,
-                    text="Сегодня вышла новая лекция курса. Вы получите к ней доступ по ссылке ниже, если ответили на вопросы прошлых лекций.",
+                    text=(
+                        "Сегодня вышла новая лекция курса. "
+                        "Вы получите к ней доступ по ссылке ниже, если ответили на вопросы прошлых лекций."
+                    ),
                     reply_markup=merge_inline_menus(
                         make_one_button_menu("Перейти к курсу", "self_support_course"),
                         TO_MAIN_MENU_BUTTON
                     )
                 )
+
             except Exception as e:
                 logger.error(f"Error sending message to user {user_id}: {str(e)}")
                 continue
