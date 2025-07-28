@@ -94,5 +94,6 @@ session_data/
 downloads/
 uploads/
 media/ 
+tmp/
 
 templates/
