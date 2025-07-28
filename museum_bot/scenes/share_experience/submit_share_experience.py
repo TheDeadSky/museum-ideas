@@ -21,16 +21,15 @@ class SubmitShareExperienceScene(Scene, state="share-experience-submit"):
             file_id = data["experience"].file_id
             file_binary: BinaryIO = BytesIO()
             logging.info(f"Downloading file {data['experience']}")
-            
+
             voice_file = await message.bot.get_file(file_id)
             await message.bot.download_file(voice_file.file_path, file_binary)
-            file_binary.seek(0)
 
             upload_url = "https://ideasformuseums.com/tgbot/upload-audio/"
             async with aiohttp.ClientSession() as session:
                 form = aiohttp.FormData()
                 form.add_field(
-                    name="filedata",
+                    name="audio_file",
                     value=file_binary,
                     filename="voice.ogg",
                     content_type="audio/ogg"
@@ -38,7 +37,7 @@ class SubmitShareExperienceScene(Scene, state="share-experience-submit"):
                 async with session.post(upload_url, data=form) as resp:
                     upload_response = await resp.json()
 
-            if "file_id" in upload_response:
+            if "filename" in upload_response:
                 get_audio_url = "https://ideasformuseums.com/tgbot/get-audio/?filename="
 
                 data["experience"] = get_audio_url + upload_response["filename"]
