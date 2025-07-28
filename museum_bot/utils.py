@@ -1,4 +1,5 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+import aiohttp
 
 
 def merge_inline_menus(first_menu: InlineKeyboardMarkup, second_menu: InlineKeyboardMarkup) -> InlineKeyboardMarkup:
@@ -30,3 +31,11 @@ def make_one_button_menu(text: str, callback_data: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text=text, callback_data=callback_data)],
     ])
+
+
+async def fetch_audio_binary(url):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            if response.status != 200:
+                raise Exception(f"Ошибка загрузки: HTTP {response.status}")
+            return await response.read()

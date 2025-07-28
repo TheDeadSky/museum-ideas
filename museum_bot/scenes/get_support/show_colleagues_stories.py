@@ -1,9 +1,9 @@
 from aiogram import F
 from aiogram.fsm.scene import Scene, on
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, BufferedInputFile
 
 from menus import TO_MAIN_MENU_BUTTON, ONE_MORE_STORY_BUTTON
-from utils import merge_inline_menus, make_one_button_menu
+from utils import merge_inline_menus, make_one_button_menu, fetch_audio_binary
 from services.api_service import get_random_history
 
 
@@ -52,20 +52,12 @@ class ShowColleaguesStoriesScene(Scene, state="colleagues-stories"):
             await message.answer(
                 display_text
             )
-            await message.answer_audio(
-                story.media_url,
-                reply_markup=merge_inline_menus(
-                    ONE_MORE_STORY_BUTTON,
-                    TO_MAIN_MENU_BUTTON
-                )
-            )
 
-        elif story.content_type == "video":
-            await message.answer(
-                display_text
-            )
-            await message.answer_video(
-                story.media_url,
+            audio_binary = await fetch_audio_binary(story.media_url)
+            buffered_audio = BufferedInputFile(audio_binary, filename="voice.ogg")
+
+            await message.answer_voice(
+                buffered_audio,
                 reply_markup=merge_inline_menus(
                     ONE_MORE_STORY_BUTTON,
                     TO_MAIN_MENU_BUTTON
