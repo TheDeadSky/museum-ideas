@@ -16,8 +16,8 @@ self_support_course_labeler = BotLabeler()
 
 
 @self_support_course_labeler.message(payload="self_support_course", state=GeneralStates.GET_SUPPORT)
-async def on_enter_self_support_course(message: Message, from_user: User):
-    self_support_course_response = await get_self_support_course_part(from_user.id)
+async def on_enter_self_support_course(message: Message):
+    self_support_course_response = await get_self_support_course_part(message.peer_id)
 
     if self_support_course_response.success:
         course_data = self_support_course_response.course_data
@@ -91,7 +91,7 @@ async def on_user_answer(message: Message):
     data = message.state_peer.payload
 
     await self_support_course_answer(
-        vk_id=str(message.from_user.id),
+        vk_id=str(message.peer_id),
         part_id=data["part_id"],
         answer=user_answer
     )
@@ -99,4 +99,4 @@ async def on_user_answer(message: Message):
 
 @self_support_course_labeler.message(payload="self_support_next_part", state=GeneralStates.SELF_SUPPORT_COURSE)
 async def next_part(message: Message):
-    await on_enter_self_support_course(message, message.from_user)
+    await on_enter_self_support_course(message)

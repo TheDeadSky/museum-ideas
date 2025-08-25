@@ -16,11 +16,9 @@ def make_registration_button(button_text="Познакомиться", *, callba
 
 
 async def submit_registration(message: Message, registration_data: dict[str, Any]):
-    from_user = message.peer_id
-
     raw_data = {
         **registration_data,
-        "vk_id": from_user
+        "vk_id": message.peer_id
     }
 
     registration_data = RegistrationData(**raw_data)
