@@ -23,7 +23,7 @@ async def start_handler(message: Message):
         )
         return
 
-    state_dispenser.set(
+    await state_dispenser.set(
         message.peer_id,
         Registration.REGISTRATION_START
     )
