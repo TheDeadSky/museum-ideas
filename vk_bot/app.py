@@ -27,10 +27,10 @@ async def health():
 
 @app.post("/vk-bot/callback", response_class=PlainTextResponse)
 async def vk_handler(req: Request, background_task: BackgroundTasks):
-    data = await req.body()
+    data = await req.json()
     logging.info(f"data: {data}")
     try:
-        data = await req.model_dump_json()
+        data = await req.json()
     except Exception:
         logging.warning("Empty request")
         return Response("not today", status_code=403)
