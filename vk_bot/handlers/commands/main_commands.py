@@ -14,7 +14,7 @@ async def start_handler(message: Message):
 
     is_registered = await get_is_registered(vk_id)
     if is_registered:
-        main_menu_text = await get_text_from_db("main_menu_text")
+        main_menu_text = await get_text_from_db("main_menu_message")
         await default_main_menu(
             message,
             main_menu_text
