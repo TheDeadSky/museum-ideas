@@ -7,7 +7,7 @@ from menus import MAIN_MENU
 commands_labeler = BotLabeler()
 
 
-@commands_labeler.message(command="/start")
+# @commands_labeler.message(command="/start")
 @commands_labeler.message(text="Начать")
 async def start_handler(message: Message):
     vk_id = str(message.from_id)
@@ -26,6 +26,6 @@ async def start_handler(message: Message):
     await message.answer(greetings, keyboard=make_registration_button())
 
 
-@commands_labeler.message(text="/dev_menu")
+@commands_labeler.message(command="/dev_menu")
 async def menu_handler(message: Message):
     await message.answer("Главное меню:", keyboard=MAIN_MENU)
