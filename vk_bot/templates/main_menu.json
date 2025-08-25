@@ -1,0 +1,28 @@
+{
+    "buttons": [
+        {
+            "order": 1,
+            "text": "Получить поддержку",
+            "callback_data": "get_support",
+            "modes": ["prod", "dev"]
+        },
+        {
+            "order": 2,
+            "text": "Поделиться опытом",
+            "callback_data": "share_experience",
+            "modes": ["prod", "dev"]
+        },
+        {
+            "order": 3,
+            "text": "Обратная связь",
+            "callback_data": "feedback",
+            "modes": ["prod", "dev"]
+        },
+        {
+            "order": 4,
+            "text": "О проекте",
+            "callback_data": "about_project",
+            "modes": ["prod", "dev"]
+        }
+    ]
+}
