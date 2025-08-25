@@ -1,5 +1,6 @@
 import os
-from vkbottle import API, BotLabeler, BuiltinStateDispenser, VoiceMessageUploader
+from vkbottle import API, BuiltinStateDispenser, VoiceMessageUploader
+from vkbottle.bot import BotLabeler
 
 APP_NAME = "Museum VK Bot"
 APP_VERSION = "1.0.0"
