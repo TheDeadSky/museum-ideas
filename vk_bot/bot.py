@@ -18,9 +18,9 @@ bot = Bot(
     callback=callback
 )
 
+bot.labeler.load(commands_labeler)
 bot.labeler.load(registration_labeler)
 bot.labeler.load(main_menu_labeler)
 bot.labeler.load(get_support_labeler)
 bot.labeler.load(share_experience_labeler)
 bot.labeler.load(feedback_labeler)
-bot.labeler.load(commands_labeler)
