@@ -11,7 +11,8 @@ from states.general_states import GeneralStates
 from states.registration import Registration
 
 
-def make_registration_button(button_text="Познакомиться", *, callback_data: dict[str, any] = {"action": "registration"}):
+def make_registration_button(button_text="Познакомиться", **kwargs):
+    callback_data = kwargs.get("callback_data", {"cmd": "registration"})
     return make_one_button_menu(button_text, callback_data)
 
 
