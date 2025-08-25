@@ -1,4 +1,4 @@
-from vkbottle.bot import BotLabeler, Message, User
+from vkbottle.bot import BotLabeler, Message
 
 from menus import NEXT_PART_BUTTON, TO_MAIN_MENU_BUTTON
 from services.api_service import (
