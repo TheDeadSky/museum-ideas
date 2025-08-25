@@ -9,8 +9,8 @@ from settings import state_dispenser
 experience_anonymity_labeler = BotLabeler()
 
 
-@experience_anonymity_labeler.callback_query(payload="yes", state=ShareExperienceStates.ANONYMITY)
-@experience_anonymity_labeler.callback_query(payload="no", state=ShareExperienceStates.ANONYMITY)
+@experience_anonymity_labeler.message(payload="yes", state=ShareExperienceStates.ANONYMITY)
+@experience_anonymity_labeler.message(payload="no", state=ShareExperienceStates.ANONYMITY)
 async def handle_anonymous(message: Message):
     logging.info(message.payload)
     state_payload = message.state_peer.payload

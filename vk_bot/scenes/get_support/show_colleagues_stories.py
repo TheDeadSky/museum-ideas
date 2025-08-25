@@ -77,6 +77,6 @@ async def on_enter_show_colleagues_stories(message: Message):
         )
 
 
-@colleagues_stories_labeler.callback_query(payload="one_more_story", state=GeneralStates.GET_SUPPORT)
+@colleagues_stories_labeler.message(payload="one_more_story", state=GeneralStates.GET_SUPPORT)
 async def on_one_more_story(message: Message):
     await on_enter_show_colleagues_stories(message)
