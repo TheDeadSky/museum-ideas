@@ -10,19 +10,19 @@ class KeyboardButtonSchema(BaseModel):
     color: str | None = None
 
     def primary(self) -> "KeyboardButtonSchema":
-        self.color = KeyboardButtonColor.PRIMARY
+        self.color = KeyboardButtonColor.PRIMARY.value
         return self
 
     def secondary(self) -> "KeyboardButtonSchema":
-        self.color = KeyboardButtonColor.SECONDARY
+        self.color = KeyboardButtonColor.SECONDARY.value
         return self
 
     def positive(self) -> "KeyboardButtonSchema":
-        self.color = KeyboardButtonColor.POSITIVE
+        self.color = KeyboardButtonColor.POSITIVE.value
         return self
 
     def negative(self) -> "KeyboardButtonSchema":
-        self.color = KeyboardButtonColor.NEGATIVE
+        self.color = KeyboardButtonColor.NEGATIVE.value
         return self
 
     def text(self) -> "KeyboardButtonSchema":

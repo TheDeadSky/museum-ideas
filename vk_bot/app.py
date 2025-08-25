@@ -1,6 +1,6 @@
 import logging
 
-from fastapi.concurrency import asynccontextmanager
+from contextlib import asynccontextmanager
 from fastapi.responses import PlainTextResponse
 
 from bot import bot
@@ -15,6 +15,7 @@ async def lifespan(app: FastAPI):
     logging.info("Setup webhook")
     global confirmation_code, secret_key
     confirmation_code, secret_key = await bot.setup_webhook()
+    yield
 
 app = FastAPI(lifespan=lifespan)
 
