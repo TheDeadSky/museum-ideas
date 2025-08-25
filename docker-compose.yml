@@ -96,6 +96,8 @@ services:
       - HOST=${VK_BOT_HOST:-0.0.0.0}
       - PORT=${VK_BOT_PORT:-9001}
       - DEBUG=${VK_DEBUG:-false}
+      - VK_BOT_TOKEN=${VK_BOT_TOKEN}
+      - WEBHOOK_PATH=${WEBHOOK_PATH:-/vk-bot/callback}
     ports:
       - "9001:9001"
     networks:
