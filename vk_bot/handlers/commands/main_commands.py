@@ -12,8 +12,8 @@ commands_labeler = BotLabeler()
 async def start_handler(message: Message):
     vk_id = str(message.from_id)
 
-    is_registered = await get_is_registered(vk_id)
-    if is_registered:
+    is_registered_response = await get_is_registered(vk_id)
+    if is_registered_response["success"]:
         main_menu_text = await get_text_from_db("main_menu_message")
         await default_main_menu(
             message,
