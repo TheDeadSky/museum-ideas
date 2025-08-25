@@ -13,7 +13,7 @@ async def default_main_menu(message: Message, main_menu_text: str = "Главн�
 
         if main_menu_data:
             ordered_buttons = sorted(main_menu_data["buttons"], key=lambda x: x["order"])
-            keyboard = Keyboard(one_time=True, inline=True)
+            keyboard = Keyboard(one_time=False, inline=True)
 
             for button in ordered_buttons:
                 if mode in button["modes"]:
