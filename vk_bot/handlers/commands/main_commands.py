@@ -21,7 +21,7 @@ async def start_handler(message: Message):
         )
         return
 
-    greetings = await get_text_from_db("start_greetings")
+    greetings = await get_text_from_db("welcome_message")
 
     await message.answer(greetings, keyboard=make_registration_button())
 
