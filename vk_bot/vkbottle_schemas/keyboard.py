@@ -1,11 +1,11 @@
-from typing import Literal
+from typing import Any, Literal
 from vkbottle.tools.keyboard.color import KeyboardButtonColor
 from pydantic import BaseModel
 
 
 class KeyboardButtonSchema(BaseModel):
     label: str
-    payload: str | dict[str, str] | None = None
+    payload: str | dict[str, Any] | None = None
     type: Literal["text", "open_link", "callback", "location", "vkpay", "open_app"] = "text"
     color: str | None = None
 
@@ -49,5 +49,5 @@ class KeyboardButtonSchema(BaseModel):
         self.type = "open_app"
         return self
 
-    def get_json(self) -> str:
+    def get_json(self) -> dict[str, Any]:
         return self.model_dump()

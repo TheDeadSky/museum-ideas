@@ -1,4 +1,5 @@
 import aiohttp
+from typing import Any
 
 from vkbottle import Keyboard
 from vkbottle_schemas.keyboard import KeyboardButtonSchema
@@ -11,9 +12,9 @@ def merge_inline_menus(first_menu: Keyboard, second_menu: Keyboard) -> Keyboard:
     ])
 
 
-def make_one_button_menu(text: str, payload: dict[str, any]) -> Keyboard:
+def make_one_button_menu(text: str, payload: dict[str, Any]) -> Keyboard:
     return Keyboard(one_time=True, inline=True).schema([
-        [KeyboardButtonSchema(label=text, payload=payload).primary().get_json()],
+        [KeyboardButtonSchema(label=text, payload=payload, type="callback").primary().get_json()],
     ])
 
 
