@@ -13,7 +13,7 @@ def merge_inline_menus(first_menu: Keyboard, second_menu: Keyboard) -> Keyboard:
 
 
 def make_one_button_menu(text: str, payload: dict[str, Any]) -> Keyboard:
-    return Keyboard(one_time=True, inline=False).schema([
+    return Keyboard(one_time=False, inline=True).schema([
         [KeyboardButtonSchema(label=text, payload=payload, type="callback").primary().get_json()],
     ])
 
