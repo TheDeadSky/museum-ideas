@@ -1,6 +1,7 @@
 import os
 from vkbottle import API, BuiltinStateDispenser, VoiceMessageUploader
 from vkbottle.bot import BotLabeler
+from vkbottle.callback import BotCallback
 
 APP_NAME = "Museum VK Bot"
 APP_VERSION = "1.0.0"
@@ -17,3 +18,4 @@ state_dispenser = BuiltinStateDispenser()
 voice_uploader = VoiceMessageUploader(
     api=api
 )
+callback = BotCallback(url="https://deadsky-dev.ru/vk-bot/callback", title="my server")
