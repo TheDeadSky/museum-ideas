@@ -2,10 +2,10 @@ from vkbottle import Keyboard
 from vkbottle_schemas.keyboard import KeyboardButtonSchema
 
 MAIN_MENU = Keyboard(one_time=True, inline=True).schema([
-    [KeyboardButtonSchema(label="Получить поддержку", payload="get_support").primary().get_json()],
-    [KeyboardButtonSchema(label="Поделиться опытом", payload="share_experience").primary().get_json()],
-    [KeyboardButtonSchema(label="Обратная связь", payload="feedback").primary().get_json()],
-    [KeyboardButtonSchema(label="О проекте", payload="about_project").secondary().get_json()],
+    [KeyboardButtonSchema(label="Получить поддержку", payload="get_support", type="callback").primary().get_json()],
+    [KeyboardButtonSchema(label="Поделиться опытом", payload="share_experience", type="callback").primary().get_json()],
+    [KeyboardButtonSchema(label="Обратная связь", payload="feedback", type="callback").primary().get_json()],
+    [KeyboardButtonSchema(label="О проекте", payload="about_project", type="callback").secondary().get_json()],
 ]).get_json()
 
 YES_NO_MENU = Keyboard(one_time=True, inline=True).schema([
