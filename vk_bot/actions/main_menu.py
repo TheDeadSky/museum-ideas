@@ -1,6 +1,6 @@
 import os
 import json
-from vkbottle import Keyboard, Text
+from vkbottle import Keyboard, Callback
 from vkbottle.bot import Message
 
 from menus import MAIN_MENU
@@ -17,7 +17,7 @@ async def default_main_menu(message: Message, main_menu_text: str = "Главн�
 
             for button in ordered_buttons:
                 if mode in button["modes"]:
-                    keyboard.add(Text(button["text"]), payload={"cmd": button["callback_data"]})
+                    keyboard.add(Callback(button["text"], payload={"cmd": button["callback_data"]}))
 
             await message.answer(main_menu_text, keyboard=keyboard.get_json())
         else:
