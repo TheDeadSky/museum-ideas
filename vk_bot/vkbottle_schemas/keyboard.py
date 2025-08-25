@@ -50,4 +50,4 @@ class KeyboardButtonSchema(BaseModel):
         return self
 
     def get_json(self) -> str:
-        return self.model_dump_json()
+        return self.model_dump()
