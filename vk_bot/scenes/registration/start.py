@@ -6,7 +6,7 @@ from settings import state_dispenser
 
 
 def init(labeler: BotLabeler):
-    @labeler.message(payload={"action": "registration"}, state=Registration.REGISTRATION_START)
+    @labeler.message(payload={"cmd": "registration"}, state=Registration.REGISTRATION_START)
     async def start_registration(message: Message):
         name_question = await get_text_from_db("name_question")
         state_dispenser.set(
