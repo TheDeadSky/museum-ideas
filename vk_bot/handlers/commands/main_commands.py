@@ -3,6 +3,8 @@ from actions.main_menu import default_main_menu
 from actions.registration import make_registration_button
 from services.api_service import get_is_registered, get_text_from_db
 from menus import MAIN_MENU
+from states.registration import Registration
+from settings import state_dispenser
 
 commands_labeler = BotLabeler()
 
@@ -20,6 +22,11 @@ async def start_handler(message: Message):
             main_menu_text
         )
         return
+
+    state_dispenser.set(
+        message.peer_id,
+        Registration.REGISTRATION_START
+    )
 
     greetings = await get_text_from_db("welcome_message")
 
