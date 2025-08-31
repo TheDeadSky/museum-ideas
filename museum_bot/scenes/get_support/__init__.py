@@ -17,6 +17,7 @@ get_support_scenes_registry = (
     GetSupportScene,
     SelfSupportCourseScene,
     ShowColleaguesStoriesScene,
+    JoinOnlineMeetup
 )
 
 __all__ = [
