@@ -29,7 +29,14 @@ class JoinOnlineMeetup(Scene, state="join-online-meetup"):
 
         dont_join_online_meetup_text = await get_text_from_db("dont_join_online_meetup_text")
 
-        await callback.message.edit_text(
-            dont_join_online_meetup_text,
-            reply_markup=TO_MAIN_MENU_BUTTON
-        )
+        if isinstance(callback.message, Message):
+            await callback.message.edit_text(
+                dont_join_online_meetup_text,
+                reply_markup=TO_MAIN_MENU_BUTTON
+            )
+        elif callback.bot:
+            await callback.bot.send_message(
+                callback.from_user.id,
+                text=dont_join_online_meetup_text,
+                reply_markup=TO_MAIN_MENU_BUTTON
+            )
