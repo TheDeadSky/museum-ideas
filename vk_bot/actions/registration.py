@@ -13,7 +13,7 @@ from states.registration import Registration
 
 def make_registration_button(button_text="Познакомиться", **kwargs):
     callback_data = kwargs.get("callback_data", {"cmd": "registration"})
-    return make_one_button_menu(button_text, callback_data)
+    return make_one_button_menu(button_text, callback_data, _type="text")
 
 
 async def submit_registration(message: Message, registration_data: dict[str, Any]):
