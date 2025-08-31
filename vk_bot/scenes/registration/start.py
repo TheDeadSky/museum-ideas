@@ -7,10 +7,14 @@ from settings import state_dispenser
 
 
 def init(labeler: BotLabeler):
-    @labeler.raw_event(
-        GroupEventType.MESSAGE_EVENT,
-        MessageEvent,
-        rules.PayloadRule({"cmd": "registration"}),
+    # @labeler.raw_event(
+    #     GroupEventType.MESSAGE_EVENT,
+    #     MessageEvent,
+    #     rules.PayloadRule({"cmd": "registration"}),
+    #     state=Registration.REGISTRATION_START
+    # )
+    @labeler.private_message(
+        payload={"cmd": "registration"},
         state=Registration.REGISTRATION_START
     )
     async def start_registration(event: MessageEvent):
