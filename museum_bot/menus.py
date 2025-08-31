@@ -37,6 +37,7 @@ TO_MAIN_MENU_BUTTON = InlineKeyboardMarkup(inline_keyboard=[
 GET_SUPPORT_MENU = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="Пройти курс самоподдержки", callback_data="self_support")],
     [InlineKeyboardButton(text="Узнать истории коллег", callback_data="colleagues_stories")],
+    [InlineKeyboardButton(text="Присоединиться к онлайн-встречам", callback_data="join_online_meetup")]
 ])
 
 ONE_MORE_STORY_BUTTON = InlineKeyboardMarkup(inline_keyboard=[
@@ -45,4 +46,9 @@ ONE_MORE_STORY_BUTTON = InlineKeyboardMarkup(inline_keyboard=[
 
 NEXT_PART_BUTTON = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="Смотреть следующую лекцию", callback_data="self_support_next_part")],
+])
+
+JOIN_ONLINE_MEETUP_MENU = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text="Перейти", url="https://t.me/+dBiLytf_PzZkOGRi")],
+    [InlineKeyboardButton(text="Нет", callback_data="no")]
 ])

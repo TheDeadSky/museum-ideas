@@ -5,6 +5,7 @@ from aiogram.types import Message, CallbackQuery
 from aiogram import F
 
 from menus import GET_SUPPORT_MENU, TO_MAIN_MENU_BUTTON
+from scenes.get_support.join_online_meetup import JoinOnlineMeetup
 from services.api_service import get_text_from_db
 from utils import merge_inline_menus
 from scenes.get_support.self_support_course_scene import SelfSupportCourseScene
@@ -36,10 +37,22 @@ class GetSupportScene(Scene, state="get-support"):
     async def on_self_support(self, callback: CallbackQuery):
         logging.info("Self support callback handler: GetSupportScene.on_self_support")
         await callback.answer()
-        await callback.message.delete_reply_markup()
+
+        if isinstance(callback.message, Message):
+            await callback.message.delete_reply_markup()
 
     @on.callback_query(F.data == "colleagues_stories", after=After.goto(ShowColleaguesStoriesScene))
     async def on_colleagues_stories(self, callback: CallbackQuery):
         logging.info("Colleagues stories callback handler: GetSupportScene.on_colleagues_stories")
         await callback.answer()
-        await callback.message.delete_reply_markup()
+
+        if isinstance(callback.message, Message):
+            await callback.message.delete_reply_markup()
+
+    @on.callback_query(F.data == "join_online_meetup", after=After.goto(JoinOnlineMeetup))
+    async def on_join_online_meetup(self, callback: CallbackQuery):
+        logging.info("Join to online meetup")
+        await callback.answer()
+
+        if isinstance(callback.message, Message):
+            await callback.message.delete_reply_markup()
