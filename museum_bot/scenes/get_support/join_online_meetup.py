@@ -21,7 +21,7 @@ class JoinOnlineMeetup(Scene, state="join-online-meetup"):
 
     @on.callback_query.enter()
     async def on_enter_callback(self, callback: CallbackQuery):
-        self.on_enter(callback.message)
+        await self.on_enter(callback.message)
 
     @on.callback_query(F.data == "no")
     async def dont_join_online_meetup(callback: CallbackQuery):
