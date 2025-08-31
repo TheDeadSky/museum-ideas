@@ -24,7 +24,9 @@ class JoinOnlineMeetup(Scene, state="join-online-meetup"):
         await self.on_enter(callback.message)
 
     @on.callback_query(F.data == "no")
-    async def dont_join_online_meetup(callback: CallbackQuery):
+    async def dont_join_online_meetup(self, callback: CallbackQuery):
+        await callback.answer()
+
         dont_join_online_meetup_text = await get_text_from_db("dont_join_online_meetup_text")
 
         await callback.message.edit_text(
