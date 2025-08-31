@@ -10,7 +10,7 @@ from utils import merge_inline_menus
 class JoinOnlineMeetup(Scene, state="join-online-meetup"):
     @on.message.enter()
     async def on_enter(self, message: Message):
-        join_online_meetup_text = get_text_from_db("join_online_meetup_text")
+        join_online_meetup_text = await get_text_from_db("join_online_meetup_text")
         await message.answer(
             join_online_meetup_text,
             reply_markup=merge_inline_menus(
@@ -25,7 +25,7 @@ class JoinOnlineMeetup(Scene, state="join-online-meetup"):
 
     @on.callback_query(F.data == "no")
     async def dont_join_online_meetup(callback: CallbackQuery):
-        dont_join_online_meetup_text = get_text_from_db("dont_join_online_meetup_text")
+        dont_join_online_meetup_text = await get_text_from_db("dont_join_online_meetup_text")
 
         await callback.message.edit_text(
             dont_join_online_meetup_text,
