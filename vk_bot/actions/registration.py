@@ -19,7 +19,7 @@ def make_registration_button(button_text="Познакомиться", **kwargs)
 async def submit_registration(message: Message | MessageEvent, registration_data: dict[str, Any]):
     raw_data = {
         **registration_data,
-        "vk_id": message.peer_id
+        "vk_id": str(message.peer_id)
     }
 
     registration_data_object = RegistrationData(**raw_data)
