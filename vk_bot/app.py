@@ -15,8 +15,8 @@ secret_key: str = os.getenv("VK_SECRET_KEY", "")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logging.info("Setup webhook")
-    global confirmation_code, secret_key
-    confirmation_code, secret_key = await bot.setup_webhook()
+    # global confirmation_code, secret_key
+    # confirmation_code, secret_key = await bot.setup_webhook()
     yield
 
 app = FastAPI(lifespan=lifespan)
