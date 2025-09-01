@@ -25,7 +25,7 @@ async def on_enter_show_colleagues_stories(event: MessageEvent):
 
     if not history_response.success or not history_response.history:
         await event.send_message(
-            text=history_response.message,
+            history_response.message,
             keyboard=merge_inline_menus(
                 make_one_button_menu("Добавить историю", {"cmd": "share_experience"}),
                 TO_MAIN_MENU_BUTTON
