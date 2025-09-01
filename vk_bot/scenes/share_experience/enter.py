@@ -24,7 +24,7 @@ async def on_enter_share_experience(event: MessageEvent):
     ask_text = await get_text_from_db("share_experience_format_ask")
     await event.send_message(
         ask_text,
-        keyboard=make_one_button_menu("Отмена", {"cmd": "menu"}).get_json()
+        keyboard=make_one_button_menu("Отмена", {"cmd": "main_menu"}).get_json()
     )
     await state_dispenser.set(
         event.peer_id,

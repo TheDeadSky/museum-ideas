@@ -18,7 +18,7 @@ async def on_feedback_message_handler(message: Message):
 
     await message.answer(
         feedback_entry_message,
-        keyboard=make_one_button_menu("Отмена", {"cmd": "menu"}).get_json()
+        keyboard=make_one_button_menu("Отмена", {"cmd": "main_menu"}).get_json()
     )
 
 
@@ -32,7 +32,7 @@ async def on_feedback_event_handler(event: MessageEvent):
 
     await event.send_message(
         feedback_entry_message,
-        keyboard=make_one_button_menu("Отмена", {"cmd": "menu"}).get_json()
+        keyboard=make_one_button_menu("Отмена", {"cmd": "main_menu"}, "callback").get_json()
     )
 
 
