@@ -23,7 +23,7 @@ async def on_enter_show_colleagues_stories(event: MessageEvent):
         str(event.peer_id)
     )
 
-    if not history_response.success:
+    if not history_response.success or not history_response.history:
         await event.send_message(
             text=history_response.message,
             keyboard=merge_inline_menus(
