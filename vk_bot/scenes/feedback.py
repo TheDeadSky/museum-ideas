@@ -13,7 +13,7 @@ feedback_labeler = BotLabeler()
 
 @feedback_labeler.message(text="Обратная связь")
 @feedback_labeler.message(text="отзыв")
-async def on_feedback_message_handler(self, message: Message):
+async def on_feedback_message_handler(message: Message):
     feedback_entry_message = await get_text_from_db("feedback_entry_message")
 
     await message.answer(
@@ -27,7 +27,7 @@ async def on_feedback_message_handler(self, message: Message):
     MessageEvent,
     rules.PayloadRule({"cmd": "feedback"})
 )
-async def on_feedback_event_handler(self, event: MessageEvent):
+async def on_feedback_event_handler(event: MessageEvent):
     feedback_entry_message = await get_text_from_db("feedback_entry_message")
 
     await event.send_message(
@@ -37,7 +37,7 @@ async def on_feedback_event_handler(self, event: MessageEvent):
 
 
 @feedback_labeler.message(state=GeneralStates.FEEDBACK)
-async def handle_feedback(self, message: Message):
+async def handle_feedback(message: Message):
     data = {}
     data["feedback_text"] = message.text
 
