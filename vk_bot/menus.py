@@ -1,7 +1,7 @@
 from vkbottle import Keyboard
 from vkbottle_schemas.keyboard import KeyboardButtonSchema
 
-MAIN_MENU = Keyboard(one_time=True, inline=True).schema([
+MAIN_MENU = Keyboard(one_time=False, inline=True).schema([
     [KeyboardButtonSchema(
         label="Получить поддержку",
         payload={"cmd": "get_support"},
@@ -24,11 +24,11 @@ MAIN_MENU = Keyboard(one_time=True, inline=True).schema([
     ).secondary().get_json()],
 ])
 
-TO_MAIN_MENU_BUTTON = Keyboard(one_time=True, inline=True).schema([
+TO_MAIN_MENU_BUTTON = Keyboard(one_time=False, inline=True).schema([
     [KeyboardButtonSchema(label="В главное меню", payload={"cmd": "main_menu"}).secondary().get_json()],
 ])
 
-GET_SUPPORT_MENU = Keyboard(one_time=True, inline=True).schema([
+GET_SUPPORT_MENU = Keyboard(one_time=False, inline=True).schema([
     [KeyboardButtonSchema(
         label="Пройти курс самоподдержки",
         payload={"cmd": "self_support"}
@@ -39,14 +39,14 @@ GET_SUPPORT_MENU = Keyboard(one_time=True, inline=True).schema([
     ).primary().get_json()],
 ])
 
-ONE_MORE_STORY_BUTTON = Keyboard(one_time=True, inline=True).schema([
+ONE_MORE_STORY_BUTTON = Keyboard(one_time=False, inline=True).schema([
     [KeyboardButtonSchema(
         label="Узнать еще одну историю",
         payload={"cmd": "one_more_story"}
     ).primary().get_json()],
 ])
 
-NEXT_PART_BUTTON = Keyboard(one_time=True, inline=True).schema([
+NEXT_PART_BUTTON = Keyboard(one_time=False, inline=True).schema([
     [KeyboardButtonSchema(
         label="Смотреть следующую лекцию",
         payload={"cmd": "self_support_next_part"}
