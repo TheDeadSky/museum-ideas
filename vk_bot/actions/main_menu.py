@@ -47,7 +47,7 @@ async def default_main_menu(
 def make_to_main_menu_menu(for_state: str | None = None):
     return Keyboard(one_time=False, inline=True).schema([
         [KeyboardButtonSchema(
-            label="В главное меню", payload={"cmd": "menu", "state": for_state},
+            label="В главное меню", payload={"cmd": "main_menu", "state": for_state},
             type="callback"
         ).primary().get_json()],
     ]).get_json()

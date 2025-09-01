@@ -105,6 +105,12 @@ async def on_user_answer(message: Message):
     )
 
 
-@self_support_course_labeler.message(payload="self_support_next_part", state=GeneralStates.SELF_SUPPORT_COURSE)
-async def next_part(message: Message):
-    await on_enter_self_support_course(message)
+@self_support_course_labeler.raw_event(
+    GroupEventType.MESSAGE_EVENT,
+    MessageEvent,
+    rules.PayloadRule({
+        "cmd": "self_support_next_part"
+    })
+)
+async def next_part(event: MessageEvent):
+    await on_enter_self_support_course(event)
