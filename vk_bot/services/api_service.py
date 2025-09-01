@@ -24,7 +24,7 @@ async def get_self_support_course_part(vk_id: str) -> SelfSupportCourseResponse:
                 raise Exception(f"API error: {error_data.get('detail', 'Unknown error')}")
 
 
-async def self_support_course_answer(vk_id: str, part_id: int, answer: str) -> SelfSupportCourseResponse:
+async def self_support_course_answer(vk_id: str, part_id: int, answer: str):
     api_base_url = os.getenv("API_BASE_URL", "http://museum_api:8000")
     async with aiohttp.ClientSession() as session:
         async with session.post(
@@ -117,7 +117,7 @@ async def send_feedback(data: Feedback):
                 raise Exception(f"API error: {error_data.get('detail', 'Unknown error')}")
 
 
-async def send_feedback_response_to_user(user_id: str, response_text: str, feedback_id: str = None):
+async def send_feedback_response_to_user(user_id: str, response_text: str, feedback_id: str | None = None):
     """Send feedback response to user via bot's external API endpoint"""
     api_base_url = os.getenv("API_BASE_URL", "http://localhost:3000")
 

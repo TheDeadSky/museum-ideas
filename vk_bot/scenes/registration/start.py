@@ -10,11 +10,14 @@ def init(labeler: BotLabeler):
     @labeler.raw_event(
         GroupEventType.MESSAGE_EVENT,
         MessageEvent,
-        rules.PayloadRule({"cmd": "registration"})
+        rules.PayloadRule({
+            "cmd": "registration",
+            "state": Registration.REGISTRATION_START.value
+        })
     )
     async def start_registration(event: MessageEvent):
         name_question = await get_text_from_db("name_question")
-        state_dispenser.set(
+        await state_dispenser.set(
             event.peer_id,
             Registration.REGISTRATION_NAME
         )

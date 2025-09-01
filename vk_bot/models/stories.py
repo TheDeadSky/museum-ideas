@@ -15,4 +15,4 @@ class HistoryData(BaseModel):
 
 
 class HistoryResponse(BaseResponse):
-    history: HistoryData | None = None
+    history: HistoryData

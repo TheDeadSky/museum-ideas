@@ -1,25 +1,38 @@
 import logging
-from vkbottle.bot import BotLabeler, Message
+
+from vkbottle.bot import BotLabeler, rules, MessageEvent
+from vkbottle_types.events.bot_events import GroupEventType
 
 from actions.share_experience import submit_share_experience
 from states.share_experience import ShareExperienceStates
 from settings import state_dispenser
+from utils import get_state_payload
 
 
 experience_anonymity_labeler = BotLabeler()
 
 
-@experience_anonymity_labeler.message(payload="yes", state=ShareExperienceStates.ANONYMITY)
-@experience_anonymity_labeler.message(payload="no", state=ShareExperienceStates.ANONYMITY)
-async def handle_anonymous(message: Message):
-    logging.info(message.payload)
-    state_payload = message.state_peer.payload
-    state_payload.update({
-        "is_anonymous": message.payload == "yes"
+@experience_anonymity_labeler.raw_event(
+    GroupEventType.MESSAGE_EVENT,
+    MessageEvent,
+    rules.PayloadRule({
+        "cmd": "yes",
+        "state": ShareExperienceStates.ANONYMITY.value
+    }),
+    rules.PayloadRule({
+        "cmd": "no",
+        "state": ShareExperienceStates.ANONYMITY.value
     })
-    state_dispenser.set(
-        message.peer_id,
+)
+async def handle_anonymous(event: MessageEvent):
+    logging.info(event.payload)
+    state_payload = await get_state_payload(state_dispenser, event.peer_id)
+    state_payload.update({
+        "is_anonymous": event.payload == "yes"
+    })
+    await state_dispenser.set(
+        event.peer_id,
         ShareExperienceStates.ANONYMITY,
         **state_payload
     )
-    await submit_share_experience(message, state_payload)
+    await submit_share_experience(event, state_payload)

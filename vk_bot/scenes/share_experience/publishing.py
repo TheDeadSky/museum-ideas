@@ -1,42 +1,58 @@
-from vkbottle.bot import BotLabeler, Message
+from vkbottle.bot import BotLabeler, rules, MessageEvent
+from vkbottle_types.events.bot_events import GroupEventType
 
+from actions.general import make_yes_no_menu
 from actions.share_experience import submit_share_experience
 from states.share_experience import ShareExperienceStates
 from settings import state_dispenser
-from menus import YES_NO_MENU_SWAPPED_ICONS
 from services.api_service import get_text_from_db
+from utils import get_state_payload
 
 experience_publishing_labeler = BotLabeler()
 
 
-@experience_publishing_labeler.message(payload="yes")
-async def publish_yes(message: Message):
-    state_payload = message.state_peer.payload
+@experience_publishing_labeler.raw_event(
+    GroupEventType.MESSAGE_EVENT,
+    MessageEvent,
+    rules.PayloadRule({
+        "cmd": "yes",
+        "state": ShareExperienceStates.PUBLISHING.value
+    }),
+)
+async def publish_yes(event: MessageEvent):
+    state_payload = await get_state_payload(state_dispenser, event.peer_id)
     state_payload.update({
         "publish": True
     })
-    state_dispenser.set(
-        message.peer_id,
+    await state_dispenser.set(
+        event.peer_id,
         ShareExperienceStates.ANONYMITY,
         **state_payload
     )
     anonymous_question = await get_text_from_db("anonymous_message_question")
-    await message.answer(
+    await event.send_message(
         anonymous_question,
-        keyboard=YES_NO_MENU_SWAPPED_ICONS
+        keyboard=make_yes_no_menu(True, ShareExperienceStates.ANONYMITY.value)
     )
 
 
-@experience_publishing_labeler.message(payload="no")
-async def publish_no(message: Message):
-    state_payload = message.state_peer.payload
+@experience_publishing_labeler.raw_event(
+    GroupEventType.MESSAGE_EVENT,
+    MessageEvent,
+    rules.PayloadRule({
+        "cmd": "no",
+        "state": ShareExperienceStates.PUBLISHING.value
+    })
+)
+async def publish_no(event: MessageEvent):
+    state_payload = await get_state_payload(state_dispenser, event.peer_id)
     state_payload.update({
         "publish": False,
         "anonymous": True
     })
-    state_dispenser.set(
-        message.peer_id,
+    await state_dispenser.set(
+        event.peer_id,
         ShareExperienceStates.ANONYMITY,
         **state_payload
     )
-    await submit_share_experience(message, state_payload)
+    await submit_share_experience(event, state_payload)

@@ -1,46 +1,68 @@
-from vkbottle.bot import Message, BotLabeler
+from vkbottle.bot import Message, BotLabeler, rules, MessageEvent
+from vkbottle_types.events.bot_events import GroupEventType
 
 from states.registration import Registration
 from services.api_service import get_text_from_db
 from settings import state_dispenser
-from menus import CONFIRMATION_MENU, YES_NO_MENU
+from actions.general import make_confirmation_menu, make_yes_no_menu
 
 
 def init(labeler: BotLabeler):
     @labeler.message(state=Registration.REGISTRATION_NAME)
     async def name_input_handler(message: Message):
-        state_dispenser.set(
+        await state_dispenser.set(
             message.peer_id,
             Registration.REGISTRATION_NAME_CONFIRMATION,
             firstname=message.text
         )
         name_confirmation_message = await get_text_from_db("name_confirmation_message")
+        confirmation_menu = make_confirmation_menu(for_state=Registration.REGISTRATION_NAME_CONFIRMATION.value)
         await message.answer(
             name_confirmation_message.format(message.text),
-            keyboard=CONFIRMATION_MENU
+            keyboard=confirmation_menu
         )
 
-    @labeler.message(text="not_confirm", state=Registration.REGISTRATION_NAME_CONFIRMATION)
-    async def not_confirm(message: Message):
-        state_payload = message.state_peer.payload
+    @labeler.raw_event(
+        GroupEventType.MESSAGE_EVENT,
+        MessageEvent,
+        rules.PayloadRule({
+            "cmd": "not_confirm",
+            "state": Registration.REGISTRATION_NAME_CONFIRMATION.value
+        })
+    )
+    async def not_confirm(event: MessageEvent):
+        state_peer = await state_dispenser.get(event.peer_id)
+
+        if state_peer is None:
+            state_payload = {}
+        else:
+            state_payload = state_peer.payload
+
         state_payload.update({
             "firstname": None
         })
-        state_dispenser.set(
-            message.peer_id,
+        await state_dispenser.set(
+            event.peer_id,
             Registration.REGISTRATION_NAME,
             **state_payload
         )
-        await message.answer("Введите Ваше имя заново.")
+        await event.send_message("Введите Ваше имя заново.")
 
-    @labeler.message(text="confirm", state=Registration.REGISTRATION_NAME_CONFIRMATION)
-    async def confirm(message: Message):
-        state_dispenser.set(
-            message.peer_id,
+    @labeler.raw_event(
+        GroupEventType.MESSAGE_EVENT,
+        MessageEvent,
+        rules.PayloadRule({
+            "cmd": "confirm",
+            "state": Registration.REGISTRATION_NAME_CONFIRMATION.value
+        })
+    )
+    async def confirm(event: MessageEvent):
+        await state_dispenser.set(
+            event.peer_id,
             Registration.REGISTRATION_IS_MUSEUM_WORKER
         )
         is_museum_worker_question = await get_text_from_db("is_museum_worker_question")
-        await message.answer(
+        await event.send_message(
             is_museum_worker_question,
-            keyboard=YES_NO_MENU
+            keyboard=make_yes_no_menu(for_state=Registration.REGISTRATION_IS_MUSEUM_WORKER.value)
         )

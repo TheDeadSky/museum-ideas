@@ -1,39 +1,55 @@
-from vkbottle.bot import Message, BotLabeler
+from vkbottle.bot import BotLabeler, rules, MessageEvent
+from vkbottle_types.events.bot_events import GroupEventType
 
 from states.registration import Registration
 from services.api_service import get_text_from_db
 from settings import state_dispenser
-from menus import SKIP_BUTTON
+from actions.general import make_skip_menu
+from utils import get_state_payload
 
 
 def init(labeler: BotLabeler):
-    @labeler.message(text="yes", state=Registration.REGISTRATION_IS_MUSEUM_WORKER)
-    async def yes(message: Message):
-        state_payload = message.state_peer.payload
+    @labeler.raw_event(
+        GroupEventType.MESSAGE_EVENT,
+        MessageEvent,
+        rules.PayloadRule({
+            "cmd": "yes",
+            "state": Registration.REGISTRATION_IS_MUSEUM_WORKER.value
+        })
+    )
+    async def yes(event: MessageEvent):
+        state_payload = await get_state_payload(state_dispenser, event.peer_id)
         state_payload.update({
             "is_museum_worker": True
         })
-        state_dispenser.set(
-            message.peer_id,
+        await state_dispenser.set(
+            event.peer_id,
             Registration.REGISTRATION_WHICH_MUSEUM,
             **state_payload
         )
         which_museum_question = await get_text_from_db("which_museum_question")
-        await message.answer(
+        await event.send_message(
             which_museum_question,
-            keyboard=SKIP_BUTTON
+            keyboard=make_skip_menu(for_state=Registration.REGISTRATION_WHICH_MUSEUM.value)
         )
 
-    @labeler.message(text="no", state=Registration.REGISTRATION_IS_MUSEUM_WORKER)
-    async def no(message: Message):
-        state_payload = message.state_peer.payload
+    @labeler.raw_event(
+        GroupEventType.MESSAGE_EVENT,
+        MessageEvent,
+        rules.PayloadRule({
+            "cmd": "no",
+            "state": Registration.REGISTRATION_IS_MUSEUM_WORKER.value
+        })
+    )
+    async def no(event: MessageEvent):
+        state_payload = await get_state_payload(state_dispenser, event.peer_id)
         state_payload.update({
             "is_museum_worker": False
         })
-        state_dispenser.set(
-            message.peer_id,
+        await state_dispenser.set(
+            event.peer_id,
             Registration.REGISTRATION_OCCUPATION,
             **state_payload
         )
         sphere_of_activity_question = await get_text_from_db("sphere_of_activity_question")
-        await message.answer(sphere_of_activity_question)
+        await event.send_message(sphere_of_activity_question)

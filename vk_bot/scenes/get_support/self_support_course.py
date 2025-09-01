@@ -1,4 +1,5 @@
-from vkbottle.bot import BotLabeler, Message
+from vkbottle.bot import Message, BotLabeler, rules, MessageEvent
+from vkbottle_types.events.bot_events import GroupEventType
 
 from menus import NEXT_PART_BUTTON, TO_MAIN_MENU_BUTTON
 from services.api_service import (
@@ -8,32 +9,39 @@ from services.api_service import (
     self_support_course_answer
 )
 from states.general_states import GeneralStates
-from utils import make_one_button_menu, merge_inline_menus
+from utils import make_one_button_menu, merge_inline_menus, get_state_payload
 from settings import state_dispenser
 
 
 self_support_course_labeler = BotLabeler()
 
 
-@self_support_course_labeler.message(payload="self_support_course", state=GeneralStates.GET_SUPPORT)
-async def on_enter_self_support_course(message: Message):
-    self_support_course_response = await get_self_support_course_part(message.peer_id)
+@self_support_course_labeler.raw_event(
+    GroupEventType.MESSAGE_EVENT,
+    MessageEvent,
+    rules.PayloadRule({
+        "cmd": "self_support_course"
+    })
+)
+async def on_enter_self_support_course(event: MessageEvent):
+    self_support_course_response = await get_self_support_course_part(str(event.peer_id))
 
     if self_support_course_response.success:
         course_data = self_support_course_response.course_data
         part_data = self_support_course_response.part_data
 
-        state_payload = message.state_peer.payload
+        state_payload = await get_state_payload(state_dispenser, event.peer_id)
         state_payload.update({"part_id": part_data.id})
-        state_dispenser.set(
-            message.peer_id,
+
+        await state_dispenser.set(
+            event.peer_id,
             GeneralStates.SELF_SUPPORT_COURSE,
             **state_payload
         )
 
         course_title = course_data.title
         course_description = course_data.description
-        await message.answer(f"{course_title}\n{course_description}")
+        await event.send_message(f"{course_title}\n{course_description}")
 
         # if part_data.image_url:
         #     await message.answer_photo(
@@ -41,7 +49,7 @@ async def on_enter_self_support_course(message: Message):
         #     )
         part_title = part_data.title
         part_description = part_data.description
-        await message.answer(f"{part_title}\n{part_description}")
+        await event.send_message(f"{part_title}\n{part_description}")
 
         # if part_data.video_url:
         #     await message.answer("🎥 Видео:")
@@ -52,16 +60,16 @@ async def on_enter_self_support_course(message: Message):
         #     file = BufferedInputFile(video_data, "video.mp4")
         #     await message.answer_video(file)
 
-        await message.answer(f"❓ {part_data.question}")
+        await event.send_message(f"❓ {part_data.question}")
 
     else:
-        await message.answer(self_support_course_response.message)
-        await message.answer(
+        await event.send_message(self_support_course_response.message)
+        await event.send_message(
             "В ожидании следующей лекции вы можете узнать истории коллег.",
             keyboard=merge_inline_menus(
-                make_one_button_menu("Узнать истории коллег", "colleagues_stories"),
+                make_one_button_menu("Узнать истории коллег", {"cmd": "colleagues_stories"}),
                 TO_MAIN_MENU_BUTTON
-            )
+            ).get_json()
         )
 
 
@@ -72,23 +80,23 @@ async def on_user_answer(message: Message):
     congratulations_text = await get_text_from_db("congratulations_text")
     achievement_photo = await get_random_achievement_photo_url()
 
-    next_part = await get_self_support_course_part(message.peer_id)
+    next_part = await get_self_support_course_part(str(message.peer_id))
 
-    keyboard = TO_MAIN_MENU_BUTTON
+    keyboard = TO_MAIN_MENU_BUTTON.get_json()
 
     if next_part.success:
         keyboard = merge_inline_menus(
             NEXT_PART_BUTTON,
             TO_MAIN_MENU_BUTTON,
-        )
+        ).get_json()
 
-    await message.answer_photo(
-        photo=achievement_photo,
-        caption=congratulations_text,
+    await message.answer(
+        congratulations_text,
+        attachment=achievement_photo,
         keyboard=keyboard
     )
 
-    data = message.state_peer.payload
+    data = message.state_peer.payload if message.state_peer else {}
 
     await self_support_course_answer(
         vk_id=str(message.peer_id),

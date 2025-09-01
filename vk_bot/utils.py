@@ -1,18 +1,26 @@
 import aiohttp
-from typing import Any
+from typing import Any, Literal
 
-from vkbottle import Keyboard
+from vkbottle import Keyboard, BuiltinStateDispenser
 from vkbottle_schemas.keyboard import KeyboardButtonSchema
 
 
 def merge_inline_menus(first_menu: Keyboard, second_menu: Keyboard) -> Keyboard:
-    return Keyboard(one_time=True, inline=True).schema([
+    keyboard = Keyboard(one_time=False, inline=True)
+
+    keyboard.buttons = [
         *first_menu.buttons,
-        *second_menu.buttons,
-    ])
+        *second_menu.buttons
+    ]
+
+    return keyboard
 
 
-def make_one_button_menu(text: str, payload: dict[str, Any], _type: str = "callback") -> Keyboard:
+def make_one_button_menu(
+    text: str,
+    payload: dict[str, Any],
+    _type: Literal["text", "open_link", "callback", "location", "vkpay", "open_app"] = "callback"
+) -> Keyboard:
     return Keyboard(one_time=False, inline=True).schema([
         [KeyboardButtonSchema(label=text, payload=payload, type=_type).primary().get_json()],
     ])
@@ -24,3 +32,12 @@ async def fetch_audio_binary(url):
             if response.status != 200:
                 raise Exception(f"Ошибка загрузки: HTTP {response.status}")
             return await response.read()
+
+
+async def get_state_payload(dispenser: BuiltinStateDispenser, peer_id: int):
+    state_peer = await dispenser.get(peer_id)
+
+    if state_peer is None:
+        return {}
+
+    return state_peer.payload

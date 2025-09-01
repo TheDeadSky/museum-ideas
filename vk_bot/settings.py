@@ -12,6 +12,9 @@ WEBHOOK_PATH = os.getenv("WEBHOOK_PATH", "/vk-bot/callback")
 WEBAPP_HOST = os.getenv("WEBAPP_HOST", "0.0.0.0")
 WEBAPP_PORT = int(os.getenv("WEBAPP_PORT", "9001"))
 
+if TOKEN is None:
+    raise RuntimeError("VK_BOT_TOKEN not found")
+
 api = API(TOKEN)
 labeler = BotLabeler()
 state_dispenser = BuiltinStateDispenser()

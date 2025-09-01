@@ -1,6 +1,8 @@
-from vkbottle.bot import Message, BotLabeler
+from vkbottle.bot import Message, BotLabeler, rules, MessageEvent
+from vkbottle_types.events.bot_events import GroupEventType
 
-from menus import CONFIRMATION_MENU, TO_MAIN_MENU_BUTTON
+from actions.general import make_confirmation_menu
+from menus import TO_MAIN_MENU_BUTTON
 from services.api_service import send_feedback, get_text_from_db
 from models.feedback import Feedback
 from utils import make_one_button_menu
@@ -11,13 +13,26 @@ feedback_labeler = BotLabeler()
 
 @feedback_labeler.message(text="Обратная связь")
 @feedback_labeler.message(text="отзыв")
-@feedback_labeler.message(payload="feedback", state=GeneralStates.MAIN_MENU)
-async def on_feedback_handler(self, message: Message):
+async def on_feedback_message_handler(self, message: Message):
     feedback_entry_message = await get_text_from_db("feedback_entry_message")
 
     await message.answer(
         feedback_entry_message,
-        reply_markup=make_one_button_menu("Отмена", "menu")
+        keyboard=make_one_button_menu("Отмена", {"cmd": "menu"}).get_json()
+    )
+
+
+@feedback_labeler.raw_event(
+    GroupEventType.MESSAGE_EVENT,
+    MessageEvent,
+    rules.PayloadRule({"cmd": "feedback"})
+)
+async def on_feedback_event_handler(self, event: MessageEvent):
+    feedback_entry_message = await get_text_from_db("feedback_entry_message")
+
+    await event.send_message(
+        feedback_entry_message,
+        keyboard=make_one_button_menu("Отмена", {"cmd": "menu"}).get_json()
     )
 
 
@@ -28,26 +43,34 @@ async def handle_feedback(self, message: Message):
 
     await message.answer(
         "Подтвердите отправку сообщения:",
-        reply_markup=CONFIRMATION_MENU
+        keyboard=make_confirmation_menu(for_state=GeneralStates.FEEDBACK.value)
     )
 
 
-@feedback_labeler.message(payload="confirm", state=GeneralStates.FEEDBACK)
-async def confirm_feedback(self, message: Message):
+@feedback_labeler.raw_event(
+    GroupEventType.MESSAGE_EVENT,
+    MessageEvent,
+    rules.PayloadRule({"cmd": "confirm", "state": GeneralStates.FEEDBACK.value})
+)
+async def confirm_feedback(event: MessageEvent):
     data = {}
 
     await send_feedback(
         Feedback(
-            sm_id=str(message.peer_id),
-            feedback=data["feedback_text"]
+            sm_id=str(event.peer_id),
+            feedback_text=data["feedback_text"]
         )
     )
 
     feedback_accepted_message = await get_text_from_db("feedback_accepted_message")
 
-    await message.answer(feedback_accepted_message, reply_markup=TO_MAIN_MENU_BUTTON)
+    await event.send_message(feedback_accepted_message, keyboard=TO_MAIN_MENU_BUTTON.get_json())
 
 
-@feedback_labeler.message(payload="not_confirm", state=GeneralStates.FEEDBACK)
-async def not_confirm_feedback(self, message: Message):
-    await message.answer("Отправка отменена")
+@feedback_labeler.raw_event(
+    GroupEventType.MESSAGE_EVENT,
+    MessageEvent,
+    rules.PayloadRule({"cmd": "not_confirm", "state": GeneralStates.FEEDBACK.value})
+)
+async def not_confirm_feedback(event: MessageEvent):
+    await event.send_message("Отправка отменена", keyboard=TO_MAIN_MENU_BUTTON.get_json())

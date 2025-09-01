@@ -20,8 +20,8 @@ class SelfSupportCourseData(BaseModel):
 
 
 class SelfSupportCourseResponse(BaseResponse):
-    course_data: SelfSupportCourseData | None = None
-    part_data: SelfSupportCoursePartData | None = None
+    course_data: SelfSupportCourseData
+    part_data: SelfSupportCoursePartData
 
 
 class CourseUserAnswer(BaseModel):
