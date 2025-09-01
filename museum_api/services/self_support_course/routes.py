@@ -33,7 +33,7 @@ async def answer_self_support_course(
 
 
 @router.post("/notify-users-about-course")
-async def new_course_part_notification(db: Session = Depends(get_db)) -> CourseNotificationResponse:
+async def new_course_part_notification_tg(db: Session = Depends(get_db)) -> CourseNotificationResponse:
     """Get users telegram IDs split by course progress status"""
 
     return await new_course_part_notify(db)

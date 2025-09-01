@@ -4,10 +4,12 @@ import aiohttp
 from fastapi import HTTPException
 from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 
 from db.models import UserCourseProgress, Course, CoursePart, User
 from db.utils import get_user_by_sm_id
 from schemas import BaseResponse
+from services.self_support_course.utils import send_notifications_tg, send_notifications_vk
 from .schemas import (
     CourseUserAnswer,
     SelfSupportCourseData,
@@ -103,7 +105,7 @@ async def save_self_support_course_answer(answer_data: CourseUserAnswer, db: Ses
     )
 
 
-async def new_course_part_notify(db: Session) -> CourseNotificationResponse:
+async def new_course_part_notify_tg(db: Session) -> CourseNotificationResponse:
     try:
         # Get users with course progress
         users_with_progress_query = select(User.telegram_id).distinct().join(
@@ -149,6 +151,128 @@ async def new_course_part_notify(db: Session) -> CourseNotificationResponse:
                 success=False,
                 message=response_data.get("message")
             )
+
+    except Exception as e:
+        return CourseNotificationResponse(
+            success=False,
+            message=f"Error getting user notifications: {str(e)}"
+        )
+
+
+async def new_course_part_notify_vk(db: Session) -> CourseNotificationResponse:
+    try:
+        # Get users with course progress
+        users_with_progress_query = select(User.vk_id).distinct().join(
+            UserCourseProgress, User.id == UserCourseProgress.user_id
+        ).where(User.vk_id.isnot(None))
+
+        users_with_progress = db.execute(users_with_progress_query).scalars().all()
+        users_with_progress_ids = [str(vk_id) for vk_id in users_with_progress if vk_id]
+
+        # Get users without course progress but subscribed to a course
+        users_without_progress_query = select(User.vk_id).where(
+            and_(
+                User.vk_id.isnot(None),
+                ~User.id.in_(
+                    select(UserCourseProgress.user_id).distinct()
+                )
+            )
+        )
+
+        users_without_progress = db.execute(users_without_progress_query).scalars().all()
+        users_without_progress_ids = [str(vk_id) for vk_id in users_without_progress if vk_id]
+
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                "http://vk_bot:9001/api/notify-users-about-course",
+                json={
+                    "users_with_progress": users_with_progress_ids,
+                    "users_without_progress": users_without_progress_ids
+                }
+            ) as response:
+                response_data = await response.json()
+
+        if response_data.get("success"):
+            return CourseNotificationResponse(
+                success=True,
+                message=(
+                    f"Found {len(users_with_progress_ids)} users with progress and "
+                    f"{len(users_without_progress_ids)} users without progress"
+                )
+            )
+        else:
+            return CourseNotificationResponse(
+                success=False,
+                message=response_data.get("message")
+            )
+
+    except Exception as e:
+        return CourseNotificationResponse(
+            success=False,
+            message=f"Error getting user notifications: {str(e)}"
+        )
+
+
+async def new_course_part_notify(db: Session) -> CourseNotificationResponse:
+    try:
+        users_with_progress_query = select(
+            User.telegram_id,
+            User.vk_id
+        ).distinct().join(
+            UserCourseProgress, User.id == UserCourseProgress.user_id
+        ).where(
+            or_(
+                User.telegram_id.isnot(None),
+                User.vk_id.isnot(None)
+            )
+        )
+
+        users_with_progress = db.execute(users_with_progress_query).scalars().all()
+        users_with_progress_tg_ids = []
+        users_with_progress_vk_ids = []
+
+        for sm_ids in users_with_progress:
+            tg_id, vk_id = sm_ids
+            if tg_id:
+                users_with_progress_tg_ids.append(tg_id)
+            if vk_id:
+                users_with_progress_vk_ids.append(vk_id)
+
+        users_without_progress_query = select(
+            User.telegram_id,
+            User.vk_id
+        ).where(
+            and_(
+                or_(
+                    User.telegram_id.isnot(None),
+                    User.vk_id.isnot(None)
+                ),
+                ~User.id.in_(
+                    select(UserCourseProgress.user_id).distinct()
+                )
+            )
+        )
+
+        users_without_progress = db.execute(users_without_progress_query).scalars().all()
+        users_without_progress_tg_ids = []
+        users_without_progress_vk_ids = []
+
+        for sm_ids in users_without_progress:
+            tg_id, vk_id = sm_ids
+            if tg_id:
+                users_without_progress_tg_ids.append(tg_id)
+            if vk_id:
+                users_without_progress_vk_ids.append(vk_id)
+
+        tg_response = await send_notifications_tg(users_with_progress_tg_ids, users_without_progress_tg_ids)
+        vk_response = await send_notifications_vk(users_with_progress_vk_ids, users_without_progress_vk_ids)
+
+        return CourseNotificationResponse(
+            success=True,
+            message="All messages was send to bots",
+            tg_response=tg_response,
+            vk_response=vk_response,
+        )
 
     except Exception as e:
         return CourseNotificationResponse(

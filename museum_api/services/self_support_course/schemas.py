@@ -37,5 +37,11 @@ class CourseUserAnswer(BaseModel):
     sm_id: int
 
 
+class CourseNotificationSmResponse(BaseResponse):
+    users_with_progress: list[str]
+    users_without_progress: list[str]
+
+
 class CourseNotificationResponse(BaseResponse):
-    pass
+    tg_response: CourseNotificationSmResponse
+    vk_response: CourseNotificationSmResponse
