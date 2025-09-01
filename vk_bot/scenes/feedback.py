@@ -75,7 +75,7 @@ async def confirm_feedback(event: MessageEvent):
     await send_feedback(
         Feedback(
             sm_id=str(event.peer_id),
-            feedback_text=data["feedback_text"]
+            feedback=data["feedback_text"]
         )
     )
 
