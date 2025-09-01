@@ -4,7 +4,7 @@ from vkbottle_types.events.bot_events import GroupEventType
 from actions.general import make_confirmation_menu
 from menus import TO_MAIN_MENU_BUTTON
 from services.api_service import send_feedback, get_text_from_db
-from utils import make_one_button_menu
+from utils import make_one_button_menu, get_state_payload
 from states.feedback import FeedbackStates
 from models.feedback import Feedback
 from settings import state_dispenser
@@ -70,7 +70,7 @@ async def handle_feedback(message: Message):
     rules.PayloadRule({"cmd": "confirm", "state": FeedbackStates.CONFIRM.value})
 )
 async def confirm_feedback(event: MessageEvent):
-    data = {}
+    data = await get_state_payload(state_dispenser, event.peer_id)
 
     await send_feedback(
         Feedback(
