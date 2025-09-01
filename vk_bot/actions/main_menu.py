@@ -36,12 +36,12 @@ async def default_main_menu(
 
             for button in ordered_buttons:
                 if mode in button["modes"]:
-                    keyboard.add(Callback(button["text"], payload={"cmd": button["callback_data"]})).row()
+                    keyboard.add(Callback(button["text"], payload=button["callback_data"])).row()
 
             await send_method(main_menu_text, keyboard=keyboard.get_json())
             return
 
-    await send_method(main_menu_text, keyboard=MAIN_MENU)
+    await send_method(main_menu_text, keyboard=MAIN_MENU.get_json())
 
 
 def make_to_main_menu_menu(for_state: str | None = None):
