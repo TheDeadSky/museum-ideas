@@ -35,7 +35,7 @@ TO_MAIN_MENU_BUTTON = Keyboard(one_time=False, inline=True).schema([
 GET_SUPPORT_MENU = Keyboard(one_time=False, inline=True).schema([
     [KeyboardButtonSchema(
         label="Пройти курс самоподдержки",
-        payload={"cmd": "self_support"},
+        payload={"cmd": "self_support_course"},
         type="callback"
     ).primary().get_json()],
     [KeyboardButtonSchema(
