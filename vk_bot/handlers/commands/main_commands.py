@@ -16,7 +16,7 @@ async def start_handler(message: Message):
 
     is_registered_response = await get_is_registered(vk_id)
     if is_registered_response["success"]:
-        main_menu_text = await get_text_from_db("main_menu_message")
+        main_menu_text = await get_text_from_db("main_menu_text")
         await default_main_menu(
             message,
             main_menu_text
@@ -28,11 +28,11 @@ async def start_handler(message: Message):
         Registration.REGISTRATION_START
     )
 
-    greetings = await get_text_from_db("welcome_message")
+    greetings = await get_text_from_db("start_greetings")
 
-    await message.answer(greetings, keyboard=make_registration_button())
+    await message.answer(greetings, keyboard=make_registration_button().get_json())
 
 
 @commands_labeler.message(command="/dev_menu")
 async def menu_handler(message: Message):
-    await message.answer("Главное меню:", keyboard=MAIN_MENU)
+    await message.answer("Главное меню:", keyboard=MAIN_MENU.get_json())
