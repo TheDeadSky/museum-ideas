@@ -7,6 +7,7 @@ from services.api_service import send_feedback, get_text_from_db
 from models.feedback import Feedback
 from utils import make_one_button_menu
 from states.general_states import GeneralStates
+from settings import state_dispenser
 
 feedback_labeler = BotLabeler()
 
@@ -15,6 +16,11 @@ feedback_labeler = BotLabeler()
 @feedback_labeler.message(text="отзыв")
 async def on_feedback_message_handler(message: Message):
     feedback_entry_message = await get_text_from_db("feedback_entry_message")
+
+    await state_dispenser.set(
+        message.peer_id,
+        GeneralStates.FEEDBACK
+    )
 
     await message.answer(
         feedback_entry_message,
@@ -30,6 +36,11 @@ async def on_feedback_message_handler(message: Message):
 async def on_feedback_event_handler(event: MessageEvent):
     feedback_entry_message = await get_text_from_db("feedback_entry_message")
 
+    await state_dispenser.set(
+        event.peer_id,
+        GeneralStates.FEEDBACK
+    )
+
     await event.send_message(
         feedback_entry_message,
         keyboard=make_one_button_menu("Отмена", {"cmd": "main_menu"}, "callback").get_json()
@@ -40,6 +51,12 @@ async def on_feedback_event_handler(event: MessageEvent):
 async def handle_feedback(message: Message):
     data = {}
     data["feedback_text"] = message.text
+
+    await state_dispenser.set(
+        message.peer_id,
+        GeneralStates.FEEDBACK,
+        **data
+    )
 
     await message.answer(
         "Подтвердите отправку сообщения:",

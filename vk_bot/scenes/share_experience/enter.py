@@ -34,10 +34,9 @@ async def on_enter_share_experience(event: MessageEvent):
 
 @experience_enter_labeler.message(state=ShareExperienceStates.SHARE_EXPERIENCE)
 async def handle_experience_input(message: Message):
-    state_payload = message.state_peer.payload if message.state_peer else {}
-    state_payload.update({
+    state_payload = {
         "experience": message.text
-    })
+    }
     await state_dispenser.set(
         message.peer_id,
         ShareExperienceStates.CONFIRMATION,
