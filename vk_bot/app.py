@@ -1,3 +1,4 @@
+import os
 import logging
 
 from contextlib import asynccontextmanager
@@ -6,8 +7,9 @@ from fastapi.responses import PlainTextResponse
 from bot import bot
 from fastapi import BackgroundTasks, FastAPI, Request, Response
 
-confirmation_code: str = ""
-secret_key: str = ""
+
+confirmation_code: str = os.getenv("VK_CONFIRMATION_CODE", "")
+secret_key: str = os.getenv("VK_SECRET_KEY", "")
 
 
 @asynccontextmanager
@@ -39,8 +41,6 @@ async def vk_handler(req: Request, background_task: BackgroundTasks):
         logging.info("Send confirmation token: {}", confirmation_code)
         return Response(confirmation_code)
 
-    # If the secrets match, then the message definitely came from our bot
     if data["secret"] == secret_key:
-        # Running the process in the background, because the logic can be complicated
         background_task.add_task(bot.process_event, data)
     return Response("ok")
