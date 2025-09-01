@@ -1,3 +1,5 @@
+import logging
+
 from vkbottle.bot import BotLabeler, rules, MessageEvent
 from vkbottle_types.events.bot_events import GroupEventType
 
@@ -45,6 +47,7 @@ async def publish_yes(event: MessageEvent):
     })
 )
 async def publish_no(event: MessageEvent):
+    logging.info("publish no")
     state_payload = await get_state_payload(state_dispenser, event.peer_id)
     state_payload.update({
         "publish": False,

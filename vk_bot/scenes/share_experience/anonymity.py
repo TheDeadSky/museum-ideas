@@ -25,7 +25,7 @@ experience_anonymity_labeler = BotLabeler()
     })
 )
 async def handle_anonymous(event: MessageEvent):
-    logging.info(event.payload)
+    logging.info("anonymity yes")
     state_payload = await get_state_payload(state_dispenser, event.peer_id)
     state_payload.update({
         "is_anonymous": event.payload == "yes"

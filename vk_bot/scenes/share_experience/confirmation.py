@@ -7,7 +7,7 @@ from states.general_states import GeneralStates
 from states.share_experience import ShareExperienceStates
 from settings import state_dispenser
 from services.api_service import get_text_from_db
-
+from utils import get_state_payload
 
 experience_confirmation_labeler = BotLabeler()
 
@@ -21,9 +21,11 @@ experience_confirmation_labeler = BotLabeler()
     })
 )
 async def confirm(event: MessageEvent):
+    state_payload = await get_state_payload(state_dispenser, event.peer_id)
     await state_dispenser.set(
         event.peer_id,
-        ShareExperienceStates.PUBLISHING
+        ShareExperienceStates.PUBLISHING,
+        **state_payload
     )
     publish_question = await get_text_from_db("publish_message_question")
     await event.edit_message(
