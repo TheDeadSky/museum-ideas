@@ -17,7 +17,7 @@ class SelfSupportCoursePartData(BaseModel):
     image_url: str | None = None
     course_text: str | None = Field(default=None, description="Text of the course", max_length=4096)
     question: str | None = Field(default=None, description="Question for the user", max_length=4096)
-    publication_date: datetime
+    publication_date: datetime | None
 
 
 class SelfSupportCourseData(BaseModel):
@@ -43,5 +43,5 @@ class CourseNotificationSmResponse(BaseResponse):
 
 
 class CourseNotificationResponse(BaseResponse):
-    tg_response: CourseNotificationSmResponse
-    vk_response: CourseNotificationSmResponse
+    tg_response: CourseNotificationSmResponse | None = None
+    vk_response: CourseNotificationSmResponse | None = None
