@@ -142,9 +142,13 @@ async def new_course_part_notify(db: Session) -> CourseNotificationResponse:
         users_with_progress_vk_ids = []
 
         if sentry_imported:
-            capture_message("new_course_part_notify", "debug", {
-                "users_with_progress": str(users_with_progress)
-            })
+            capture_message(
+                "new_course_part_notify",
+                level="debug",
+                scope={
+                    "users_with_progress": str(users_with_progress)
+                }
+            )
 
         for sm_ids in users_with_progress:
             tg_id, vk_id = sm_ids
