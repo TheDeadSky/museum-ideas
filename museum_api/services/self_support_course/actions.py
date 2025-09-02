@@ -19,6 +19,12 @@ from .schemas import (
     CourseNotificationResponse
 )
 
+try:
+    from sentry_sdk import capture_exception, capture_message
+    sentry_imported = True
+except ImportError:
+    sentry_imported = False
+
 
 async def load_self_support_course(sm_id: int, db: Session) -> SelfSupportCourseResponse | BaseResponse:
     user = get_user_by_sm_id(db, sm_id)
@@ -135,8 +141,12 @@ async def new_course_part_notify(db: Session) -> CourseNotificationResponse:
         users_with_progress_tg_ids = []
         users_with_progress_vk_ids = []
 
+        if sentry_imported:
+            capture_message("new_course_part_notify", "debug", {
+                "users_with_progress": str(users_with_progress)
+            })
+
         for sm_ids in users_with_progress:
-            logging.info("sm_ids: ", sm_ids)
             tg_id, vk_id = sm_ids
             if tg_id:
                 users_with_progress_tg_ids.append(tg_id)
@@ -185,6 +195,8 @@ async def new_course_part_notify(db: Session) -> CourseNotificationResponse:
         )
 
     except Exception as e:
+        if sentry_imported:
+            capture_exception(e)
         return CourseNotificationResponse(
             success=False,
             message=f"Error getting user notifications: {str(e)}",
