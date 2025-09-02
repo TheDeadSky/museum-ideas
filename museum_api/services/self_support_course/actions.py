@@ -136,6 +136,7 @@ async def new_course_part_notify(db: Session) -> CourseNotificationResponse:
         users_with_progress_vk_ids = []
 
         for sm_ids in users_with_progress:
+            logging.info("sm_ids: ", sm_ids)
             tg_id, vk_id = sm_ids
             if tg_id:
                 users_with_progress_tg_ids.append(tg_id)
