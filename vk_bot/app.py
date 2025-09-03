@@ -1,4 +1,3 @@
-import os
 import logging
 
 from contextlib import asynccontextmanager
@@ -8,15 +7,15 @@ from bot import bot
 from fastapi import BackgroundTasks, FastAPI, Request, Response
 
 
-confirmation_code: str = os.getenv("VK_CONFIRMATION_CODE", "")
-secret_key: str = os.getenv("VK_SECRET_KEY", "")
+confirmation_code: str = ""
+secret_key: str = ""
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logging.info("Setup webhook")
-    # global confirmation_code, secret_key
-    # confirmation_code, secret_key = await bot.setup_webhook()
+    global confirmation_code, secret_key
+    confirmation_code, secret_key = await bot.setup_webhook()
     yield
 
 app = FastAPI(lifespan=lifespan)

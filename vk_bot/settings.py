@@ -11,6 +11,9 @@ WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 WEBHOOK_PATH = os.getenv("WEBHOOK_PATH", "/vk-bot/callback")
 WEBAPP_HOST = os.getenv("WEBAPP_HOST", "0.0.0.0")
 WEBAPP_PORT = int(os.getenv("WEBAPP_PORT", "9001"))
+VK_SECRET_KEY = os.getenv("VK_SECRET_KEY", "")
+VK_CONFIRMATION_CODE = os.getenv("VK_CONFIRMATION_CODE", "")
+
 
 if TOKEN is None:
     raise RuntimeError("VK_BOT_TOKEN not found")
@@ -21,4 +24,9 @@ state_dispenser = BuiltinStateDispenser()
 voice_uploader = VoiceMessageUploader(
     api=api
 )
-callback = BotCallback(url="https://deadsky-dev.ru/vk-bot/callback", title="my server")
+callback = BotCallback(
+    url="https://deadsky-dev.ru/vk-bot/callback",
+    title="my server",
+    secret_key=VK_SECRET_KEY,
+    api=api
+)
