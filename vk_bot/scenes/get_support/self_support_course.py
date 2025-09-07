@@ -9,7 +9,7 @@ from services.api_service import (
     self_support_course_answer
 )
 from states.general_states import GeneralStates
-from utils import make_one_button_menu, merge_inline_menus, get_state_payload
+from utils import make_one_button_menu, merge_inline_menus, get_state_payload, fetch_binary_data
 from settings import state_dispenser, video_uploader, photo_message_uploader
 
 
@@ -44,8 +44,9 @@ async def on_enter_self_support_course(event: MessageEvent):
         await event.send_message(f"{course_title}\n{course_description}")
 
         if part_data.image_url:
+            photo_data = await fetch_binary_data(part_data.image_url)
             photo = await photo_message_uploader.upload(
-                file_source=part_data.image_url
+                file_source=photo_data
             )
             await event.send_message(
                 attachment=photo
@@ -80,7 +81,12 @@ async def on_user_answer(message: Message):
     user_answer = message.text
 
     congratulations_text = await get_text_from_db("congratulations_text")
-    achievement_photo = await get_random_achievement_photo_url()
+
+    achievement_url = await get_random_achievement_photo_url()
+    achievement_binary = await fetch_binary_data(achievement_url)
+    achievement_photo = await photo_message_uploader.upload(
+        file_source=achievement_binary
+    )
 
     next_part = await get_self_support_course_part(str(message.peer_id))
 

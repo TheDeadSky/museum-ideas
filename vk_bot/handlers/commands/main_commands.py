@@ -1,11 +1,12 @@
-import aiohttp
 from vkbottle.bot import BotLabeler, Message
+
 from actions.main_menu import default_main_menu
 from actions.registration import make_registration_button
 from services.api_service import get_is_registered, get_text_from_db
 from menus import MAIN_MENU
 from states.registration import Registration
 from settings import state_dispenser, photo_message_uploader
+from utils import fetch_binary_data
 
 commands_labeler = BotLabeler()
 
@@ -47,9 +48,7 @@ async def test_vid_handler(message: Message):
 
 @commands_labeler.message(command="test_ph")
 async def test_ph_handler(message: Message):
-    async with aiohttp.ClientSession() as session:
-        async with session.get("https://ideasformuseums.com/botimages/img_lec1.jpg") as response:
-            photo_data = await response.read()
+    photo_data = await fetch_binary_data("https://ideasformuseums.com/botimages/img_lec1.jpg")
 
     photo = await photo_message_uploader.upload(
         photo_data,

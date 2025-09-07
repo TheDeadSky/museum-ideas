@@ -4,7 +4,7 @@ from vkbottle_types.events.bot_events import GroupEventType
 
 from menus import ONE_MORE_STORY_BUTTON, TO_MAIN_MENU_BUTTON
 from services.api_service import get_random_history
-from utils import fetch_audio_binary, make_one_button_menu, merge_inline_menus
+from utils import fetch_binary_data, make_one_button_menu, merge_inline_menus
 from settings import voice_uploader
 
 
@@ -69,7 +69,7 @@ async def on_enter_show_colleagues_stories(event: MessageEvent):
         #     display_text
         # )
 
-        audio_binary = await fetch_audio_binary(story.media_url)
+        audio_binary = await fetch_binary_data(story.media_url)
         buffered_audio = await voice_uploader.upload(
             audio_binary,
             title=f"story_voice_{event.peer_id}.ogg"
