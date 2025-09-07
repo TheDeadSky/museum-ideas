@@ -4,7 +4,7 @@ from actions.registration import make_registration_button
 from services.api_service import get_is_registered, get_text_from_db
 from menus import MAIN_MENU
 from states.registration import Registration
-from settings import state_dispenser
+from settings import state_dispenser, video_uploader
 
 commands_labeler = BotLabeler()
 
@@ -36,3 +36,13 @@ async def start_handler(message: Message):
 @commands_labeler.message(command="/dev_menu")
 async def menu_handler(message: Message):
     await message.answer("Главное меню:", keyboard=MAIN_MENU.get_json())
+
+
+@commands_labeler.message(command="/test_vid")
+async def test_vid_handler(message: Message):
+    video = await video_uploader.upload(
+        link="https://ideasformuseums.com/botimages/video/course-1_lecture-1.mp4",
+        peer_id=message.peer_id,
+    )
+    await message.answer("🎥 Видео:")
+    await message.answer(attachment=video)

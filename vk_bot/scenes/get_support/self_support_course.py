@@ -10,7 +10,7 @@ from services.api_service import (
 )
 from states.general_states import GeneralStates
 from utils import make_one_button_menu, merge_inline_menus, get_state_payload
-from settings import state_dispenser
+from settings import state_dispenser, video_uploader, photo_message_uploader
 
 
 self_support_course_labeler = BotLabeler()
@@ -43,22 +43,24 @@ async def on_enter_self_support_course(event: MessageEvent):
         course_description = course_data.description
         await event.send_message(f"{course_title}\n{course_description}")
 
-        # if part_data.image_url:
-        #     await message.answer_photo(
-        #         photo=part_data.image_url
-        #     )
+        if part_data.image_url:
+            photo = await photo_message_uploader.upload(
+                file_source=part_data.image_url
+            )
+            await event.send_message(
+                attachment=photo
+            )
         part_title = part_data.title
         part_description = part_data.description
         await event.send_message(f"{part_title}\n{part_description}")
 
-        # if part_data.video_url:
-        #     await message.answer("🎥 Видео:")
-        #     async with aiohttp.ClientSession() as session:
-        #         async with session.get(part_data.video_url) as response:
-        #             video_data = await response.read()
-
-        #     file = BufferedInputFile(video_data, "video.mp4")
-        #     await message.answer_video(file)
+        if part_data.video_url:
+            video = await video_uploader.upload(
+                link=part_data.video_url,
+                peer_id=event.peer_id,
+            )
+            await event.send_message("🎥 Видео:")
+            await event.send_message(attachment=video)
 
         await event.send_message(f"❓ {part_data.question}")
 
