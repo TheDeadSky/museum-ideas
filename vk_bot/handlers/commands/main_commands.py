@@ -38,7 +38,7 @@ async def menu_handler(message: Message):
     await message.answer("Главное меню:", keyboard=MAIN_MENU.get_json())
 
 
-@commands_labeler.message(command="/test_vid")
+@commands_labeler.message(command="test_vid")
 async def test_vid_handler(message: Message):
     video = await video_uploader.upload(
         link="https://ideasformuseums.com/botimages/video/course-1_lecture-1.mp4",
