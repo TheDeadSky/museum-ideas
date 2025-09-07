@@ -41,7 +41,7 @@ async def menu_handler(message: Message):
 @commands_labeler.message(command="test_vid")
 async def test_vid_handler(message: Message):
     video = await video_uploader.upload(
-        link="https://ideasformuseums.com/botimages/video/course-1_lecture-1.mp4",
+        file_source="https://ideasformuseums.com/botimages/video/course-1_lecture-1.mp4",
         peer_id=message.peer_id,
     )
     await message.answer("🎥 Видео:")
