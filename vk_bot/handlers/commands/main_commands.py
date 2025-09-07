@@ -43,6 +43,7 @@ async def test_vid_handler(message: Message):
     video = await video_uploader.upload(
         file_source="https://ideasformuseums.com/botimages/video/course-1_lecture-1.mp4",
         peer_id=message.peer_id,
+        owner_id=-229734251
     )
     await message.answer("🎥 Видео:")
     await message.answer(attachment=video)
