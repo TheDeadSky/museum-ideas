@@ -8,6 +8,7 @@ class SelfSupportCoursePartData(BaseModel):
     title: str
     description: str = Field(description="Text of the course", max_length=4096)
     video_url: str | None = None
+    vk_video_id: str | None = None
     image_url: str | None = None
     question: str | None = Field(default=None, description="Question for the user", max_length=4096)
     publication_date: datetime

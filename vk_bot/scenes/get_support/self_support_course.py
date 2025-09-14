@@ -62,6 +62,9 @@ async def on_enter_self_support_course(event: MessageEvent):
             )
             await event.send_message("🎥 Видео:")
             await event.send_message(attachment=video)
+        elif part_data.vk_video_id:
+            await event.send_message("🎥 Видео:")
+            await event.send_message(attachment=part_data.vk_video_id)
 
         await event.send_message(f"❓ {part_data.question}")
 

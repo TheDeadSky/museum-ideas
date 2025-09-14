@@ -87,6 +87,7 @@ async def load_self_support_course(sm_id: int, db: Session) -> SelfSupportCourse
         title=part_title,
         description=part_description,
         video_url=next_course_part.video_url,
+        vk_video_id=next_course_part.vk_video_id,
         image_url=next_course_part.image_url,
         course_text=next_course_part.description,
         question=next_course_part.question,
