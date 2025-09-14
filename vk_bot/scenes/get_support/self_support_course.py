@@ -55,14 +55,7 @@ async def on_enter_self_support_course(event: MessageEvent):
         part_description = part_data.description
         await event.send_message(f"{part_title}\n{part_description}")
 
-        if part_data.video_url:
-            video = await video_uploader.upload(
-                link=part_data.video_url,
-                peer_id=event.peer_id,
-            )
-            await event.send_message("🎥 Видео:")
-            await event.send_message(attachment=video)
-        elif part_data.vk_video_id:
+        if part_data.vk_video_id:
             await event.send_message("🎥 Видео:")
             await event.send_message(attachment=part_data.vk_video_id)
 
