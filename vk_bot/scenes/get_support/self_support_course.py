@@ -31,7 +31,7 @@ async def on_enter_self_support_course(event: MessageEvent):
         part_data = self_support_course_response.part_data
 
         state_payload = await get_state_payload(state_dispenser, event.peer_id)
-        state_payload.update({"part_id": part_data.id})
+        state_payload.update({"part_id": part_data.id, "is_last_part": part_data.is_last_part})
 
         await state_dispenser.set(
             event.peer_id,
@@ -75,8 +75,14 @@ async def on_enter_self_support_course(event: MessageEvent):
 @self_support_course_labeler.message(state=GeneralStates.SELF_SUPPORT_COURSE)
 async def on_user_answer(message: Message):
     user_answer = message.text
+    state_payload = message.state_peer.payload
+    is_last_part: bool = state_payload["is_last_part"]
 
-    congratulations_text = await get_text_from_db("congratulations_text")
+    await self_support_course_answer(
+        vk_id=str(message.peer_id),
+        part_id=state_payload["part_id"],
+        answer=user_answer
+    )
 
     achievement_url = await get_random_achievement_photo_url()
     achievement_binary = await fetch_binary_data(achievement_url)
@@ -84,29 +90,31 @@ async def on_user_answer(message: Message):
         file_source=achievement_binary
     )
 
-    next_part = await get_self_support_course_part(str(message.peer_id))
-
     keyboard = TO_MAIN_MENU_BUTTON.get_json()
 
-    if next_part.success:
-        keyboard = merge_inline_menus(
-            NEXT_PART_BUTTON,
-            TO_MAIN_MENU_BUTTON,
-        ).get_json()
+    if is_last_part:
+        last_part_text = get_text_from_db("last_course_part_text")
+        await message.answer(
+            last_part_text,
+            attachment=achievement_photo,
+            keyboard=keyboard
+        )
+    else:
+        congratulations_text = await get_text_from_db("congratulations_text")
 
-    await message.answer(
-        congratulations_text,
-        attachment=achievement_photo,
-        keyboard=keyboard
-    )
+        next_part = await get_self_support_course_part(str(message.peer_id))
 
-    data = message.state_peer.payload if message.state_peer else {}
+        if next_part.success:
+            keyboard = merge_inline_menus(
+                NEXT_PART_BUTTON,
+                TO_MAIN_MENU_BUTTON,
+            ).get_json()
 
-    await self_support_course_answer(
-        vk_id=str(message.peer_id),
-        part_id=data["part_id"],
-        answer=user_answer
-    )
+        await message.answer(
+            congratulations_text,
+            attachment=achievement_photo,
+            keyboard=keyboard
+        )
 
 
 @self_support_course_labeler.raw_event(
@@ -116,5 +124,5 @@ async def on_user_answer(message: Message):
         "cmd": "self_support_next_part"
     })
 )
-async def next_part(event: MessageEvent):
+async def next_part_handler(event: MessageEvent):
     await on_enter_self_support_course(event)

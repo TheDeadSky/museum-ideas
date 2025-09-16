@@ -12,6 +12,7 @@ class SelfSupportCoursePartData(BaseModel):
     image_url: str | None = None
     question: str | None = Field(default=None, description="Question for the user", max_length=4096)
     publication_date: datetime
+    is_last_part: bool = False
 
 
 class SelfSupportCourseData(BaseModel):

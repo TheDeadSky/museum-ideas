@@ -151,6 +151,7 @@ class CoursePart(Base):
     image_url: Mapped[Optional[str]] = mapped_column(String(500))
     question: Mapped[Optional[str]] = mapped_column(Text)
     date_of_publication: Mapped[Optional[DateTime]] = mapped_column(DateTime)
+    is_last_part: Mapped[bool] = mapped_column(default=False)
 
     course: Mapped[Optional["Course"]] = relationship(
         "Course", back_populates="parts"

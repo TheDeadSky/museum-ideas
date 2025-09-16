@@ -19,6 +19,7 @@ class SelfSupportCoursePartData(BaseModel):
     course_text: str | None = Field(default=None, description="Text of the course", max_length=4096)
     question: str | None = Field(default=None, description="Question for the user", max_length=4096)
     publication_date: datetime | None
+    is_last_part: bool = False
 
 
 class SelfSupportCourseData(BaseModel):

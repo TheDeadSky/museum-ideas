@@ -17,13 +17,13 @@ from scenes.get_support.show_colleagues_stories import ShowColleaguesStoriesScen
 class SelfSupportCourseScene(Scene, state="self-support-course"):
     @on.message.enter()
     async def on_enter(self, message: Message, from_user: User):
-        self_support_course_response = await get_self_support_course_part(from_user.id)
+        self_support_course_response = await get_self_support_course_part(str(from_user.id))
 
         if self_support_course_response.success:
             course_data = self_support_course_response.course_data
             part_data = self_support_course_response.part_data
 
-            await self.wizard.update_data(part_id=part_data.id)
+            await self.wizard.update_data(part_id=part_data.id, is_last_part=self_support_course_response.is_last_part)
 
             course_title = f"<b>{course_data.title}</b>"
             course_description = f"<i>{course_data.description}</i>"
@@ -66,27 +66,32 @@ class SelfSupportCourseScene(Scene, state="self-support-course"):
     @on.message()
     async def on_user_answer(self, message: Message):
         user_answer = message.text
+        data = await self.wizard.get_data()
+        is_last_part = data["is_last_part"]
 
-        congratulations_text = await get_text_from_db("congratulations_text")
+        await self.complete_course_part(message, user_answer)
+
         achievement_photo = await get_random_achievement_photo_url()
-
-        next_part = await get_self_support_course_part(message.from_user.id)
 
         markup = TO_MAIN_MENU_BUTTON
 
-        if next_part.success:
-            markup = merge_inline_menus(
-                NEXT_PART_BUTTON,
-                TO_MAIN_MENU_BUTTON,
-            )
+        if is_last_part:
+            caption = await get_text_from_db("last_course_part_text")
+        else:
+            caption = await get_text_from_db("congratulations_text")
+            next_part = await get_self_support_course_part(str(message.from_user.id))
+
+            if next_part.success:
+                markup = merge_inline_menus(
+                    NEXT_PART_BUTTON,
+                    TO_MAIN_MENU_BUTTON,
+                )
 
         await message.answer_photo(
             photo=achievement_photo,
-            caption=congratulations_text,
+            caption=caption,
             reply_markup=markup
         )
-
-        await self.complete_course_part(message, user_answer)
 
     async def complete_course_part(self, message: Message, user_answer: str = None):
         data = await self.wizard.get_data()

@@ -91,7 +91,8 @@ async def load_self_support_course(sm_id: int, db: Session) -> SelfSupportCourse
         image_url=next_course_part.image_url,
         course_text=next_course_part.description,
         question=next_course_part.question,
-        publication_date=next_course_part.date_of_publication
+        publication_date=next_course_part.date_of_publication,
+        is_last_part=next_course_part.is_last_part,
     )
 
     self_support_course_schema = SelfSupportCourseResponse(
