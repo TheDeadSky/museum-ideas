@@ -23,7 +23,7 @@ class SelfSupportCourseScene(Scene, state="self-support-course"):
             course_data = self_support_course_response.course_data
             part_data = self_support_course_response.part_data
 
-            await self.wizard.update_data(part_id=part_data.id, is_last_part=self_support_course_response.is_last_part)
+            await self.wizard.update_data(part_id=part_data.id, is_last_part=part_data.is_last_part)
 
             course_title = f"<b>{course_data.title}</b>"
             course_description = f"<i>{course_data.description}</i>"
