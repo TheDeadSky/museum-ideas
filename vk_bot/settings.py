@@ -37,7 +37,7 @@ photo_message_uploader = PhotoMessageUploader(
     api=api
 )
 callback = BotCallback(
-    url="https://deadsky-dev.ru/vk-bot/callback",
+    url="https://bothelp.ideasformuseums.com/vk-bot/callback",
     title="my server",
     secret_key=VK_SECRET_KEY,
     api=api,
