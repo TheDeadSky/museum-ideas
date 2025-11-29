@@ -8,4 +8,4 @@ pydantic-settings==2.2.1
 alembic==1.16.2
 python-dotenv==1.1.0 
 aiohttp
-sentry
+sentry-sdk==2.33.0
