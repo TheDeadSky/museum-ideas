@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   # MySQL Database
-  mysql:
+  help-mysql:
     image: mysql:8.0
     container_name: museum_mysql
     restart: unless-stopped
@@ -24,7 +24,7 @@ services:
       retries: 10
 
   # FastAPI Backend
-  museum_api:
+  help-museum_api:
     build:
       context: ./museum_api
       dockerfile: Dockerfile
@@ -38,10 +38,10 @@ services:
       - DB_USER=${MYSQL_USER}
       - DB_PASSWORD=${MYSQL_PASSWORD}
       - HOST=${API_HOST:-0.0.0.0}
-      - PORT=${API_PORT:-8000}
+      - PORT=${API_PORT:-8088}
       - DEBUG=${DEBUG:-false}
     ports:
-      - "8000:8000"
+      - "8088:8088"
     depends_on:
       mysql:
         condition: service_healthy
@@ -57,7 +57,7 @@ services:
       start_period: 40s
 
   # Telegram Bot
-  museum_bot:
+  help-museum_bot:
     build:
       context: ./museum_bot
       dockerfile: Dockerfile
@@ -69,14 +69,14 @@ services:
       - WEBHOOK_PATH=${WEBHOOK_PATH}
       - WEBAPP_HOST=${WEBAPP_HOST}
       - WEBAPP_PORT=${WEBAPP_PORT}
-      - API_BASE_URL=http://museum_api:8000
+      - API_BASE_URL=http://museum_api:9090
     depends_on:
       museum_api:
         condition: service_healthy
     networks:
       - museum_network
     ports:
-      - "9000:9000"
+      - "9090:9090"
     volumes:
       - ./museum_bot:/app
     healthcheck:
@@ -86,7 +86,7 @@ services:
       retries: 3
       start_period: 40s
 
-  vk_bot:
+  help-vk_bot:
     build:
       context: ./vk_bot
       dockerfile: Dockerfile
@@ -94,12 +94,12 @@ services:
     restart: unless-stopped
     environment:
       - HOST=${VK_BOT_HOST:-0.0.0.0}
-      - PORT=${VK_BOT_PORT:-9001}
+      - PORT=${VK_BOT_PORT:-9091}
       - DEBUG=${VK_DEBUG:-false}
       - VK_BOT_TOKEN=${VK_BOT_TOKEN}
       - WEBHOOK_PATH=${WEBHOOK_PATH:-/vk-bot/callback}
     ports:
-      - "9001:9001"
+      - "9091:9091"
     networks:
       - museum_network
     volumes:
