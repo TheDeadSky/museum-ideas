@@ -58,13 +58,13 @@ async def on_enter_show_colleagues_stories(event: MessageEvent):
         )
 
     elif story.content_type == "audio":
-        await event.send_message(
-            "Временно недоступно",
-            keyboard=merge_inline_menus(
-                ONE_MORE_STORY_BUTTON,
-                TO_MAIN_MENU_BUTTON
-            ).get_json()
-        )
+        # await event.send_message(
+        #     "Временно недоступно",
+        #     keyboard=merge_inline_menus(
+        #         ONE_MORE_STORY_BUTTON,
+        #         TO_MAIN_MENU_BUTTON
+        #     ).get_json()
+        # )
         # await message.answer(
         #     display_text
         # )
