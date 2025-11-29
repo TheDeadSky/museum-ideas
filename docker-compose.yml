@@ -4,7 +4,7 @@ services:
   # MySQL Database
   help-mysql:
     image: mysql:8.0
-    container_name: museum_mysql
+    container_name: help-mysql
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -28,7 +28,7 @@ services:
     build:
       context: ./museum_api
       dockerfile: Dockerfile
-    container_name: museum_api
+    container_name: help-museum_api
     restart: unless-stopped
     environment:
       - DATABASE_URL=mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql:${MYSQL_PORT:-3306}/${MYSQL_DATABASE}
@@ -43,7 +43,7 @@ services:
     ports:
       - "8088:8088"
     depends_on:
-      mysql:
+      help-mysql:
         condition: service_healthy
     networks:
       - museum_network
@@ -61,7 +61,7 @@ services:
     build:
       context: ./museum_bot
       dockerfile: Dockerfile
-    container_name: museum_bot
+    container_name: help-museum_bot
     restart: unless-stopped
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
@@ -71,7 +71,7 @@ services:
       - WEBAPP_PORT=${WEBAPP_PORT}
       - API_BASE_URL=http://museum_api:9090
     depends_on:
-      museum_api:
+      help-museum_api:
         condition: service_healthy
     networks:
       - museum_network
@@ -90,7 +90,7 @@ services:
     build:
       context: ./vk_bot
       dockerfile: Dockerfile
-    container_name: vk_bot
+    container_name: help-vk_bot
     restart: unless-stopped
     environment:
       - HOST=${VK_BOT_HOST:-0.0.0.0}
