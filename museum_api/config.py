@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     # Database settings
     DATABASE_URL: str = "mysql+pymysql://user:password@localhost:3306/museum_bot"
-    DB_HOST: str = "localhost"
+    DB_HOST: str = "help-mysql"
     DB_PORT: int = 3306
     DB_NAME: str = "museum_bot"
     DB_USER: str = "user"
