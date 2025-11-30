@@ -76,7 +76,7 @@ services:
     networks:
       - museum_network
     ports:
-      - "9090:3000"
+      - "9090:9000"
     volumes:
       - ./museum_bot:/app
     healthcheck:
