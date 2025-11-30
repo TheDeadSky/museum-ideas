@@ -32,7 +32,7 @@ services:
     restart: unless-stopped
     environment:
       - DATABASE_URL=mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@help-mysql:${MYSQL_PORT:-3306}/${MYSQL_DATABASE}
-      - DB_HOST=${DB_HOST:-mysql}
+      - DB_HOST=${DB_HOST:-help-mysql}
       - DB_PORT=${DB_PORT:-3306}
       - DB_NAME=${MYSQL_DATABASE}
       - DB_USER=${MYSQL_USER}
