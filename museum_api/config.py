@@ -9,20 +9,20 @@ class Settings(BaseSettings):
     DB_NAME: str = "museum_bot"
     DB_USER: str = "user"
     DB_PASSWORD: str = "password"
-    
+
     # Application settings
     APP_NAME: str = "Museum Bot Backend"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = False
-    
+
     # Server settings
     HOST: str = "0.0.0.0"
     PORT: int = 8000
-    
+
     class Config:
         env_file = ".env"
         case_sensitive = True
-    
+
     @property
     def database_url(self) -> str:
         """Construct database URL from individual components"""
@@ -30,4 +30,4 @@ class Settings(BaseSettings):
 
 
 # Create settings instance
-settings = Settings() 
+settings = Settings()
