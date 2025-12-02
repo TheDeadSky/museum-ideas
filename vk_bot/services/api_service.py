@@ -12,7 +12,7 @@ from models.course import SelfSupportCourseResponse, CourseUserAnswer
 
 
 async def get_self_support_course_part(vk_id: str) -> SelfSupportCourseResponse:
-    api_base_url = os.getenv("API_BASE_URL", "http://museum_api:8000")
+    api_base_url = os.getenv("API_BASE_URL", "http://help-museum_api:8000")
 
     async with aiohttp.ClientSession() as session:
         async with session.post(f"{api_base_url}/self-support-course/{vk_id}") as response:
@@ -25,7 +25,7 @@ async def get_self_support_course_part(vk_id: str) -> SelfSupportCourseResponse:
 
 
 async def self_support_course_answer(vk_id: str, part_id: int, answer: str):
-    api_base_url = os.getenv("API_BASE_URL", "http://museum_api:8000")
+    api_base_url = os.getenv("API_BASE_URL", "http://help-museum_api:8000")
     async with aiohttp.ClientSession() as session:
         async with session.post(
             url=f"{api_base_url}/self-support-course/{vk_id}/answer",
@@ -55,7 +55,7 @@ async def get_random_achievement_photo_url():
 
 async def get_is_registered(sm_id: str):
     """Check if a user is registered by social media ID (telegram_id or vk_id)"""
-    api_base_url = os.getenv("API_BASE_URL", "http://museum_api:8000")
+    api_base_url = os.getenv("API_BASE_URL", "http://help-museum_api:8000")
 
     async with aiohttp.ClientSession() as session:
         async with session.get(f"{api_base_url}/is-registered/{sm_id}") as response:
@@ -68,7 +68,7 @@ async def get_is_registered(sm_id: str):
 
 async def register(user_data: RegistrationData):
     """Register a new user by sending data to the /register endpoint."""
-    api_base_url = os.getenv("API_BASE_URL", "http://museum_api:8000")
+    api_base_url = os.getenv("API_BASE_URL", "http://help-museum_api:8000")
 
     async with aiohttp.ClientSession() as session:
         async with session.post(f"{api_base_url}/register", json=user_data.model_dump()) as response:
@@ -81,7 +81,7 @@ async def register(user_data: RegistrationData):
 
 async def get_random_history(vk_id: str) -> HistoryResponse:
     """Get random history from the museum API."""
-    api_base_url = os.getenv("API_BASE_URL", "http://museum_api:8000")
+    api_base_url = os.getenv("API_BASE_URL", "http://help-museum_api:8000")
 
     async with aiohttp.ClientSession() as session:
         async with session.get(f"{api_base_url}/random-history/{vk_id}") as response:
@@ -94,7 +94,7 @@ async def get_random_history(vk_id: str) -> HistoryResponse:
 
 
 async def send_experience(data: ShareExperienceData):
-    api_base_url = os.getenv("API_BASE_URL", "http://museum_api:8000")
+    api_base_url = os.getenv("API_BASE_URL", "http://help-museum_api:8000")
 
     async with aiohttp.ClientSession() as session:
         async with session.post(f"{api_base_url}/share-experience", json=data.model_dump()) as response:
@@ -106,7 +106,7 @@ async def send_experience(data: ShareExperienceData):
 
 
 async def send_feedback(data: Feedback):
-    api_base_url = os.getenv("API_BASE_URL", "http://museum_api:8000")
+    api_base_url = os.getenv("API_BASE_URL", "http://help-museum_api:8000")
 
     async with aiohttp.ClientSession() as session:
         async with session.post(f"{api_base_url}/send-feedback", json=data.model_dump()) as response:
