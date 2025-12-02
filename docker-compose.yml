@@ -69,7 +69,7 @@ services:
       - WEBHOOK_PATH=${WEBHOOK_PATH}
       - WEBAPP_HOST=${WEBAPP_HOST}
       - WEBAPP_PORT=${WEBAPP_PORT}
-      - API_BASE_URL=http://museum_api
+      - API_BASE_URL=http://help-museum_api:8000
     depends_on:
       help-museum_api:
         condition: service_healthy
