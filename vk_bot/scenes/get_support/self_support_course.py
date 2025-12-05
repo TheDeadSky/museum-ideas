@@ -24,7 +24,11 @@ self_support_course_labeler = BotLabeler()
     })
 )
 async def on_enter_self_support_course(event: MessageEvent):
-    self_support_course_response = await get_self_support_course_part(str(event.peer_id))
+    try:
+        self_support_course_response = await get_self_support_course_part(str(event.peer_id))
+    except Exception as e:
+        await event.send_message("Курс пройден. Спасибо!", keyboard=TO_MAIN_MENU_BUTTON.get_json())
+        return
 
     if self_support_course_response.success:
         course_data = self_support_course_response.course_data
