@@ -63,14 +63,14 @@ async def load_self_support_course(sm_id: int, db: Session) -> SelfSupportCourse
                 message=f"Not found finished course part for course(id={course.id}) & part({user_progress.part_id})"
             )
 
+    if not next_course_part:
+        raise HTTPException(status_code=404, detail="No course parts found")
+
     if next_course_part.date_of_publication > datetime.now():
         return BaseResponse(
             success=False,
             message=f"Следующая лекция выйдет {next_course_part.date_of_publication.strftime('%d.%m.%Y')}"
         )
-
-    if not next_course_part:
-        raise HTTPException(status_code=404, detail="No course parts found")
 
     course_title = course.course_name if course.course_name else ""
     course_description = course.description if course.description else ""
