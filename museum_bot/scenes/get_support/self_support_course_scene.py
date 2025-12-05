@@ -17,7 +17,10 @@ from scenes.get_support.show_colleagues_stories import ShowColleaguesStoriesScen
 class SelfSupportCourseScene(Scene, state="self-support-course"):
     @on.message.enter()
     async def on_enter(self, message: Message, from_user: User):
-        self_support_course_response = await get_self_support_course_part(str(from_user.id))
+        try:
+            self_support_course_response = await get_self_support_course_part(str(from_user.id))
+        except Exception as e:
+            await message.answer("Курс пройден. Спасибо!", reply_markup=TO_MAIN_MENU_BUTTON)
 
         if self_support_course_response.success:
             course_data = self_support_course_response.course_data
