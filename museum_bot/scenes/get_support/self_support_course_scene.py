@@ -21,6 +21,7 @@ class SelfSupportCourseScene(Scene, state="self-support-course"):
             self_support_course_response = await get_self_support_course_part(str(from_user.id))
         except Exception as e:
             await message.answer("Курс пройден. Спасибо!", reply_markup=TO_MAIN_MENU_BUTTON)
+            return
 
         if self_support_course_response.success:
             course_data = self_support_course_response.course_data
