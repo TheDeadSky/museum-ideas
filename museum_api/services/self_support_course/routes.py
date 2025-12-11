@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from db.database import get_db
+from schemas import BaseResponse
 from .schemas import SelfSupportCourseResponse, CourseUserAnswer, CourseNotificationResponse
 from .actions import (
     load_self_support_course,
@@ -27,7 +28,7 @@ async def get_self_support_course(
 async def answer_self_support_course(
     answer_data: CourseUserAnswer,
     db: Session = Depends(get_db)
-) -> SelfSupportCourseResponse:
+) -> BaseResponse:
     """Answer a self-support course question"""
     return await save_self_support_course_answer(answer_data, db)
 

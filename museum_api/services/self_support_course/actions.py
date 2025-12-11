@@ -10,13 +10,14 @@ from sqlalchemy import or_
 from db.models import UserCourseProgress, Course, CoursePart, User
 from db.utils import get_user_by_sm_id
 from schemas import BaseResponse
-from services.self_support_course.utils import send_notifications_tg, send_notifications_vk
+from services.self_support_course.utils import send_notifications_tg, send_notifications_vk, \
+    collect_users_for_notification
 from .schemas import (
     CourseUserAnswer,
     SelfSupportCourseData,
     SelfSupportCoursePartData,
     SelfSupportCourseResponse,
-    CourseNotificationResponse
+    CourseNotificationResponse, CourseNotificationSmResponse
 )
 
 try:
@@ -126,37 +127,35 @@ async def save_self_support_course_answer(answer_data: CourseUserAnswer, db: Ses
 
 
 async def new_course_part_notify(db: Session) -> CourseNotificationResponse:
+    tg_response = await new_course_part_notify_tg(db)
+    vk_response = await new_course_part_notify_vk(db)
+
+    return CourseNotificationResponse(
+        success=True,
+        message="All messages was send to bots",
+        tg_response=tg_response,
+        vk_response=vk_response,
+    )
+
+
+async def new_course_part_notify_tg(db: Session) -> CourseNotificationSmResponse  | None:
     try:
         users_with_progress_query = select(
             User.telegram_id
         ).distinct().join(
             UserCourseProgress, User.id == UserCourseProgress.user_id
         ).where(
-            or_(
-                User.telegram_id.isnot(None)
-            )
+            User.telegram_id.isnot(None)
         )
 
         users_with_progress = db.execute(users_with_progress_query).scalars().all()
-        users_with_progress_tg_ids = []
-        users_with_progress_vk_ids = []
-
-        for sm_ids in users_with_progress:
-            tg_id = sm_ids
-            vk_id = None
-            if tg_id:
-                users_with_progress_tg_ids.append(tg_id)
-            if vk_id:
-                users_with_progress_vk_ids.append(vk_id)
+        users_with_progress = list(users_with_progress) if users_with_progress else []
 
         users_without_progress_query = select(
             User.telegram_id
         ).where(
             and_(
-                or_(
-                    User.telegram_id.isnot(None),
-                    User.vk_id.isnot(None)
-                ),
+                User.telegram_id.isnot(None),
                 ~User.id.in_(
                     select(UserCourseProgress.user_id).distinct()
                 )
@@ -164,38 +163,23 @@ async def new_course_part_notify(db: Session) -> CourseNotificationResponse:
         )
 
         users_without_progress = db.execute(users_without_progress_query).scalars().all()
-        users_without_progress_tg_ids = []
-        users_without_progress_vk_ids = []
+        users_without_progress = list(users_without_progress) if users_without_progress else []
 
-        for sm_ids in users_without_progress:
-            tg_id = sm_ids
-            vk_id = None
-            if tg_id:
-                users_without_progress_tg_ids.append(tg_id)
-            if vk_id:
-                users_without_progress_vk_ids.append(vk_id)
-
-        tg_response = await send_notifications_tg(users_with_progress_tg_ids, users_without_progress_tg_ids)
-
-        try:
-            vk_response = await send_notifications_vk(users_with_progress_vk_ids, users_without_progress_vk_ids)
-        except Exception as e:
-            logging.error("", e)
-            vk_response = None
-
-        return CourseNotificationResponse(
-            success=True,
-            message="All messages was send to bots",
-            tg_response=tg_response,
-            vk_response=vk_response,
-        )
+        return await send_notifications_tg(users_with_progress, users_without_progress)
 
     except Exception as e:
         if sentry_imported:
             capture_exception(e)
-        return CourseNotificationResponse(
-            success=False,
-            message=f"Error getting user notifications: {str(e)}",
-            tg_response=None,
-            vk_response=None,
-        )
+        return None
+
+
+async def new_course_part_notify_vk(db: Session) -> CourseNotificationSmResponse | None:
+    try:
+        users_with_progress, users_without_progress = await collect_users_for_notification(db, User.vk_id)
+
+        return await send_notifications_vk(users_with_progress, users_without_progress)
+
+    except Exception as e:
+        if sentry_imported:
+            capture_exception(e)
+        return None

@@ -6,6 +6,7 @@ from fastapi.responses import PlainTextResponse
 from bot import bot
 from fastapi import BackgroundTasks, FastAPI, Request, Response
 
+from bot_actions_api.bot_actions_routes import vk_bot_actions_router
 
 confirmation_code: str = ""
 secret_key: str = ""
@@ -19,6 +20,7 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan)
+app.include_router(vk_bot_actions_router)
 
 
 @app.get("/health")
