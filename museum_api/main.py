@@ -14,6 +14,10 @@ from services.feedback.routes import router as feedback_router
 from services.share_experience.routes import router as share_experience_router
 from services.history.routes import router as history_router
 
+import asyncio
+
+asyncio.get_event_loop().run_until_complete()
+
 try:
     import sentry_sdk
     sentry_sdk.init("https://9485268e8cff4009a5e148f812472fad@errors.asarta.ru/12", environment="museum_api")

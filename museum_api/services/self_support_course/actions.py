@@ -140,30 +140,7 @@ async def new_course_part_notify(db: Session) -> CourseNotificationResponse:
 
 async def new_course_part_notify_tg(db: Session) -> CourseNotificationSmResponse  | None:
     try:
-        users_with_progress_query = select(
-            User.telegram_id
-        ).distinct().join(
-            UserCourseProgress, User.id == UserCourseProgress.user_id
-        ).where(
-            User.telegram_id.isnot(None)
-        )
-
-        users_with_progress = db.execute(users_with_progress_query).scalars().all()
-        users_with_progress = list(users_with_progress) if users_with_progress else []
-
-        users_without_progress_query = select(
-            User.telegram_id
-        ).where(
-            and_(
-                User.telegram_id.isnot(None),
-                ~User.id.in_(
-                    select(UserCourseProgress.user_id).distinct()
-                )
-            )
-        )
-
-        users_without_progress = db.execute(users_without_progress_query).scalars().all()
-        users_without_progress = list(users_without_progress) if users_without_progress else []
+        users_with_progress, users_without_progress = await collect_users_for_notification(db, User.telegram_id)
 
         return await send_notifications_tg(users_with_progress, users_without_progress)
 
