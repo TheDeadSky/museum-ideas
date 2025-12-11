@@ -3,9 +3,8 @@ import logging
 from datetime import datetime
 
 from fastapi import HTTPException
-from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
+
 
 from db.models import UserCourseProgress, Course, CoursePart, User
 from db.utils import get_user_by_sm_id
