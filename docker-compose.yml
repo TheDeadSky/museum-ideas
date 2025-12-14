@@ -1,7 +1,4 @@
-version: '3.8'
-
 services:
-  # MySQL Database
   help-mysql:
     image: mysql:8.0
     container_name: help-mysql
@@ -11,6 +8,7 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: "Europe/Moscow"
     ports:
       - "3306:3306"
     volumes:
@@ -23,7 +21,6 @@ services:
       timeout: 20s
       retries: 10
 
-  # FastAPI Backend
   help-museum_api:
     build:
       context: ./museum_api
@@ -40,6 +37,7 @@ services:
       - HOST=${API_HOST:-0.0.0.0}
       - PORT=${API_PORT:-8000}
       - DEBUG=${DEBUG:-false}
+      - TZ=Europe/Moscow
     ports:
       - "8088:8000"
     depends_on:
@@ -56,7 +54,6 @@ services:
       retries: 3
       start_period: 40s
 
-  # Telegram Bot
   help-museum_bot:
     build:
       context: ./museum_bot
@@ -70,6 +67,7 @@ services:
       - WEBAPP_HOST=${WEBAPP_HOST}
       - WEBAPP_PORT=${WEBAPP_PORT}
       - API_BASE_URL=http://help-museum_api:8000
+      - TZ=Europe/Moscow
     depends_on:
       help-museum_api:
         condition: service_healthy
@@ -98,6 +96,7 @@ services:
       - DEBUG=${VK_DEBUG:-false}
       - VK_BOT_TOKEN=${VK_BOT_TOKEN}
       - WEBHOOK_PATH=${WEBHOOK_PATH:-/vk-bot/callback}
+      - TZ=Europe/Moscow
     ports:
       - "9091:9001"
     networks:
