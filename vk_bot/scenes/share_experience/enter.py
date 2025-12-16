@@ -36,6 +36,7 @@ async def on_enter_share_experience(event: MessageEvent):
 
 @experience_enter_labeler.message(AttachmentTypeRule("audio"), state=ShareExperienceStates.SHARE_EXPERIENCE)
 async def handle_experience_input(message: Message):
+    print("WE ARE IN AUDIO HANDLER")
     voice_attachment : MessagesMessageAttachment = next(
         filter(lambda attachment: attachment.type == "audio", message.attachments)
     )
