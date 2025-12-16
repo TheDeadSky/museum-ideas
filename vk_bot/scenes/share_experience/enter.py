@@ -1,3 +1,5 @@
+import logging
+
 from vkbottle.bot import BotLabeler, rules, MessageEvent, Message
 from vkbottle.dispatch.rules.base import AttachmentTypeRule
 from vkbottle_types.events.bot_events import GroupEventType
@@ -36,7 +38,7 @@ async def on_enter_share_experience(event: MessageEvent):
 
 @experience_enter_labeler.message(AttachmentTypeRule("audio"), state=ShareExperienceStates.SHARE_EXPERIENCE)
 async def handle_experience_input(message: Message):
-    print("WE ARE IN AUDIO HANDLER")
+    logging.info("WE ARE IN AUDIO HANDLER")
     voice_attachment : MessagesMessageAttachment = next(
         filter(lambda attachment: attachment.type == "audio", message.attachments)
     )
@@ -59,6 +61,7 @@ async def handle_experience_input(message: Message):
 
 @experience_enter_labeler.message(state=ShareExperienceStates.SHARE_EXPERIENCE)
 async def handle_experience_input(message: Message):
+    logging.info("WE ARE IN TEXT HANDLER")
     state_payload = {
         "experience": message.text,
         "experience_type": "text"
