@@ -1,5 +1,7 @@
 from vkbottle.bot import BotLabeler, rules, MessageEvent, Message
+from vkbottle.dispatch.rules.base import AttachmentTypeRule
 from vkbottle_types.events.bot_events import GroupEventType
+from vkbottle_types.objects import MessagesMessageAttachment
 
 from actions.general import make_confirmation_menu
 from services.api_service import get_text_from_db
@@ -32,10 +34,15 @@ async def on_enter_share_experience(event: MessageEvent):
     )
 
 
-@experience_enter_labeler.message(state=ShareExperienceStates.SHARE_EXPERIENCE)
+@experience_enter_labeler.message(AttachmentTypeRule("audio"), state=ShareExperienceStates.SHARE_EXPERIENCE)
 async def handle_experience_input(message: Message):
+    voice_attachment : MessagesMessageAttachment = next(
+        filter(lambda attachment: attachment.type == "audio", message.attachments)
+    )
+
     state_payload = {
-        "experience": message.text
+        "experience": voice_attachment.audio.url,
+        "experience_type": "audio"
     }
     await state_dispenser.set(
         message.peer_id,
@@ -47,3 +54,25 @@ async def handle_experience_input(message: Message):
         thank_message,
         keyboard=make_confirmation_menu(ShareExperienceStates.CONFIRMATION.value)
     )
+
+
+@experience_enter_labeler.message(state=ShareExperienceStates.SHARE_EXPERIENCE)
+async def handle_experience_input(message: Message):
+    state_payload = {
+        "experience": message.text,
+        "experience_type": "text"
+    }
+    await state_dispenser.set(
+        message.peer_id,
+        ShareExperienceStates.CONFIRMATION,
+        **state_payload
+    )
+    thank_message = await get_text_from_db("save_message_confirmation")
+    await message.answer(
+        thank_message,
+        keyboard=make_confirmation_menu(ShareExperienceStates.CONFIRMATION.value)
+    )
+
+
+
+

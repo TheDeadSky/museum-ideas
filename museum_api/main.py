@@ -1,5 +1,7 @@
 from contextlib import asynccontextmanager
 
+import sentry_sdk
+
 from fastapi import (
     FastAPI,
     Depends
@@ -14,11 +16,8 @@ from services.feedback.routes import router as feedback_router
 from services.share_experience.routes import router as share_experience_router
 from services.history.routes import router as history_router
 
-try:
-    import sentry_sdk
-    sentry_sdk.init("https://9485268e8cff4009a5e148f812472fad@errors.asarta.ru/12", environment="museum_api")
-except ImportError:
-    pass
+sentry_sdk.init("https://9485268e8cff4009a5e148f812472fad@errors.asarta.ru/12", environment="museum_api")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
