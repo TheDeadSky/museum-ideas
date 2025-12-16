@@ -44,7 +44,7 @@ async def handle_experience_audio_input(message: Message):
     )
 
     state_payload = {
-        "experience": voice_attachment.audio_message.url,
+        "experience": voice_attachment.audio_message.link_ogg,
         "experience_type": "audio"
     }
     await state_dispenser.set(
