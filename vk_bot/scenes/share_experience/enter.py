@@ -5,8 +5,6 @@ from vkbottle.dispatch.rules.base import AttachmentTypeRule
 from vkbottle_types.events.bot_events import GroupEventType
 from vkbottle_types.objects import MessagesMessageAttachment
 
-from bot import bot
-
 from actions.general import make_confirmation_menu
 from services.api_service import get_text_from_db
 from utils import make_one_button_menu
