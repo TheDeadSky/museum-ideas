@@ -40,7 +40,7 @@ async def on_enter_share_experience(event: MessageEvent):
 async def handle_experience_audio_input(message: Message):
     logging.getLogger("vkbottle").debug("WE ARE IN AUDIO HANDLER")
     voice_attachment : MessagesMessageAttachment = next(
-        filter(lambda attachment: attachment.type == "audio", message.attachments)
+        filter(lambda attachment: attachment.type == "audio_message", message.attachments)
     )
 
     state_payload = {
