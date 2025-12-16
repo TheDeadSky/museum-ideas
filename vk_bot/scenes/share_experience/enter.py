@@ -36,7 +36,7 @@ async def on_enter_share_experience(event: MessageEvent):
     )
 
 
-@experience_enter_labeler.message(AttachmentTypeRule("audio"), state=ShareExperienceStates.SHARE_EXPERIENCE)
+@experience_enter_labeler.message(AttachmentTypeRule("audio_message"), state=ShareExperienceStates.SHARE_EXPERIENCE)
 async def handle_experience_audio_input(message: Message):
     logging.getLogger("vkbottle").debug("WE ARE IN AUDIO HANDLER")
     voice_attachment : MessagesMessageAttachment = next(
