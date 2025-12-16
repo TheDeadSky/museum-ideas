@@ -1,3 +1,4 @@
+import logging
 import sentry_sdk
 from vkbottle import Bot
 
@@ -10,6 +11,8 @@ from scenes.feedback import feedback_labeler
 from settings import state_dispenser, labeler, api, callback
 
 sentry_sdk.init("https://9485268e8cff4009a5e148f812472fad@errors.asarta.ru/12")
+
+logging.getLogger("vkbottle").setLevel("DEBUG")
 
 bot = Bot(
     api=api,
