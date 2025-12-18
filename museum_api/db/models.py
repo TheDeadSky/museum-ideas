@@ -35,7 +35,7 @@ class User(Base):
     occupation: Mapped[Optional[str]] = mapped_column(String(255))
     registration_date: Mapped[Optional[DateTime]] = mapped_column(
         DateTime,
-        default=datetime.now()
+        default=datetime.now
     )
     course_subscribe: Mapped[Optional[int]] = mapped_column(
         ForeignKey("courses.id")
@@ -79,13 +79,13 @@ class Story(Base):
     is_agreed_to_publication: Mapped[bool] = mapped_column(Boolean, default=False)
     updated: Mapped[Optional[DateTime]] = mapped_column(
         DateTime,
-        default=datetime.now(),
-        onupdate=datetime.now()
+        default=datetime.now,
+        onupdate=datetime.now
     )
     created: Mapped[Optional[DateTime]] = mapped_column(
         DateTime,
-        default=datetime.now(),
-        onupdate=datetime.now()
+        default=datetime.now,
+        onupdate=datetime.now
     )
 
     user: Mapped[Optional["User"]] = relationship(
@@ -111,7 +111,7 @@ class UserQuestion(Base):
     parent_id: Mapped[Optional[int]] = mapped_column(Integer)
     question_date: Mapped[Optional[DateTime]] = mapped_column(
         DateTime,
-        default=datetime.now()
+        default=datetime.now
     )
     answer_date: Mapped[Optional[DateTime]] = mapped_column(
         DateTime
