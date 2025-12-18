@@ -1,6 +1,6 @@
 import io
 
-from aiogram import Router
+from aiogram import Router, F
 from aiogram.fsm.scene import ScenesManager
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message
@@ -13,7 +13,7 @@ from services.api_service import get_text_from_db, get_is_registered
 
 mc_router = Router()
 
-
+@mc_router.message(F.text.casefold().in_({"старт", "начать"}))
 @mc_router.message(CommandStart())
 async def command_start_handler(message: Message, scenes: ScenesManager) -> None:
     await scenes.close()
