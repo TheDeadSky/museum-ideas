@@ -20,11 +20,13 @@ async def save_user_experience(data: ShareExperienceData, db: Session) -> BaseRe
     if user.lastname:
         user_name += " " + user.lastname
 
-    if user_name is None and user.tg_username:
-        user_name = user.tg_username
-    else:
-        sm_type = "vk" if user.vk_id else "tg"
-        user_name = f"Unknown_{sm_type}_{data.sm_id}"
+    sm_type = "vk" if user.vk_id else "tg"
+
+    if user_name is None:
+        if sm_type == "tg" and user.tg_username:
+            user_name = user.tg_username
+        else:
+            user_name = f"Unknown_{sm_type}_{data.sm_id}"
 
     content_type = ContentType.TEXT
     if data.experience_type == "audio":
