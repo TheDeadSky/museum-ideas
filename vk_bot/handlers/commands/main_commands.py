@@ -12,8 +12,8 @@ commands_labeler = BotLabeler()
 
 
 @commands_labeler.message(command="start")
-@commands_labeler.message(text="[Нн]ачать")
-@commands_labeler.message(text="[Сс]тарт")
+@commands_labeler.message(text="Начать")
+@commands_labeler.message(text="Старт")
 async def start_handler(message: Message):
     vk_id = str(message.from_id)
 

@@ -9,7 +9,7 @@ from services.api_service import get_text_from_db
 main_menu_labeler = BotLabeler()
 
 
-@main_menu_labeler.message(text="[Мм]еню")
+@main_menu_labeler.message(text="Меню")
 @main_menu_labeler.message(command="menu")
 async def on_main_menu_handler(message: Message):
     main_menu_text = await get_text_from_db("main_menu_text")
