@@ -8,11 +8,23 @@ from .enums import ExperienceStatus, ContentType
 
 
 async def save_user_experience(data: ShareExperienceData, db: Session) -> BaseResponse:
-    user = get_user_by_sm_id(db, data.sm_id)
+    user = get_user_by_sm_id(db, int(data.sm_id))
+
+    if not user:
+        return BaseResponse(
+            success=False,
+            message=f"User not found by sm_id: {data.sm_id}."
+        )
 
     user_name = user.firstname
     if user.lastname:
         user_name += " " + user.lastname
+
+    if user_name is None and user.tg_username:
+        user_name = user.tg_username
+    else:
+        sm_type = "vk" if user.vk_id else "tg"
+        user_name = f"Unknown_{sm_type}_{data.sm_id}"
 
     content_type = ContentType.TEXT
     if data.experience_type == "audio":
