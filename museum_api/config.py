@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     TG_BOT_API_BASE_URL: str = "http://help-museum_bot:9000"
     VK_BOT_API_BASE_URL: str = "http://help-vk_bot:9001"
 
+    SENTRY_DSN = "https://your-sentry-dsn@some.example.com/1"
+    SENTRY_ENVIRONMENT = "development"
+
     class Config:
         env_file = ".env"
         case_sensitive = True

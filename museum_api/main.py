@@ -20,7 +20,7 @@ from modules import (
     common
 )
 
-sentry_sdk.init("https://9485268e8cff4009a5e148f812472fad@errors.asarta.ru/12", environment="museum_api")
+sentry_sdk.init(settings.SENTRY_DSN, environment=settings.SENTRY_ENVIRONMENT)
 
 
 @asynccontextmanager
