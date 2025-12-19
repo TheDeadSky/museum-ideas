@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from db.models import User
 from db.utils import get_user_by_sm_id
-from .schemas import RegistrationData, RegistrationResponse
+from .models import RegistrationData, RegistrationResponse
 from .utils import raise_if_user_exist
 from .exceptions import RegistrationException, UserExistException
 

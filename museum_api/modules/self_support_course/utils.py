@@ -2,7 +2,7 @@ from sqlalchemy import select, and_
 from sqlalchemy.orm import Session
 
 from db.models import User, UserCourseProgress
-from .schemas import CourseNotificationSmResponse
+from .models import CourseNotificationSmResponse
 from services.tg_bot_api_service.service import TgBotAPIService
 from services.vk_bot_api_service.service import VkBotAPIService
 
@@ -69,7 +69,7 @@ async def collect_users_for_notification(db: Session, member=User.telegram_id):
     )
 
     users_with_progress = db.execute(users_with_progress_query).scalars().all()
-    users_with_progress = list(users_with_progress) if users_with_progress else []
+    users_with_progress = list(users_with_progress) if users_with_progress is None else []
 
     users_without_progress_query = select(
         member
@@ -83,6 +83,6 @@ async def collect_users_for_notification(db: Session, member=User.telegram_id):
     )
 
     users_without_progress = db.execute(users_without_progress_query).scalars().all()
-    users_without_progress = list(users_without_progress) if users_without_progress else []
+    users_without_progress = list(users_without_progress) if users_without_progress is None else []
 
     return users_with_progress, users_without_progress

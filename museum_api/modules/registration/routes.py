@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from db.database import get_db
 from .actions import registration, RegistrationException, is_user_registered
-from .schemas import RegistrationData, RegistrationResponse
+from .models import RegistrationData, RegistrationResponse
 
 router = APIRouter()
 

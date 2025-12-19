@@ -5,9 +5,9 @@ from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 
 from db.database import get_db
-from schemas import BaseResponse
+from shared.models import BaseResponse
 from .actions import render_feedbacks_page, save_user_feedback, get_feedbacks, answer_feedback
-from .schemas import FeedbackListResponse, FeedbackAnswerData, IncomingFeedback
+from .models import FeedbackListResponse, FeedbackAnswerData, IncomingFeedback
 
 router = APIRouter()
 

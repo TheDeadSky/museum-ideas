@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from schemas import BaseResponse
+from shared.models import BaseResponse
 
 
 class SelfSupportCourseBeginnerData(BaseModel):
@@ -36,7 +36,7 @@ class SelfSupportCourseResponse(BaseResponse):
 class CourseUserAnswer(BaseModel):
     answer: str | None = None
     part_id: int
-    sm_id: int
+    sm_id: str
 
 
 class CourseNotificationSmResponse(BaseResponse):

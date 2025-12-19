@@ -5,9 +5,9 @@ from sqlalchemy.orm import Session
 
 from db.utils import define_user_platform, get_user_by_sm_id
 from db.models import User, UserQuestion
-from schemas import BaseResponse
+from shared.models import BaseResponse
 from services.vk_bot_api_service.service import VkBotAPIService
-from .schemas import Feedback, FeedbackAnswerData, FeedbackListResponse, IncomingFeedback
+from .models import Feedback, FeedbackAnswerData, FeedbackListResponse, IncomingFeedback
 from services.tg_bot_api_service.service import TgBotAPIService
 
 

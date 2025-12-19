@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from schemas import BaseResponse
+from shared.models import BaseResponse
 
 
 class RegistrationData(BaseModel):

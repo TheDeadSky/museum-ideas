@@ -2,8 +2,7 @@ from typing import List
 
 from pydantic import BaseModel
 
-from schemas import BaseResponse
-from shared.models import ApiResponse
+from shared.models import ApiResponse, BaseResponse
 
 
 class MessageForAll(BaseModel):

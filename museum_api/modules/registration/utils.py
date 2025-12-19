@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
 from db.models import User
-from .schemas import RegistrationData
+from .models import RegistrationData
 from .exceptions import RegistrationException, UserExistException
 
 

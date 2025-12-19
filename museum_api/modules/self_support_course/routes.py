@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from db.database import get_db
-from schemas import BaseResponse
-from .schemas import SelfSupportCourseResponse, CourseUserAnswer, CourseNotificationResponse
+from shared.models import BaseResponse
+from .models import SelfSupportCourseResponse, CourseUserAnswer, CourseNotificationResponse
 from .actions import (
     load_self_support_course,
     save_self_support_course_answer,

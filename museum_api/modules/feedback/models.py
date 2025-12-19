@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from schemas import BaseResponse
+from shared.models import BaseResponse
 
 
 class IncomingFeedback(BaseModel):

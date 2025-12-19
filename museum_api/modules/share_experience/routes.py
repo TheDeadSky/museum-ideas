@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 
 from db.database import get_db
 from .actions import save_user_experience
-from .schemas import ShareExperienceData
-from schemas import BaseResponse
+from .models import ShareExperienceData
+from shared.models import BaseResponse
 
 router = APIRouter()
 

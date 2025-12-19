@@ -2,14 +2,14 @@ from datetime import datetime
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-
+from sentry_sdk import capture_exception
 
 from db.models import UserCourseProgress, Course, CoursePart, User
 from db.utils import get_user_by_sm_id
-from schemas import BaseResponse
+from shared.models import BaseResponse
 from modules.self_support_course.utils import send_notifications_tg, send_notifications_vk, \
     collect_users_for_notification
-from .schemas import (
+from .models import (
     CourseUserAnswer,
     SelfSupportCourseData,
     SelfSupportCoursePartData,
@@ -17,14 +17,8 @@ from .schemas import (
     CourseNotificationResponse, CourseNotificationSmResponse
 )
 
-try:
-    from sentry_sdk import capture_exception, capture_message
-    sentry_imported = True
-except ImportError:
-    sentry_imported = False
 
-
-async def load_self_support_course(sm_id: int, db: Session) -> SelfSupportCourseResponse | BaseResponse:
+async def load_self_support_course(sm_id: str, db: Session) -> SelfSupportCourseResponse:
     user = get_user_by_sm_id(db, sm_id)
     if not user:
         raise HTTPException(status_code=404, detail=f"User not found by sm_id({sm_id})")
@@ -56,7 +50,7 @@ async def load_self_support_course(sm_id: int, db: Session) -> SelfSupportCourse
                 CoursePart.order_number == finished_course_part_number + 1,
             ).first()
         else:
-            return BaseResponse(
+            return SelfSupportCourseResponse(
                 success=False,
                 message=f"Not found finished course part for course(id={course.id}) & part({user_progress.part_id})"
             )
@@ -64,10 +58,13 @@ async def load_self_support_course(sm_id: int, db: Session) -> SelfSupportCourse
     if not next_course_part:
         raise HTTPException(status_code=404, detail="No course parts found")
 
-    if next_course_part.date_of_publication > datetime.now():
-        return BaseResponse(
+    if next_course_part.date_of_publication > datetime.now():  # type: ignore
+        return SelfSupportCourseResponse(
             success=False,
-            message=f"Следующая лекция выйдет {next_course_part.date_of_publication.strftime('%d.%m.%Y')}"
+            message=(
+                "Следующая лекция выйдет "
+                f"{next_course_part.date_of_publication.strftime('%d.%m.%Y')}"  # type: ignore
+            )
         )
 
     course_title = course.course_name if course.course_name else ""
@@ -89,7 +86,7 @@ async def load_self_support_course(sm_id: int, db: Session) -> SelfSupportCourse
         image_url=next_course_part.image_url,
         course_text=next_course_part.description,
         question=next_course_part.question,
-        publication_date=next_course_part.date_of_publication,
+        publication_date=next_course_part.date_of_publication,  # type: ignore
         is_last_part=next_course_part.is_last_part,
     )
 
@@ -135,25 +132,29 @@ async def new_course_part_notify(db: Session) -> CourseNotificationResponse:
     )
 
 
-async def new_course_part_notify_tg(db: Session) -> CourseNotificationSmResponse  | None:
+async def new_course_part_notify_tg(db: Session) -> CourseNotificationSmResponse | None:
     try:
         users_with_progress, users_without_progress = await collect_users_for_notification(db, User.telegram_id)
 
         return await send_notifications_tg(users_with_progress, users_without_progress)
 
     except Exception as e:
-        if sentry_imported:
-            capture_exception(e)
+        capture_exception(e)
         return None
 
 
 async def new_course_part_notify_vk(db: Session) -> CourseNotificationSmResponse | None:
     try:
-        users_with_progress, users_without_progress = await collect_users_for_notification(db, User.vk_id)
+        users_with_progress, users_without_progress = await collect_users_for_notification(
+            db,
+            User.vk_id
+        )
 
-        return await send_notifications_vk(users_with_progress, users_without_progress)
+        return await send_notifications_vk(
+            users_with_progress,
+            users_without_progress
+        )
 
     except Exception as e:
-        if sentry_imported:
-            capture_exception(e)
+        capture_exception(e)
         return None

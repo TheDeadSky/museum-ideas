@@ -1,14 +1,14 @@
 from sqlalchemy.orm import Session
 
 from db.models import Story
-from db.utils import get_user_by_sm_id
-from schemas import BaseResponse
-from .schemas import ShareExperienceData
+from db.utils import define_user_platform, get_user_by_sm_id
+from shared.models import BaseResponse
+from .models import ShareExperienceData
 from .enums import ExperienceStatus, ContentType
 
 
 async def save_user_experience(data: ShareExperienceData, db: Session) -> BaseResponse:
-    user = get_user_by_sm_id(db, int(data.sm_id))
+    user = get_user_by_sm_id(db, data.sm_id)
 
     if not user:
         return BaseResponse(
@@ -17,16 +17,16 @@ async def save_user_experience(data: ShareExperienceData, db: Session) -> BaseRe
         )
 
     user_name = user.firstname
-    if user.lastname:
+    if user_name and user.lastname:
         user_name += " " + user.lastname
 
-    sm_type = "vk" if user.vk_id else "tg"
+    platform = define_user_platform(db, user)
 
     if user_name is None:
-        if sm_type == "tg" and user.tg_username:
+        if platform == "tg" and user.tg_username:
             user_name = user.tg_username
         else:
-            user_name = f"Unknown_{sm_type}_{data.sm_id}"
+            user_name = f"Unknown_{platform}_{data.sm_id}"
 
     content_type = ContentType.TEXT
     if data.experience_type == "audio":

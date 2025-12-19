@@ -2,6 +2,11 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 
+class BaseResponse(BaseModel):
+    success: bool
+    message: str | None = None
+
+
 class SendFeedbackAnswerRequest(BaseModel):
     """
     Request model for sending feedback answer to user
