@@ -19,6 +19,10 @@ class Settings(BaseSettings):
     HOST: str = "0.0.0.0"
     PORT: int = 8000
 
+    # API Service settings
+    TG_BOT_API_BASE_URL: str = "http://help-museum_bot:9000"
+    VK_BOT_API_BASE_URL: str = "http://help-vk_bot:9001"
+
     class Config:
         env_file = ".env"
         case_sensitive = True
@@ -29,5 +33,4 @@ class Settings(BaseSettings):
         return f"mysql+pymysql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
 
-# Create settings instance
 settings = Settings()

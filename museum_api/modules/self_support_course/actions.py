@@ -1,5 +1,3 @@
-import logging
-
 from datetime import datetime
 
 from fastapi import HTTPException
@@ -9,7 +7,7 @@ from sqlalchemy.orm import Session
 from db.models import UserCourseProgress, Course, CoursePart, User
 from db.utils import get_user_by_sm_id
 from schemas import BaseResponse
-from services.self_support_course.utils import send_notifications_tg, send_notifications_vk, \
+from modules.self_support_course.utils import send_notifications_tg, send_notifications_vk, \
     collect_users_for_notification
 from .schemas import (
     CourseUserAnswer,

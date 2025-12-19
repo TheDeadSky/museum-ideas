@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from db.models import Story, StoryHistory
-from services.share_experience.enums import ExperienceStatus
+from modules.share_experience.enums import ExperienceStatus
 
 
 def get_viewed_story_ids(db: Session, user_id: int) -> list[int]:

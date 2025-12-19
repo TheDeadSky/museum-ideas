@@ -1,18 +1,24 @@
 from datetime import datetime
 
-import aiohttp
-
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
-from db.utils import get_user_by_sm_id
+from db.utils import define_user_platform, get_user_by_sm_id
 from db.models import User, UserQuestion
 from schemas import BaseResponse
+from services.vk_bot_api_service.service import VkBotAPIService
 from .schemas import Feedback, FeedbackAnswerData, FeedbackListResponse, IncomingFeedback
+from services.tg_bot_api_service.service import TgBotAPIService
 
 
 async def save_user_feedback(feedback: IncomingFeedback, db: Session):
     user = get_user_by_sm_id(db, feedback.sm_id)
+
+    if not user:
+        return BaseResponse(
+            success=False,
+            message=f"User not found by sm_id: {feedback.sm_id}"
+        )
 
     user_question = UserQuestion(
         user_id=user.id,
@@ -56,13 +62,13 @@ async def get_feedbacks(
         message="Отзывы получены",
         feedbacks=[Feedback(
             id=fb.id,
-            user_id=fb.user_id,
-            user_name=fb.user.firstname,
-            question=fb.question,
-            question_date=fb.question_date,
+            user_id=fb.user_id,  # type: ignore
+            user_name=fb.user.firstname,  # type: ignore
+            question=fb.question,  # type: ignore
+            question_date=fb.question_date,  # type: ignore
             answer=fb.answer,
-            answer_date=fb.answer_date,
-            viewed=fb.viewed
+            answer_date=fb.answer_date,  # type: ignore
+            viewed=fb.viewed  # type: ignore
         ) for fb in feedbacks]
     )
 
@@ -79,8 +85,14 @@ async def render_feedbacks_page():
 async def answer_feedback(answer_data: FeedbackAnswerData, db: Session):
     feedback = db.query(UserQuestion).filter(UserQuestion.id == answer_data.feedback_id).first()
 
+    if not feedback:
+        return BaseResponse(
+            success=False,
+            message=f"Feedback(id={answer_data.feedback_id}) not found"
+        )
+
     feedback.answer = answer_data.answer
-    feedback.answer_date = datetime.now()
+    feedback.answer_date = datetime.now()  # type: ignore
 
     db.commit()
     db.refresh(feedback)
@@ -122,13 +134,25 @@ async def send_answer_to_user(feedback_answer: FeedbackAnswerData, db: Session):
         }
     )
 
-    async with aiohttp.ClientSession() as session:
-        async with session.post(
-            "http://museum_bot:9000/api/send-feedback-answer",
-            json={
-                "sm_id": user.telegram_id,
-                "answer_text": feedback_answer.answer,
-                "feedback_text": feedback.question
-            }
-        ) as response:
-            return await response.json()
+    platform = define_user_platform(db, user)
+
+    if platform == "tg":
+        api_service = TgBotAPIService()
+        sm_id = user.telegram_id
+    elif platform == "vk":
+        api_service = VkBotAPIService()
+        sm_id = user.vk_id
+    else:
+        raise ValueError(f"Unknown platform: '{platform}'")
+
+    if not sm_id:
+        raise ValueError(
+            f"User({user.id}|{user.firstname} {user.lastname}) has no any social media id."
+        )
+
+    response = await api_service.send_feedback_answer(
+        sm_id=sm_id,
+        answer_text=feedback_answer.answer,
+        feedback_text=feedback.question or ""
+    )
+    return response
