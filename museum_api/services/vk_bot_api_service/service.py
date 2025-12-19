@@ -50,7 +50,7 @@ class VkBotAPIService:
             feedback_text=feedback_text
         )
 
-        url = f"{self.base_url}/api/send-feedback-answer"
+        url = f"{self.base_url}/vk-bot/send-feedback-answer"
 
         async with aiohttp.ClientSession() as session:
             async with session.post(url, json=request_data.model_dump()) as response:
@@ -77,7 +77,7 @@ class VkBotAPIService:
             sm_ids=vk_ids
         )
 
-        url = f"{self.base_url}/api/send-message-to-all"
+        url = f"{self.base_url}/vk-bot/send-message-to-all"
 
         async with aiohttp.ClientSession() as session:
             async with session.post(url, json=request_data.model_dump()) as response:
@@ -104,7 +104,7 @@ class VkBotAPIService:
             users_without_progress=users_without_progress
         )
 
-        url = f"{self.base_url}/api/notify-users-about-course"
+        url = f"{self.base_url}/vk-bot/notify-users-about-course"
 
         async with aiohttp.ClientSession() as session:
             async with session.post(url, json=request_data.model_dump()) as response:

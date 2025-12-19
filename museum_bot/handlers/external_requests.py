@@ -4,6 +4,7 @@ from aiohttp import web
 from aiogram import Bot
 
 from menus import TO_MAIN_MENU_BUTTON
+from models.base import SendMessageToAllRequest
 from models.feedback import FeedbackAnswer
 from models.course import CourseNotificationData
 from utils import make_one_button_menu, merge_inline_menus
@@ -136,6 +137,35 @@ class ExternalRequestHandler:
             "message": "Users notified successfully"
         })
 
+    async def send_message_to_all(self, request: web.Request) -> web.Response:
+        json_body = await request.json()
+
+        message_data = SendMessageToAllRequest(**json_body)
+
+        queue = 10
+
+        for tg_id in message_data.sm_ids:
+            try:
+                await self.bot.send_message(
+                    chat_id=tg_id,
+                    text=message_data.message,
+                    reply_markup=TO_MAIN_MENU_BUTTON
+                )
+
+            except Exception as e:
+                logger.error(f"Error sending message to user {tg_id}: {str(e)}")
+                continue
+
+            queue -= 1
+            if queue == 0:
+                await asyncio.sleep(2)
+                queue = 10
+
+        return web.json_response({
+            "success": True,
+            "message": "Everything sent."
+        })
+
 
 def setup_external_routes(app: web.Application, bot: Bot) -> None:
     """Setup external request routes"""
@@ -145,3 +175,4 @@ def setup_external_routes(app: web.Application, bot: Bot) -> None:
     app.router.add_post("/api/send-feedback-answer", handler.send_feedback_response)
     app.router.add_post("/api/send-message", handler.send_message_to_user)
     app.router.add_post("/api/notify-users-about-course", handler.notify_users_about_course)
+    app.router.add_post("/api/send-message-to-all", handler.send_message_to_all)
