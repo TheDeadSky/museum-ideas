@@ -14,8 +14,3 @@ class MessageForAllResponse(BaseResponse):
     platform: str = "all"
     tg_response: ApiResponse | None = None
     vk_response: ApiResponse | None = None
-
-
-class TgAPIMessageForAll(BaseModel):
-    message: str
-    tg_ids: List[int]

@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from db.models import User
-from modules.common.schemas import MessageForAll, MessageForAllResponse
+from modules.common.models import MessageForAll, MessageForAllResponse
 from services.tg_bot_api_service.service import TgBotAPIService
 from services.vk_bot_api_service.service import VkBotAPIService
 from shared.models import ApiResponse

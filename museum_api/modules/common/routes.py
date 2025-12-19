@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from db.database import get_db
 from modules.common.actions import send_message_for_all
-from modules.common.schemas import MessageForAll
+from modules.common.models import MessageForAll
 
 router = APIRouter()
 
