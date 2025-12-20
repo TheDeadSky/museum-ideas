@@ -76,7 +76,7 @@ async def get_feedbacks(
 
 
 async def render_feedbacks_page():
-    with open("services/feedback/templates/feedbacks.html", "r") as file:
+    with open("modules/feedback/templates/feedbacks.html", "r") as file:
         html_content = file.read()
 
     return html_content
