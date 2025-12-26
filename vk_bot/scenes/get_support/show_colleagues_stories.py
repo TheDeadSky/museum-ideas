@@ -72,6 +72,7 @@ async def on_enter_show_colleagues_stories(event: MessageEvent):
         audio_binary = await fetch_binary_data(story.media_url)
         buffered_audio = await voice_uploader.upload(
             audio_binary,
+            peer_id=event.peer_id,
             title=f"story_voice_{event.peer_id}.ogg"
         )
 
