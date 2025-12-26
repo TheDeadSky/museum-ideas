@@ -37,11 +37,6 @@ async def get_random_history(sm_id: str, db: Session) -> HistoryResponse:
         if random_story.is_anonymous is not None
         else False
     )
-    is_agreed_to_publication = (
-        random_story.is_agreed_to_publication
-        if random_story.is_agreed_to_publication is not None
-        else False
-    )
 
     history_data = HistoryData(
         author=history_author if history_author else None,
