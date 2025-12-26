@@ -37,6 +37,11 @@ async def get_random_history(sm_id: str, db: Session) -> HistoryResponse:
         if random_story.is_anonymous is not None
         else False
     )
+    is_agreed_to_publication = (
+        random_story.is_agreed_to_publication
+        if random_story.is_agreed_to_publication is not None
+        else False
+    )
 
     history_data = HistoryData(
         author=history_author if history_author else None,
@@ -46,7 +51,7 @@ async def get_random_history(sm_id: str, db: Session) -> HistoryResponse:
         link=random_story.link or None,
         is_anonymous=is_anonymous,
         is_agreed_to_publication=is_agreed_to_publication,
-        content_type=random_story.content_type,
+        content_type=random_story.content_type or "text",
     )
 
     history_response = HistoryResponse(
